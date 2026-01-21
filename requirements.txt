@@ -1,0 +1,16 @@
+# Second-Generation Immigrant Marriage Patterns Dashboard
+# Python dependencies for deployment
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Web framework
+dash>=2.14.0
+dash-bootstrap-components>=1.5.0
+
+# Visualization
+plotly>=5.18.0
+
+# Production server
+gunicorn>=21.0.0

@@ -1,0 +1,641 @@
+YEAR,ORIGIN_REGION,MARRIAGE_TYPE,WEIGHTED_COUNT
+1880.0,Africa,Co-ethnic 2nd gen,1144.46
+1880.0,Africa,Interethnic 1st gen,102.39
+1880.0,Africa,Interethnic 2nd gen,156.78
+1880.0,Africa,Native stock (3rd+),6760.36
+1880.0,Asia,Native stock (3rd+),121.98
+1880.0,Atlantic,Native stock (3rd+),102.39
+1880.0,British Isles,Co-ethnic 1st gen,643.84
+1880.0,British Isles,Co-ethnic 2nd gen,98.08
+1880.0,British Isles,Interethnic 1st gen,609.22
+1880.0,British Isles,Interethnic 2nd gen,475.88
+1880.0,British Isles,Native stock (3rd+),555.97
+1880.0,British Isles,Same region 1st gen,96.69
+1880.0,Caribbean,Co-ethnic 1st gen,388.03
+1880.0,Caribbean,Co-ethnic 2nd gen,490.91999999999996
+1880.0,Caribbean,Interethnic 1st gen,119.24
+1880.0,Caribbean,Interethnic 2nd gen,261.55
+1880.0,Caribbean,Native stock (3rd+),2044.02
+1880.0,Central Europe,Co-ethnic 1st gen,25093.04
+1880.0,Central Europe,Co-ethnic 2nd gen,33222.87
+1880.0,Central Europe,Interethnic 1st gen,25225.22
+1880.0,Central Europe,Interethnic 2nd gen,36082.82
+1880.0,Central Europe,Native stock (3rd+),197248.06
+1880.0,Central Europe,Same region 1st gen,6146.18
+1880.0,Central Europe,Same region 2nd gen,7779.96
+1880.0,East Asia,Co-ethnic 2nd gen,192.26
+1880.0,Eastern Europe,Co-ethnic 1st gen,701.06
+1880.0,Eastern Europe,Co-ethnic 2nd gen,402.28
+1880.0,Eastern Europe,Interethnic 1st gen,468.8
+1880.0,Eastern Europe,Interethnic 2nd gen,294.69
+1880.0,Eastern Europe,Native stock (3rd+),1113.73
+1880.0,Europe,Co-ethnic 1st gen,87014.64
+1880.0,Europe,Co-ethnic 2nd gen,128898.3
+1880.0,Europe,Interethnic 1st gen,34145.09
+1880.0,Europe,Interethnic 2nd gen,32333.63
+1880.0,Europe,Native stock (3rd+),162777.62
+1880.0,Mixed,Co-ethnic 2nd gen,4029.3
+1880.0,Mixed,Interethnic 1st gen,13638.18
+1880.0,Mixed,Interethnic 2nd gen,23414.9
+1880.0,Mixed,Native stock (3rd+),28169.26
+1880.0,North America,Co-ethnic 1st gen,17135.68
+1880.0,North America,Co-ethnic 2nd gen,16844.54
+1880.0,North America,Interethnic 1st gen,5381.82
+1880.0,North America,Interethnic 2nd gen,8443.77
+1880.0,North America,Native stock (3rd+),43349.77
+1880.0,Oceania,Interethnic 1st gen,119.29
+1880.0,Oceania,Native stock (3rd+),97.73
+1880.0,Scandinavia,Co-ethnic 1st gen,84.94
+1880.0,Scandinavia,Native stock (3rd+),193.01999999999998
+1880.0,South America,Interethnic 1st gen,203.05
+1880.0,South America,Native stock (3rd+),470.02
+1880.0,South Asia,Native stock (3rd+),100.74
+1880.0,Southeast Asia,Interethnic 1st gen,117.45
+1880.0,Southeast Asia,Native stock (3rd+),90.59
+1880.0,Southern Europe,Co-ethnic 1st gen,110085.03
+1880.0,Southern Europe,Co-ethnic 2nd gen,133545.82
+1880.0,Southern Europe,Interethnic 1st gen,25389.01
+1880.0,Southern Europe,Interethnic 2nd gen,28696.05
+1880.0,Southern Europe,Native stock (3rd+),110820.34
+1880.0,Southern Europe,Same region 1st gen,1804.01
+1880.0,Southern Europe,Same region 2nd gen,377.2
+1880.0,Unknown,Co-ethnic 1st gen,107.45
+1880.0,Unknown,Interethnic 1st gen,213.3
+1880.0,Unknown,Interethnic 2nd gen,193.82999999999998
+1880.0,Unknown,Native stock (3rd+),1849.15
+1880.0,Western Europe,Co-ethnic 1st gen,7704.37
+1880.0,Western Europe,Co-ethnic 2nd gen,6190.42
+1880.0,Western Europe,Interethnic 1st gen,2427.2599999999998
+1880.0,Western Europe,Interethnic 2nd gen,3328.08
+1880.0,Western Europe,Native stock (3rd+),11546.08
+1900.0,Africa,Co-ethnic 2nd gen,202.0
+1900.0,Africa,Interethnic 2nd gen,100.0
+1900.0,Africa,Native stock (3rd+),2007.0
+1900.0,Asia,Interethnic 2nd gen,101.0
+1900.0,Atlantic,Interethnic 2nd gen,100.0
+1900.0,British Isles,Co-ethnic 1st gen,8826.0
+1900.0,British Isles,Co-ethnic 2nd gen,9528.0
+1900.0,British Isles,Interethnic 1st gen,2605.0
+1900.0,British Isles,Interethnic 2nd gen,5414.0
+1900.0,British Isles,Native stock (3rd+),3415.0
+1900.0,British Isles,Same region 1st gen,201.0
+1900.0,Caribbean,Co-ethnic 1st gen,704.0
+1900.0,Caribbean,Co-ethnic 2nd gen,200.0
+1900.0,Caribbean,Interethnic 1st gen,101.0
+1900.0,Caribbean,Interethnic 2nd gen,600.0
+1900.0,Caribbean,Native stock (3rd+),2306.0
+1900.0,Central Europe,Co-ethnic 1st gen,38902.0
+1900.0,Central Europe,Co-ethnic 2nd gen,80133.0
+1900.0,Central Europe,Interethnic 1st gen,47844.0
+1900.0,Central Europe,Interethnic 2nd gen,111327.0
+1900.0,Central Europe,Native stock (3rd+),372348.0
+1900.0,Central Europe,Same region 1st gen,7923.0
+1900.0,Central Europe,Same region 2nd gen,17842.0
+1900.0,East Asia,Co-ethnic 1st gen,301.0
+1900.0,East Asia,Co-ethnic 2nd gen,200.0
+1900.0,East Asia,Interethnic 2nd gen,301.0
+1900.0,East Asia,Native stock (3rd+),201.0
+1900.0,Eastern Europe,Co-ethnic 1st gen,8623.0
+1900.0,Eastern Europe,Co-ethnic 2nd gen,3408.0
+1900.0,Eastern Europe,Interethnic 1st gen,1103.0
+1900.0,Eastern Europe,Interethnic 2nd gen,2208.0
+1900.0,Eastern Europe,Native stock (3rd+),2208.0
+1900.0,Eastern Europe,Same region 1st gen,200.0
+1900.0,Europe,Co-ethnic 1st gen,118736.0
+1900.0,Europe,Co-ethnic 2nd gen,389118.0
+1900.0,Europe,Interethnic 1st gen,84256.0
+1900.0,Europe,Interethnic 2nd gen,128347.0
+1900.0,Europe,Native stock (3rd+),300659.0
+1900.0,Middle East,Interethnic 2nd gen,101.0
+1900.0,Mixed,Co-ethnic 2nd gen,11637.0
+1900.0,Mixed,Interethnic 1st gen,42518.0
+1900.0,Mixed,Interethnic 2nd gen,88047.0
+1900.0,Mixed,Native stock (3rd+),87566.0
+1900.0,North America,Co-ethnic 1st gen,49234.0
+1900.0,North America,Co-ethnic 2nd gen,52758.0
+1900.0,North America,Interethnic 1st gen,14950.0
+1900.0,North America,Interethnic 2nd gen,39427.0
+1900.0,North America,Native stock (3rd+),124962.0
+1900.0,Oceania,Co-ethnic 1st gen,200.0
+1900.0,Oceania,Interethnic 2nd gen,400.0
+1900.0,Scandinavia,Interethnic 2nd gen,101.0
+1900.0,Scandinavia,Native stock (3rd+),100.0
+1900.0,South America,Interethnic 1st gen,101.0
+1900.0,South America,Native stock (3rd+),701.0
+1900.0,South Asia,Native stock (3rd+),101.0
+1900.0,Southeast Asia,Native stock (3rd+),100.0
+1900.0,Southern Europe,Co-ethnic 1st gen,273992.0
+1900.0,Southern Europe,Co-ethnic 2nd gen,663147.0
+1900.0,Southern Europe,Interethnic 1st gen,76425.0
+1900.0,Southern Europe,Interethnic 2nd gen,150103.0
+1900.0,Southern Europe,Native stock (3rd+),440481.0
+1900.0,Southern Europe,Same region 1st gen,8727.0
+1900.0,Southern Europe,Same region 2nd gen,8826.0
+1900.0,Unknown,Interethnic 1st gen,301.0
+1900.0,Unknown,Interethnic 2nd gen,1404.0
+1900.0,Unknown,Native stock (3rd+),5516.0
+1900.0,Western Europe,Co-ethnic 1st gen,34086.0
+1900.0,Western Europe,Co-ethnic 2nd gen,37132.0
+1900.0,Western Europe,Interethnic 1st gen,8520.0
+1900.0,Western Europe,Interethnic 2nd gen,18061.0
+1900.0,Western Europe,Native stock (3rd+),30582.0
+1900.0,Western Europe,Same region 1st gen,301.0
+1900.0,Western Europe,Same region 2nd gen,202.0
+1910.0,Africa,Co-ethnic 1st gen,100.0
+1910.0,Africa,Interethnic 1st gen,101.0
+1910.0,Africa,Native stock (3rd+),905.0
+1910.0,Asia,Interethnic 1st gen,100.0
+1910.0,Asia,Interethnic 2nd gen,100.0
+1910.0,Asia,Native stock (3rd+),301.0
+1910.0,British Isles,Co-ethnic 1st gen,23775.0
+1910.0,British Isles,Co-ethnic 2nd gen,31583.0
+1910.0,British Isles,Interethnic 1st gen,4720.0
+1910.0,British Isles,Interethnic 2nd gen,13737.0
+1910.0,British Isles,Native stock (3rd+),9329.0
+1910.0,British Isles,Same region 1st gen,200.0
+1910.0,British Isles,Same region 2nd gen,400.0
+1910.0,Caribbean,Co-ethnic 1st gen,1402.0
+1910.0,Caribbean,Co-ethnic 2nd gen,1202.0
+1910.0,Caribbean,Interethnic 1st gen,400.0
+1910.0,Caribbean,Interethnic 2nd gen,400.0
+1910.0,Caribbean,Native stock (3rd+),3309.0
+1910.0,Central America,Interethnic 2nd gen,100.0
+1910.0,Central Europe,Co-ethnic 1st gen,46334.0
+1910.0,Central Europe,Co-ethnic 2nd gen,97615.0
+1910.0,Central Europe,Interethnic 1st gen,57384.0
+1910.0,Central Europe,Interethnic 2nd gen,159189.0
+1910.0,Central Europe,Native stock (3rd+),472374.0
+1910.0,Central Europe,Same region 1st gen,9828.0
+1910.0,Central Europe,Same region 2nd gen,25164.0
+1910.0,East Asia,Co-ethnic 1st gen,1404.0
+1910.0,East Asia,Co-ethnic 2nd gen,1000.0
+1910.0,East Asia,Interethnic 1st gen,101.0
+1910.0,East Asia,Interethnic 2nd gen,100.0
+1910.0,East Asia,Native stock (3rd+),602.0
+1910.0,Eastern Europe,Co-ethnic 1st gen,18551.0
+1910.0,Eastern Europe,Co-ethnic 2nd gen,15846.0
+1910.0,Eastern Europe,Interethnic 1st gen,4410.0
+1910.0,Eastern Europe,Interethnic 2nd gen,4712.0
+1910.0,Eastern Europe,Native stock (3rd+),4319.0
+1910.0,Eastern Europe,Same region 1st gen,903.0
+1910.0,Eastern Europe,Same region 2nd gen,402.0
+1910.0,Europe,Co-ethnic 1st gen,117644.0
+1910.0,Europe,Co-ethnic 2nd gen,432874.0
+1910.0,Europe,Interethnic 1st gen,94471.0
+1910.0,Europe,Interethnic 2nd gen,186166.0
+1910.0,Europe,Native stock (3rd+),395321.0
+1910.0,Europe,Same region 2nd gen,402.0
+1910.0,Middle East,Native stock (3rd+),101.0
+1910.0,Mixed,Co-ethnic 2nd gen,20954.0
+1910.0,Mixed,Interethnic 1st gen,57086.0
+1910.0,Mixed,Interethnic 2nd gen,124444.0
+1910.0,Mixed,Native stock (3rd+),115533.0
+1910.0,North America,Co-ethnic 1st gen,77235.0
+1910.0,North America,Co-ethnic 2nd gen,82669.0
+1910.0,North America,Interethnic 1st gen,19066.0
+1910.0,North America,Interethnic 2nd gen,72115.0
+1910.0,North America,Native stock (3rd+),190758.0
+1910.0,North America,Same region 1st gen,100.0
+1910.0,North America,Same region 2nd gen,200.0
+1910.0,Oceania,Co-ethnic 1st gen,100.0
+1910.0,Oceania,Interethnic 1st gen,100.0
+1910.0,Oceania,Interethnic 2nd gen,302.0
+1910.0,Oceania,Native stock (3rd+),802.0
+1910.0,Scandinavia,Co-ethnic 1st gen,100.0
+1910.0,Scandinavia,Native stock (3rd+),401.0
+1910.0,South America,Co-ethnic 1st gen,100.0
+1910.0,South America,Interethnic 1st gen,101.0
+1910.0,South America,Interethnic 2nd gen,100.0
+1910.0,South America,Native stock (3rd+),804.0
+1910.0,South Asia,Co-ethnic 2nd gen,200.0
+1910.0,Southeast Asia,Native stock (3rd+),300.0
+1910.0,Southern Europe,Co-ethnic 1st gen,330126.0
+1910.0,Southern Europe,Co-ethnic 2nd gen,955528.0
+1910.0,Southern Europe,Interethnic 1st gen,104430.0
+1910.0,Southern Europe,Interethnic 2nd gen,244226.0
+1910.0,Southern Europe,Native stock (3rd+),712414.0
+1910.0,Southern Europe,Same region 1st gen,14138.0
+1910.0,Southern Europe,Same region 2nd gen,21478.0
+1910.0,Unknown,Interethnic 1st gen,605.0
+1910.0,Unknown,Interethnic 2nd gen,2005.0
+1910.0,Unknown,Native stock (3rd+),6521.0
+1910.0,Western Europe,Co-ethnic 1st gen,56269.0
+1910.0,Western Europe,Co-ethnic 2nd gen,71634.0
+1910.0,Western Europe,Interethnic 1st gen,15344.0
+1910.0,Western Europe,Interethnic 2nd gen,39320.0
+1910.0,Western Europe,Native stock (3rd+),69101.0
+1910.0,Western Europe,Same region 1st gen,503.0
+1910.0,Western Europe,Same region 2nd gen,600.0
+1920.0,Africa,Interethnic 2nd gen,105.89
+1920.0,Africa,Native stock (3rd+),272.61
+1920.0,Asia,Co-ethnic 1st gen,102.7
+1920.0,Asia,Native stock (3rd+),303.71000000000004
+1920.0,Atlantic,Interethnic 1st gen,99.67
+1920.0,Atlantic,Interethnic 2nd gen,105.41
+1920.0,Atlantic,Native stock (3rd+),403.58
+1920.0,British Isles,Co-ethnic 1st gen,34356.35
+1920.0,British Isles,Co-ethnic 2nd gen,70002.9
+1920.0,British Isles,Interethnic 1st gen,16667.35
+1920.0,British Isles,Interethnic 2nd gen,39656.26
+1920.0,British Isles,Native stock (3rd+),32544.25
+1920.0,British Isles,Same region 1st gen,1833.8700000000001
+1920.0,British Isles,Same region 2nd gen,2230.96
+1920.0,Caribbean,Co-ethnic 1st gen,1331.03
+1920.0,Caribbean,Co-ethnic 2nd gen,1308.3
+1920.0,Caribbean,Interethnic 1st gen,519.06
+1920.0,Caribbean,Interethnic 2nd gen,599.96
+1920.0,Caribbean,Native stock (3rd+),4546.26
+1920.0,Caribbean,Same region 1st gen,133.9
+1920.0,Central Europe,Co-ethnic 1st gen,46254.9
+1920.0,Central Europe,Co-ethnic 2nd gen,110093.22
+1920.0,Central Europe,Interethnic 1st gen,69547.78
+1920.0,Central Europe,Interethnic 2nd gen,226824.23
+1920.0,Central Europe,Native stock (3rd+),573628.57
+1920.0,Central Europe,Same region 1st gen,12980.06
+1920.0,Central Europe,Same region 2nd gen,35413.9
+1920.0,East Asia,Co-ethnic 1st gen,3751.71
+1920.0,East Asia,Co-ethnic 2nd gen,1354.82
+1920.0,East Asia,Interethnic 1st gen,102.62
+1920.0,East Asia,Interethnic 2nd gen,207.75
+1920.0,East Asia,Native stock (3rd+),1006.96
+1920.0,East Asia,Same region 2nd gen,203.28
+1920.0,Eastern Europe,Co-ethnic 1st gen,74867.62
+1920.0,Eastern Europe,Co-ethnic 2nd gen,116264.82
+1920.0,Eastern Europe,Interethnic 1st gen,18316.11
+1920.0,Eastern Europe,Interethnic 2nd gen,43388.33
+1920.0,Eastern Europe,Native stock (3rd+),24348.97
+1920.0,Eastern Europe,Same region 1st gen,6178.82
+1920.0,Eastern Europe,Same region 2nd gen,4442.96
+1920.0,Europe,Co-ethnic 1st gen,96610.22
+1920.0,Europe,Co-ethnic 2nd gen,433004.68
+1920.0,Europe,Interethnic 1st gen,94428.81
+1920.0,Europe,Interethnic 2nd gen,225368.51
+1920.0,Europe,Native stock (3rd+),480536.91
+1920.0,Europe,Same region 1st gen,201.03
+1920.0,Middle East,Native stock (3rd+),87.21
+1920.0,Mixed,Co-ethnic 2nd gen,32456.43
+1920.0,Mixed,Interethnic 1st gen,74673.05
+1920.0,Mixed,Interethnic 2nd gen,191844.43
+1920.0,Mixed,Native stock (3rd+),181989.86000000002
+1920.0,North America,Co-ethnic 1st gen,86552.22
+1920.0,North America,Co-ethnic 2nd gen,123934.7
+1920.0,North America,Interethnic 1st gen,29339.19
+1920.0,North America,Interethnic 2nd gen,110859.74
+1920.0,North America,Native stock (3rd+),278542.26
+1920.0,North America,Same region 1st gen,241.66
+1920.0,North America,Same region 2nd gen,193.94
+1920.0,Oceania,Interethnic 1st gen,199.49
+1920.0,Oceania,Interethnic 2nd gen,462.28
+1920.0,Oceania,Native stock (3rd+),1339.52
+1920.0,Scandinavia,Co-ethnic 1st gen,103.49
+1920.0,Scandinavia,Interethnic 1st gen,298.16
+1920.0,Scandinavia,Interethnic 2nd gen,715.0600000000001
+1920.0,Scandinavia,Native stock (3rd+),635.49
+1920.0,South America,Interethnic 2nd gen,421.71000000000004
+1920.0,South America,Native stock (3rd+),1833.12
+1920.0,South Asia,Co-ethnic 1st gen,611.02
+1920.0,South Asia,Interethnic 1st gen,208.45
+1920.0,South Asia,Interethnic 2nd gen,293.02
+1920.0,South Asia,Native stock (3rd+),97.59
+1920.0,Southeast Asia,Native stock (3rd+),533.48
+1920.0,Southern Europe,Co-ethnic 1st gen,256097.24
+1920.0,Southern Europe,Co-ethnic 2nd gen,981938.74
+1920.0,Southern Europe,Interethnic 1st gen,138605.41
+1920.0,Southern Europe,Interethnic 2nd gen,349979.62
+1920.0,Southern Europe,Native stock (3rd+),968592.8
+1920.0,Southern Europe,Same region 1st gen,22370.53
+1920.0,Southern Europe,Same region 2nd gen,54716.62
+1920.0,Unknown,Interethnic 1st gen,1311.3
+1920.0,Unknown,Interethnic 2nd gen,2697.47
+1920.0,Unknown,Native stock (3rd+),6269.84
+1920.0,Western Europe,Co-ethnic 1st gen,98446.1
+1920.0,Western Europe,Co-ethnic 2nd gen,126237.35
+1920.0,Western Europe,Interethnic 1st gen,24379.74
+1920.0,Western Europe,Interethnic 2nd gen,73237.76
+1920.0,Western Europe,Native stock (3rd+),107325.89
+1920.0,Western Europe,Same region 1st gen,1316.26
+1920.0,Western Europe,Same region 2nd gen,1169.48
+1930.0,Africa,Co-ethnic 2nd gen,201.9
+1930.0,Africa,Interethnic 1st gen,100.95
+1930.0,Africa,Interethnic 2nd gen,706.65
+1930.0,Africa,Native stock (3rd+),908.5500000000001
+1930.0,Asia,Co-ethnic 1st gen,605.7
+1930.0,Asia,Co-ethnic 2nd gen,402.70000000000005
+1930.0,Asia,Interethnic 1st gen,302.85
+1930.0,Asia,Interethnic 2nd gen,403.8
+1930.0,Asia,Native stock (3rd+),403.25
+1930.0,Atlantic,Co-ethnic 1st gen,201.9
+1930.0,Atlantic,Interethnic 2nd gen,100.95
+1930.0,British Isles,Co-ethnic 1st gen,48051.25
+1930.0,British Isles,Co-ethnic 2nd gen,124370.40000000001
+1930.0,British Isles,Interethnic 1st gen,29376.45
+1930.0,British Isles,Interethnic 2nd gen,79245.75
+1930.0,British Isles,Native stock (3rd+),69453.05
+1930.0,British Isles,Same region 1st gen,2624.7000000000003
+1930.0,British Isles,Same region 2nd gen,2624.7000000000003
+1930.0,Caribbean,Co-ethnic 1st gen,1715.05
+1930.0,Caribbean,Co-ethnic 2nd gen,2926.4500000000003
+1930.0,Caribbean,Interethnic 1st gen,807.0500000000001
+1930.0,Caribbean,Interethnic 2nd gen,1817.1000000000001
+1930.0,Caribbean,Native stock (3rd+),5854.55
+1930.0,Caribbean,Same region 1st gen,302.85
+1930.0,Central America,Co-ethnic 1st gen,100.95
+1930.0,Central America,Interethnic 1st gen,100.95
+1930.0,Central America,Native stock (3rd+),100.95
+1930.0,Central Europe,Co-ethnic 1st gen,46130.3
+1930.0,Central Europe,Co-ethnic 2nd gen,112430.8
+1930.0,Central Europe,Interethnic 1st gen,64503.9
+1930.0,Central Europe,Interethnic 2nd gen,262768.75
+1930.0,Central Europe,Native stock (3rd+),646574.4500000001
+1930.0,Central Europe,Same region 1st gen,13527.300000000001
+1930.0,Central Europe,Same region 2nd gen,35736.3
+1930.0,East Asia,Co-ethnic 1st gen,7945.35
+1930.0,East Asia,Co-ethnic 2nd gen,8043.0
+1930.0,East Asia,Interethnic 1st gen,200.8
+1930.0,East Asia,Interethnic 2nd gen,301.20000000000005
+1930.0,East Asia,Native stock (3rd+),1307.95
+1930.0,East Asia,Same region 2nd gen,401.6
+1930.0,Eastern Europe,Co-ethnic 1st gen,131235.0
+1930.0,Eastern Europe,Co-ethnic 2nd gen,276401.10000000003
+1930.0,Eastern Europe,Interethnic 1st gen,32102.100000000002
+1930.0,Eastern Europe,Interethnic 2nd gen,90249.3
+1930.0,Eastern Europe,Native stock (3rd+),67938.40000000001
+1930.0,Eastern Europe,Same region 1st gen,16555.8
+1930.0,Eastern Europe,Same region 2nd gen,22410.9
+1930.0,Europe,Co-ethnic 1st gen,73592.55
+1930.0,Europe,Co-ethnic 2nd gen,389263.2
+1930.0,Europe,Interethnic 1st gen,87219.85
+1930.0,Europe,Interethnic 2nd gen,275288.75
+1930.0,Europe,Native stock (3rd+),544623.35
+1930.0,Europe,Same region 2nd gen,201.9
+1930.0,Middle East,Co-ethnic 1st gen,402.70000000000005
+1930.0,Middle East,Interethnic 2nd gen,504.75
+1930.0,Middle East,Native stock (3rd+),403.8
+1930.0,Mixed,Co-ethnic 2nd gen,33717.3
+1930.0,Mixed,Interethnic 1st gen,80659.05
+1930.0,Mixed,Interethnic 2nd gen,225117.0
+1930.0,Mixed,Native stock (3rd+),237432.9
+1930.0,North America,Co-ethnic 1st gen,114274.85
+1930.0,North America,Co-ethnic 2nd gen,192915.45
+1930.0,North America,Interethnic 1st gen,39369.950000000004
+1930.0,North America,Interethnic 2nd gen,166061.80000000002
+1930.0,North America,Native stock (3rd+),388955.85000000003
+1930.0,North America,Same region 1st gen,201.9
+1930.0,Oceania,Interethnic 1st gen,706.65
+1930.0,Oceania,Interethnic 2nd gen,2422.8
+1930.0,Oceania,Native stock (3rd+),3331.35
+1930.0,Scandinavia,Co-ethnic 1st gen,908.5500000000001
+1930.0,Scandinavia,Interethnic 1st gen,100.95
+1930.0,Scandinavia,Interethnic 2nd gen,504.75
+1930.0,Scandinavia,Native stock (3rd+),403.8
+1930.0,South America,Co-ethnic 2nd gen,605.7
+1930.0,South America,Interethnic 2nd gen,1110.45
+1930.0,South America,Native stock (3rd+),1615.2
+1930.0,South Asia,Co-ethnic 1st gen,2321.85
+1930.0,South Asia,Co-ethnic 2nd gen,1817.1000000000001
+1930.0,South Asia,Interethnic 1st gen,706.65
+1930.0,South Asia,Interethnic 2nd gen,1110.45
+1930.0,South Asia,Native stock (3rd+),403.8
+1930.0,Southeast Asia,Native stock (3rd+),1413.3
+1930.0,Southern Europe,Co-ethnic 1st gen,239251.5
+1930.0,Southern Europe,Co-ethnic 2nd gen,1146387.25
+1930.0,Southern Europe,Interethnic 1st gen,157780.9
+1930.0,Southern Europe,Interethnic 2nd gen,473851.65
+1930.0,Southern Europe,Native stock (3rd+),1382301.5
+1930.0,Southern Europe,Same region 1st gen,26851.75
+1930.0,Southern Europe,Same region 2nd gen,94085.40000000001
+1930.0,Unknown,Co-ethnic 1st gen,100.95
+1930.0,Unknown,Interethnic 1st gen,1110.45
+1930.0,Unknown,Interethnic 2nd gen,2422.8
+1930.0,Unknown,Native stock (3rd+),5753.2
+1930.0,Western Europe,Co-ethnic 1st gen,186351.80000000002
+1930.0,Western Europe,Co-ethnic 2nd gen,276502.05
+1930.0,Western Europe,Interethnic 1st gen,38561.0
+1930.0,Western Europe,Interethnic 2nd gen,148192.0
+1930.0,Western Europe,Native stock (3rd+),217646.7
+1930.0,Western Europe,Same region 1st gen,3229.4500000000003
+1930.0,Western Europe,Same region 2nd gen,8277.9
+1940.0,Africa,Interethnic 1st gen,100.0
+1940.0,Africa,Native stock (3rd+),400.0
+1940.0,Asia,Co-ethnic 1st gen,700.0
+1940.0,Asia,Native stock (3rd+),800.0
+1940.0,Atlantic,Native stock (3rd+),400.0
+1940.0,British Isles,Co-ethnic 1st gen,9500.0
+1940.0,British Isles,Interethnic 1st gen,9700.0
+1940.0,British Isles,Native stock (3rd+),108649.0
+1940.0,British Isles,Same region 1st gen,674.0
+1940.0,Caribbean,Co-ethnic 1st gen,500.0
+1940.0,Caribbean,Interethnic 1st gen,200.0
+1940.0,Caribbean,Native stock (3rd+),4056.0
+1940.0,Caribbean,Same region 1st gen,100.0
+1940.0,Central America,Native stock (3rd+),100.0
+1940.0,Central Europe,Co-ethnic 1st gen,12611.0
+1940.0,Central Europe,Interethnic 1st gen,17087.0
+1940.0,Central Europe,Native stock (3rd+),279086.0
+1940.0,Central Europe,Same region 1st gen,2300.0
+1940.0,East Asia,Co-ethnic 1st gen,1300.0
+1940.0,East Asia,Interethnic 1st gen,100.0
+1940.0,East Asia,Native stock (3rd+),1600.0
+1940.0,Eastern Europe,Co-ethnic 1st gen,38784.0
+1940.0,Eastern Europe,Interethnic 1st gen,17375.0
+1940.0,Eastern Europe,Native stock (3rd+),294345.0
+1940.0,Eastern Europe,Same region 1st gen,8000.0
+1940.0,Europe,Co-ethnic 1st gen,14147.0
+1940.0,Europe,Interethnic 1st gen,17404.0
+1940.0,Europe,Native stock (3rd+),286859.0
+1940.0,Middle East,Co-ethnic 1st gen,100.0
+1940.0,Middle East,Native stock (3rd+),400.0
+1940.0,Mixed,Interethnic 1st gen,20644.0
+1940.0,Mixed,Native stock (3rd+),137973.0
+1940.0,North America,Co-ethnic 1st gen,28859.0
+1940.0,North America,Interethnic 1st gen,9495.0
+1940.0,North America,Native stock (3rd+),213808.0
+1940.0,North America,Same region 1st gen,200.0
+1940.0,Oceania,Native stock (3rd+),1877.0
+1940.0,Scandinavia,Co-ethnic 1st gen,1588.0
+1940.0,Scandinavia,Interethnic 1st gen,200.0
+1940.0,Scandinavia,Native stock (3rd+),3288.0
+1940.0,South America,Interethnic 1st gen,100.0
+1940.0,South America,Native stock (3rd+),1454.0
+1940.0,South Asia,Co-ethnic 1st gen,263.0
+1940.0,South Asia,Interethnic 1st gen,200.0
+1940.0,South Asia,Native stock (3rd+),3000.0
+1940.0,Southeast Asia,Native stock (3rd+),300.0
+1940.0,Southern Europe,Co-ethnic 1st gen,57431.0
+1940.0,Southern Europe,Interethnic 1st gen,39560.0
+1940.0,Southern Europe,Native stock (3rd+),818304.0
+1940.0,Southern Europe,Same region 1st gen,4887.0
+1940.0,Unknown,Interethnic 1st gen,36348.0
+1940.0,Unknown,Native stock (3rd+),691183.0
+1940.0,Western Europe,Co-ethnic 1st gen,59097.0
+1940.0,Western Europe,Interethnic 1st gen,14600.0
+1940.0,Western Europe,Native stock (3rd+),337190.0
+1940.0,Western Europe,Same region 1st gen,970.0
+1950.0,Africa,Native stock (3rd+),286.0
+1950.0,Asia,Co-ethnic 1st gen,554.0
+1950.0,Asia,Interethnic 1st gen,360.0
+1950.0,Asia,Native stock (3rd+),6276.0
+1950.0,Atlantic,Co-ethnic 1st gen,83.0
+1950.0,Atlantic,Native stock (3rd+),658.0
+1950.0,British Isles,Co-ethnic 1st gen,12989.0
+1950.0,British Isles,Interethnic 1st gen,15089.0
+1950.0,British Isles,Native stock (3rd+),213850.0
+1950.0,British Isles,Same region 1st gen,581.0
+1950.0,Caribbean,Co-ethnic 1st gen,1032.0
+1950.0,Caribbean,Interethnic 1st gen,361.0
+1950.0,Caribbean,Native stock (3rd+),6408.0
+1950.0,Caribbean,Same region 1st gen,193.0
+1950.0,Central America,Native stock (3rd+),275.0
+1950.0,Central Europe,Co-ethnic 1st gen,10408.0
+1950.0,Central Europe,Interethnic 1st gen,16915.0
+1950.0,Central Europe,Native stock (3rd+),367315.0
+1950.0,Central Europe,Same region 1st gen,3141.0
+1950.0,East Asia,Co-ethnic 1st gen,1875.0
+1950.0,East Asia,Native stock (3rd+),11120.0
+1950.0,Eastern Europe,Co-ethnic 1st gen,47369.0
+1950.0,Eastern Europe,Interethnic 1st gen,29729.0
+1950.0,Eastern Europe,Native stock (3rd+),601226.0
+1950.0,Eastern Europe,Same region 1st gen,10458.0
+1950.0,Europe,Co-ethnic 1st gen,13842.0
+1950.0,Europe,Interethnic 1st gen,20555.0
+1950.0,Europe,Native stock (3rd+),360739.0
+1950.0,Middle East,Co-ethnic 1st gen,239.0
+1950.0,Middle East,Interethnic 1st gen,165.0
+1950.0,Middle East,Native stock (3rd+),754.0
+1950.0,Mixed,Interethnic 1st gen,23709.0
+1950.0,Mixed,Native stock (3rd+),197946.0
+1950.0,North America,Co-ethnic 1st gen,31716.0
+1950.0,North America,Interethnic 1st gen,9965.0
+1950.0,North America,Native stock (3rd+),278578.0
+1950.0,North America,Same region 1st gen,83.0
+1950.0,Oceania,Interethnic 1st gen,495.0
+1950.0,Oceania,Native stock (3rd+),3241.0
+1950.0,Scandinavia,Co-ethnic 1st gen,2561.0
+1950.0,Scandinavia,Interethnic 1st gen,441.0
+1950.0,Scandinavia,Native stock (3rd+),16851.0
+1950.0,Scandinavia,Same region 1st gen,165.0
+1950.0,South America,Native stock (3rd+),1709.0
+1950.0,South Asia,Co-ethnic 1st gen,705.0
+1950.0,South Asia,Interethnic 1st gen,616.0
+1950.0,South Asia,Native stock (3rd+),11380.0
+1950.0,Southeast Asia,Native stock (3rd+),764.0
+1950.0,Southern Europe,Co-ethnic 1st gen,44234.0
+1950.0,Southern Europe,Interethnic 1st gen,39794.0
+1950.0,Southern Europe,Native stock (3rd+),1009145.0
+1950.0,Southern Europe,Same region 1st gen,7623.0
+1950.0,Unknown,Interethnic 1st gen,49385.0
+1950.0,Unknown,Native stock (3rd+),1084718.0
+1950.0,Western Europe,Co-ethnic 1st gen,68131.0
+1950.0,Western Europe,Interethnic 1st gen,21043.0
+1950.0,Western Europe,Native stock (3rd+),663483.0
+1950.0,Western Europe,Same region 1st gen,2304.0
+1960.0,Africa,Interethnic 1st gen,199.0
+1960.0,Africa,Interethnic 2nd gen,1294.0
+1960.0,Africa,Native stock (3rd+),2195.0
+1960.0,Asia,Co-ethnic 2nd gen,99.0
+1960.0,Asia,Interethnic 1st gen,199.0
+1960.0,Asia,Interethnic 2nd gen,1591.0
+1960.0,Asia,Native stock (3rd+),3284.0
+1960.0,Atlantic,Co-ethnic 1st gen,100.0
+1960.0,Atlantic,Co-ethnic 2nd gen,694.0
+1960.0,Atlantic,Interethnic 1st gen,100.0
+1960.0,Atlantic,Interethnic 2nd gen,596.0
+1960.0,Atlantic,Native stock (3rd+),1197.0
+1960.0,British Isles,Co-ethnic 1st gen,3286.0
+1960.0,British Isles,Co-ethnic 2nd gen,28988.0
+1960.0,British Isles,Interethnic 1st gen,7774.0
+1960.0,British Isles,Interethnic 2nd gen,74114.0
+1960.0,British Isles,Native stock (3rd+),140252.0
+1960.0,British Isles,Same region 1st gen,496.0
+1960.0,British Isles,Same region 2nd gen,4979.0
+1960.0,Caribbean,Co-ethnic 1st gen,7180.0
+1960.0,Caribbean,Co-ethnic 2nd gen,6281.0
+1960.0,Caribbean,Interethnic 1st gen,1893.0
+1960.0,Caribbean,Interethnic 2nd gen,7863.0
+1960.0,Caribbean,Native stock (3rd+),22118.0
+1960.0,Caribbean,Same region 1st gen,697.0
+1960.0,Caribbean,Same region 2nd gen,698.0
+1960.0,Central America,Interethnic 2nd gen,995.0
+1960.0,Central America,Native stock (3rd+),2391.0
+1960.0,Central Europe,Co-ethnic 1st gen,7768.0
+1960.0,Central Europe,Co-ethnic 2nd gen,36731.0
+1960.0,Central Europe,Interethnic 1st gen,24992.0
+1960.0,Central Europe,Interethnic 2nd gen,164885.0
+1960.0,Central Europe,Native stock (3rd+),491611.0
+1960.0,Central Europe,Same region 1st gen,3285.0
+1960.0,Central Europe,Same region 2nd gen,15344.0
+1960.0,East Asia,Co-ethnic 1st gen,2991.0
+1960.0,East Asia,Co-ethnic 2nd gen,13558.0
+1960.0,East Asia,Interethnic 1st gen,698.0
+1960.0,East Asia,Interethnic 2nd gen,1496.0
+1960.0,East Asia,Native stock (3rd+),9363.0
+1960.0,East Asia,Same region 1st gen,300.0
+1960.0,East Asia,Same region 2nd gen,799.0
+1960.0,Eastern Europe,Co-ethnic 1st gen,11059.0
+1960.0,Eastern Europe,Co-ethnic 2nd gen,132669.0
+1960.0,Eastern Europe,Interethnic 1st gen,18423.0
+1960.0,Eastern Europe,Interethnic 2nd gen,96536.0
+1960.0,Eastern Europe,Native stock (3rd+),212293.0
+1960.0,Eastern Europe,Same region 1st gen,4084.0
+1960.0,Eastern Europe,Same region 2nd gen,42638.0
+1960.0,Europe,Co-ethnic 1st gen,8264.0
+1960.0,Europe,Co-ethnic 2nd gen,66980.0
+1960.0,Europe,Interethnic 1st gen,19735.0
+1960.0,Europe,Interethnic 2nd gen,121539.0
+1960.0,Europe,Native stock (3rd+),340217.0
+1960.0,Middle East,Co-ethnic 1st gen,995.0
+1960.0,Middle East,Co-ethnic 2nd gen,2390.0
+1960.0,Middle East,Interethnic 1st gen,398.0
+1960.0,Middle East,Interethnic 2nd gen,2588.0
+1960.0,Middle East,Native stock (3rd+),7866.0
+1960.0,Mixed,Interethnic 1st gen,1092929.0
+1960.0,Mixed,Interethnic 2nd gen,5289456.0
+1960.0,Mixed,Native stock (3rd+),3354966.0
+1960.0,North America,Co-ethnic 1st gen,50294.0
+1960.0,North America,Co-ethnic 2nd gen,166776.0
+1960.0,North America,Interethnic 1st gen,28107.0
+1960.0,North America,Interethnic 2nd gen,153806.0
+1960.0,North America,Native stock (3rd+),545638.0
+1960.0,North America,Same region 1st gen,597.0
+1960.0,North America,Same region 2nd gen,894.0
+1960.0,Oceania,Co-ethnic 1st gen,100.0
+1960.0,Oceania,Co-ethnic 2nd gen,100.0
+1960.0,Oceania,Interethnic 1st gen,499.0
+1960.0,Oceania,Interethnic 2nd gen,2794.0
+1960.0,Oceania,Native stock (3rd+),7367.0
+1960.0,Pacific,Interethnic 1st gen,100.0
+1960.0,Pacific,Interethnic 2nd gen,100.0
+1960.0,Pacific,Native stock (3rd+),698.0
+1960.0,Scandinavia,Co-ethnic 1st gen,996.0
+1960.0,Scandinavia,Co-ethnic 2nd gen,2388.0
+1960.0,Scandinavia,Interethnic 1st gen,2191.0
+1960.0,Scandinavia,Interethnic 2nd gen,7469.0
+1960.0,Scandinavia,Native stock (3rd+),21016.0
+1960.0,Scandinavia,Same region 2nd gen,200.0
+1960.0,South America,Co-ethnic 1st gen,100.0
+1960.0,South America,Interethnic 1st gen,1095.0
+1960.0,South America,Interethnic 2nd gen,4583.0
+1960.0,South America,Native stock (3rd+),6971.0
+1960.0,South Asia,Co-ethnic 2nd gen,797.0
+1960.0,South Asia,Interethnic 2nd gen,1891.0
+1960.0,South Asia,Native stock (3rd+),6073.0
+1960.0,Southeast Asia,Interethnic 2nd gen,597.0
+1960.0,Southeast Asia,Native stock (3rd+),1992.0
+1960.0,Southern Europe,Co-ethnic 1st gen,17232.0
+1960.0,Southern Europe,Co-ethnic 2nd gen,187596.0
+1960.0,Southern Europe,Interethnic 1st gen,46229.0
+1960.0,Southern Europe,Interethnic 2nd gen,231748.0
+1960.0,Southern Europe,Native stock (3rd+),875726.0
+1960.0,Southern Europe,Same region 1st gen,6173.0
+1960.0,Southern Europe,Same region 2nd gen,49412.0
+1960.0,Unknown,Co-ethnic 1st gen,1491.0
+1960.0,Unknown,Interethnic 1st gen,8367.0
+1960.0,Unknown,Interethnic 2nd gen,32577.0
+1960.0,Unknown,Native stock (3rd+),49908.0
+1960.0,Western Europe,Co-ethnic 1st gen,20721.0
+1960.0,Western Europe,Co-ethnic 2nd gen,202433.0
+1960.0,Western Europe,Interethnic 1st gen,24498.0
+1960.0,Western Europe,Interethnic 2nd gen,142911.0
+1960.0,Western Europe,Native stock (3rd+),424266.0
+1960.0,Western Europe,Same region 1st gen,1095.0
+1960.0,Western Europe,Same region 2nd gen,18622.0

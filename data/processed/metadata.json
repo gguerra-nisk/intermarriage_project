@@ -1,0 +1,56 @@
+{
+  "valid_origins": [
+    "Austria",
+    "Belgium",
+    "Canada",
+    "Czechoslovakia",
+    "Denmark",
+    "England",
+    "Finland",
+    "France",
+    "Germany",
+    "Hungary",
+    "Ireland",
+    "Italy",
+    "Lithuania",
+    "Luxembourg",
+    "Mexico",
+    "Netherlands",
+    "Norway",
+    "Poland",
+    "Portugal",
+    "Romania",
+    "Russia/USSR",
+    "Scotland",
+    "Sweden",
+    "Switzerland",
+    "US-born",
+    "Wales"
+  ],
+  "years": [
+    1880,
+    1900,
+    1910,
+    1920,
+    1930
+  ],
+  "presets_same_origin": [
+    "Germany",
+    "Ireland",
+    "England",
+    "Canada",
+    "Sweden",
+    "Norway",
+    "Italy",
+    "Poland"
+  ],
+  "presets_mixed_origin": [
+    "Ireland|England",
+    "England|Ireland",
+    "Germany|France",
+    "Ireland|Germany",
+    "Canada|Ireland",
+    "Ireland|Scotland"
+  ],
+  "min_sample_size": 20000
+}

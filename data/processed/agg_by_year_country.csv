@@ -1,0 +1,1461 @@
+YEAR,ORIGIN_COUNTRY,MARRIAGE_TYPE,WEIGHTED_COUNT
+1880.0,Abroad/At Sea,3rd+ gen American,2055.86
+1880.0,Abroad/At Sea,Different origin (1st gen immigrant),315.28999999999996
+1880.0,Abroad/At Sea,Different origin (2nd gen),488.39
+1880.0,Abroad/At Sea,Same origin (1st gen immigrant),107.45
+1880.0,Africa,3rd+ gen American,6760.36
+1880.0,Africa,Different origin (1st gen immigrant),102.39
+1880.0,Africa,Different origin (2nd gen),156.78
+1880.0,Africa,Same origin (2nd gen),1144.46
+1880.0,"Asia, ns",3rd+ gen American,121.98
+1880.0,Atlantic Islands,3rd+ gen American,196.07999999999998
+1880.0,Australia/New Zealand,3rd+ gen American,97.73
+1880.0,Australia/New Zealand,Different origin (1st gen immigrant),119.29
+1880.0,Austria,3rd+ gen American,527.51
+1880.0,Austria,Different origin (1st gen immigrant),397.41
+1880.0,Austria,Different origin (2nd gen),701.11
+1880.0,Austria,Same origin (1st gen immigrant),102.54
+1880.0,Belgium,3rd+ gen American,233.22
+1880.0,Belgium,Different origin (1st gen immigrant),172.32
+1880.0,Belgium,Different origin (2nd gen),262.84
+1880.0,Belgium,Same origin (1st gen immigrant),542.8199999999999
+1880.0,Belgium,Same origin (2nd gen),181.26
+1880.0,Canada,3rd+ gen American,43815.27
+1880.0,Canada,Different origin (1st gen immigrant),5878.69
+1880.0,Canada,Different origin (2nd gen),9210.6
+1880.0,Canada,Same origin (1st gen immigrant),16251.51
+1880.0,Canada,Same origin (2nd gen),15127.54
+1880.0,China,Same origin (2nd gen),192.26
+1880.0,Cuba,3rd+ gen American,202.47
+1880.0,Cuba,Different origin (1st gen immigrant),119.24
+1880.0,Cuba,Same origin (2nd gen),199.02
+1880.0,Czechoslovakia,3rd+ gen American,225.07
+1880.0,Czechoslovakia,Different origin (1st gen immigrant),619.0
+1880.0,Czechoslovakia,Different origin (2nd gen),179.83
+1880.0,Czechoslovakia,Same origin (1st gen immigrant),630.94
+1880.0,Denmark,3rd+ gen American,1184.89
+1880.0,Denmark,Different origin (1st gen immigrant),485.18
+1880.0,Denmark,Different origin (2nd gen),389.73
+1880.0,Denmark,Same origin (1st gen immigrant),294.6
+1880.0,Denmark,Same origin (2nd gen),222.24
+1880.0,England,3rd+ gen American,141037.87
+1880.0,England,Different origin (1st gen immigrant),18154.98
+1880.0,England,Different origin (2nd gen),27168.8
+1880.0,England,Same origin (1st gen immigrant),19100.23
+1880.0,England,Same origin (2nd gen),21526.74
+1880.0,"Europe, ns",3rd+ gen American,1041.69
+1880.0,"Europe, ns",Different origin (1st gen immigrant),228.59
+1880.0,"Europe, ns",Different origin (2nd gen),210.92000000000002
+1880.0,"Europe, ns",Same origin (1st gen immigrant),201.24
+1880.0,"Europe, ns",Same origin (2nd gen),218.0
+1880.0,France,3rd+ gen American,23634.98
+1880.0,France,Different origin (1st gen immigrant),9474.55
+1880.0,France,Different origin (2nd gen),13587.8
+1880.0,France,Same origin (1st gen immigrant),3416.42
+1880.0,France,Same origin (2nd gen),6175.32
+1880.0,Germany,3rd+ gen American,111307.43
+1880.0,Germany,Different origin (1st gen immigrant),27393.6
+1880.0,Germany,Different origin (2nd gen),34328.39
+1880.0,Germany,Same origin (1st gen immigrant),109888.68
+1880.0,Germany,Same origin (2nd gen),133254.37
+1880.0,Greece,3rd+ gen American,193.01999999999998
+1880.0,Greece,Same origin (1st gen immigrant),84.94
+1880.0,Hungary,3rd+ gen American,207.63
+1880.0,Hungary,Different origin (1st gen immigrant),199.78
+1880.0,India,3rd+ gen American,90.59
+1880.0,Indonesia,3rd+ gen American,197.43
+1880.0,Iran,Different origin (1st gen immigrant),117.45
+1880.0,Ireland,3rd+ gen American,158513.76
+1880.0,Ireland,Different origin (1st gen immigrant),33175.68
+1880.0,Ireland,Different origin (2nd gen),34645.46
+1880.0,Ireland,Same origin (1st gen immigrant),82871.76
+1880.0,Ireland,Same origin (2nd gen),122484.8
+1880.0,Italy,3rd+ gen American,1038.54
+1880.0,Italy,Different origin (2nd gen),384.9
+1880.0,Italy,Same origin (1st gen immigrant),203.79000000000002
+1880.0,Luxembourg,3rd+ gen American,224.0
+1880.0,Luxembourg,Different origin (1st gen immigrant),351.52
+1880.0,Luxembourg,Different origin (2nd gen),294.73
+1880.0,Luxembourg,Same origin (1st gen immigrant),219.29000000000002
+1880.0,Luxembourg,Same origin (2nd gen),554.1
+1880.0,Mexico,3rd+ gen American,1418.32
+1880.0,Mexico,Different origin (2nd gen),378.48
+1880.0,Mexico,Same origin (1st gen immigrant),967.1999999999999
+1880.0,Mexico,Same origin (2nd gen),1692.74
+1880.0,Netherlands,3rd+ gen American,3199.73
+1880.0,Netherlands,Different origin (1st gen immigrant),1154.25
+1880.0,Netherlands,Different origin (2nd gen),1728.27
+1880.0,Netherlands,Same origin (1st gen immigrant),1722.9099999999999
+1880.0,Netherlands,Same origin (2nd gen),1673.04
+1880.0,Norway,3rd+ gen American,855.09
+1880.0,Norway,Different origin (1st gen immigrant),270.2
+1880.0,Norway,Different origin (2nd gen),324.41
+1880.0,Norway,Same origin (1st gen immigrant),3826.81
+1880.0,Norway,Same origin (2nd gen),2813.7
+1880.0,Poland,3rd+ gen American,573.66
+1880.0,Poland,Different origin (1st gen immigrant),279.95000000000005
+1880.0,Poland,Different origin (2nd gen),395.17
+1880.0,Poland,Same origin (1st gen immigrant),600.37
+1880.0,Portugal,3rd+ gen American,1247.22
+1880.0,Portugal,Different origin (1st gen immigrant),82.2
+1880.0,Portugal,Different origin (2nd gen),411.07
+1880.0,Portugal,Same origin (1st gen immigrant),392.2
+1880.0,Russia/USSR,3rd+ gen American,856.83
+1880.0,Russia/USSR,Different origin (1st gen immigrant),387.35
+1880.0,Russia/USSR,Different origin (2nd gen),383.31
+1880.0,Russia/USSR,Same origin (1st gen immigrant),100.69
+1880.0,Russia/USSR,Same origin (2nd gen),402.28
+1880.0,Scotland,3rd+ gen American,43480.47
+1880.0,Scotland,Different origin (1st gen immigrant),8218.18
+1880.0,Scotland,Different origin (2nd gen),12009.52
+1880.0,Scotland,Same origin (1st gen immigrant),2518.34
+1880.0,Scotland,Same origin (2nd gen),5132.82
+1880.0,South America,3rd+ gen American,470.02
+1880.0,South America,Different origin (1st gen immigrant),203.05
+1880.0,South America,Different origin (2nd gen),102.39
+1880.0,Spain,3rd+ gen American,2158.82
+1880.0,Spain,Different origin (1st gen immigrant),96.13
+1880.0,Spain,Different origin (2nd gen),197.45999999999998
+1880.0,Spain,Same origin (1st gen immigrant),179.11
+1880.0,Spain,Same origin (2nd gen),202.66
+1880.0,Sweden,3rd+ gen American,843.44
+1880.0,Sweden,Different origin (1st gen immigrant),414.21
+1880.0,Sweden,Different origin (2nd gen),409.6
+1880.0,Sweden,Same origin (1st gen immigrant),1130.96
+1880.0,Sweden,Same origin (2nd gen),758.7
+1880.0,Switzerland,3rd+ gen American,6832.75
+1880.0,Switzerland,Different origin (1st gen immigrant),2907.44
+1880.0,Switzerland,Different origin (2nd gen),5657.52
+1880.0,Switzerland,Same origin (1st gen immigrant),2228.88
+1880.0,Switzerland,Same origin (2nd gen),2259.16
+1880.0,US Virgin Islands,3rd+ gen American,71.24
+1880.0,Wales,3rd+ gen American,10725.55
+1880.0,Wales,Different origin (1st gen immigrant),2430.4
+1880.0,Wales,Different origin (2nd gen),2926.79
+1880.0,Wales,Same origin (1st gen immigrant),3345.5
+1880.0,Wales,Same origin (2nd gen),3195.46
+1880.0,West Indies,3rd+ gen American,1770.31
+1880.0,West Indies,Different origin (2nd gen),261.55
+1880.0,West Indies,Same origin (1st gen immigrant),388.03
+1880.0,West Indies,Same origin (2nd gen),291.9
+1880.0,Yugoslavia,Different origin (1st gen immigrant),98.75
+1900.0,Abroad/At Sea,3rd+ gen American,6119.0
+1900.0,Abroad/At Sea,Different origin (1st gen immigrant),301.0
+1900.0,Abroad/At Sea,Different origin (2nd gen),2105.0
+1900.0,Africa,3rd+ gen American,2007.0
+1900.0,Africa,Different origin (2nd gen),200.0
+1900.0,Africa,Same origin (2nd gen),202.0
+1900.0,Atlantic Islands,3rd+ gen American,101.0
+1900.0,Atlantic Islands,Different origin (2nd gen),100.0
+1900.0,Australia/New Zealand,Different origin (2nd gen),400.0
+1900.0,Australia/New Zealand,Same origin (1st gen immigrant),200.0
+1900.0,Austria,3rd+ gen American,2110.0
+1900.0,Austria,Different origin (1st gen immigrant),1904.0
+1900.0,Austria,Different origin (2nd gen),3310.0
+1900.0,Austria,Same origin (1st gen immigrant),2408.0
+1900.0,Austria,Same origin (2nd gen),1402.0
+1900.0,Belgium,3rd+ gen American,1306.0
+1900.0,Belgium,Different origin (1st gen immigrant),701.0
+1900.0,Belgium,Different origin (2nd gen),1309.0
+1900.0,Belgium,Same origin (1st gen immigrant),1003.0
+1900.0,Belgium,Same origin (2nd gen),2406.0
+1900.0,Canada,3rd+ gen American,128768.0
+1900.0,Canada,Different origin (1st gen immigrant),17151.0
+1900.0,Canada,Different origin (2nd gen),48254.0
+1900.0,Canada,Same origin (1st gen immigrant),45622.0
+1900.0,Canada,Same origin (2nd gen),43722.0
+1900.0,China,3rd+ gen American,201.0
+1900.0,China,Different origin (1st gen immigrant),100.0
+1900.0,China,Different origin (2nd gen),301.0
+1900.0,China,Same origin (1st gen immigrant),301.0
+1900.0,China,Same origin (2nd gen),200.0
+1900.0,Cuba,3rd+ gen American,700.0
+1900.0,Cuba,Different origin (2nd gen),500.0
+1900.0,Cuba,Same origin (1st gen immigrant),303.0
+1900.0,Czechoslovakia,3rd+ gen American,1906.0
+1900.0,Czechoslovakia,Different origin (1st gen immigrant),1103.0
+1900.0,Czechoslovakia,Different origin (2nd gen),3607.0
+1900.0,Czechoslovakia,Same origin (1st gen immigrant),6418.0
+1900.0,Czechoslovakia,Same origin (2nd gen),8026.0
+1900.0,Denmark,3rd+ gen American,5115.0
+1900.0,Denmark,Different origin (1st gen immigrant),2204.0
+1900.0,Denmark,Different origin (2nd gen),5722.0
+1900.0,Denmark,Same origin (1st gen immigrant),2505.0
+1900.0,Denmark,Same origin (2nd gen),2808.0
+1900.0,England,3rd+ gen American,284590.0
+1900.0,England,Different origin (1st gen immigrant),41426.0
+1900.0,England,Different origin (2nd gen),98287.0
+1900.0,England,Same origin (1st gen immigrant),30976.0
+1900.0,England,Same origin (2nd gen),63698.0
+1900.0,"Europe, ns",3rd+ gen American,301.0
+1900.0,"Europe, ns",Different origin (1st gen immigrant),100.0
+1900.0,"Europe, ns",Different origin (2nd gen),101.0
+1900.0,"Europe, ns",Same origin (1st gen immigrant),100.0
+1900.0,"Europe, ns",Same origin (2nd gen),400.0
+1900.0,Finland,3rd+ gen American,100.0
+1900.0,Finland,Different origin (1st gen immigrant),200.0
+1900.0,Finland,Different origin (2nd gen),201.0
+1900.0,Finland,Same origin (1st gen immigrant),101.0
+1900.0,France,3rd+ gen American,37313.0
+1900.0,France,Different origin (1st gen immigrant),10831.0
+1900.0,France,Different origin (2nd gen),26581.0
+1900.0,France,Same origin (1st gen immigrant),3406.0
+1900.0,France,Same origin (2nd gen),8410.0
+1900.0,Germany,3rd+ gen American,439887.0
+1900.0,Germany,Different origin (1st gen immigrant),86157.0
+1900.0,Germany,Different origin (2nd gen),167857.0
+1900.0,Germany,Same origin (1st gen immigrant),260361.0
+1900.0,Germany,Same origin (2nd gen),653509.0
+1900.0,Gibraltar,3rd+ gen American,100.0
+1900.0,Greece,Different origin (2nd gen),101.0
+1900.0,Hungary,3rd+ gen American,302.0
+1900.0,Hungary,Different origin (1st gen immigrant),402.0
+1900.0,Hungary,Different origin (2nd gen),500.0
+1900.0,Hungary,Same origin (1st gen immigrant),400.0
+1900.0,Hungary,Same origin (2nd gen),200.0
+1900.0,Iceland,Same origin (1st gen immigrant),101.0
+1900.0,India,3rd+ gen American,501.0
+1900.0,Indonesia,3rd+ gen American,101.0
+1900.0,Indonesia,Different origin (1st gen immigrant),100.0
+1900.0,Ireland,3rd+ gen American,299062.0
+1900.0,Ireland,Different origin (1st gen immigrant),82752.0
+1900.0,Ireland,Different origin (2nd gen),143196.0
+1900.0,Ireland,Same origin (1st gen immigrant),111213.0
+1900.0,Ireland,Same origin (2nd gen),360824.0
+1900.0,Italy,3rd+ gen American,3213.0
+1900.0,Italy,Different origin (1st gen immigrant),602.0
+1900.0,Italy,Different origin (2nd gen),2610.0
+1900.0,Italy,Same origin (1st gen immigrant),4812.0
+1900.0,Italy,Same origin (2nd gen),1004.0
+1900.0,Lithuania,Same origin (1st gen immigrant),100.0
+1900.0,Luxembourg,3rd+ gen American,201.0
+1900.0,Luxembourg,Different origin (1st gen immigrant),100.0
+1900.0,Luxembourg,Same origin (1st gen immigrant),301.0
+1900.0,Luxembourg,Same origin (2nd gen),600.0
+1900.0,Mexico,3rd+ gen American,4516.0
+1900.0,Mexico,Different origin (1st gen immigrant),603.0
+1900.0,Mexico,Different origin (2nd gen),1005.0
+1900.0,Mexico,Same origin (1st gen immigrant),5214.0
+1900.0,Mexico,Same origin (2nd gen),8232.0
+1900.0,Netherlands,3rd+ gen American,6613.0
+1900.0,Netherlands,Different origin (1st gen immigrant),2605.0
+1900.0,Netherlands,Different origin (2nd gen),7214.0
+1900.0,Netherlands,Same origin (1st gen immigrant),6520.0
+1900.0,Netherlands,Same origin (2nd gen),10036.0
+1900.0,Norway,3rd+ gen American,8116.0
+1900.0,Norway,Different origin (1st gen immigrant),3909.0
+1900.0,Norway,Different origin (2nd gen),7127.0
+1900.0,Norway,Same origin (1st gen immigrant),23559.0
+1900.0,Norway,Same origin (2nd gen),25500.0
+1900.0,Philippines,Different origin (2nd gen),101.0
+1900.0,Poland,3rd+ gen American,1105.0
+1900.0,Poland,Different origin (1st gen immigrant),1103.0
+1900.0,Poland,Different origin (2nd gen),1807.0
+1900.0,Poland,Same origin (1st gen immigrant),6617.0
+1900.0,Poland,Same origin (2nd gen),2606.0
+1900.0,Portugal,3rd+ gen American,1302.0
+1900.0,Portugal,Different origin (1st gen immigrant),200.0
+1900.0,Portugal,Different origin (2nd gen),500.0
+1900.0,Portugal,Same origin (1st gen immigrant),1705.0
+1900.0,Portugal,Same origin (2nd gen),200.0
+1900.0,Puerto Rico,Different origin (2nd gen),100.0
+1900.0,Russia/USSR,3rd+ gen American,1704.0
+1900.0,Russia/USSR,Different origin (1st gen immigrant),903.0
+1900.0,Russia/USSR,Different origin (2nd gen),1104.0
+1900.0,Russia/USSR,Same origin (1st gen immigrant),2207.0
+1900.0,Russia/USSR,Same origin (2nd gen),802.0
+1900.0,Scotland,3rd+ gen American,82538.0
+1900.0,Scotland,Different origin (1st gen immigrant),17754.0
+1900.0,Scotland,Different origin (2nd gen),37707.0
+1900.0,Scotland,Same origin (1st gen immigrant),4817.0
+1900.0,Scotland,Same origin (2nd gen),7425.0
+1900.0,South America,3rd+ gen American,801.0
+1900.0,South America,Different origin (1st gen immigrant),101.0
+1900.0,South America,Different origin (2nd gen),101.0
+1900.0,Spain,3rd+ gen American,1809.0
+1900.0,Spain,Different origin (1st gen immigrant),100.0
+1900.0,Spain,Different origin (2nd gen),1505.0
+1900.0,Spain,Same origin (1st gen immigrant),202.0
+1900.0,Sweden,3rd+ gen American,10129.0
+1900.0,Sweden,Different origin (1st gen immigrant),2609.0
+1900.0,Sweden,Different origin (2nd gen),7218.0
+1900.0,Sweden,Same origin (1st gen immigrant),13936.0
+1900.0,Sweden,Same origin (2nd gen),9630.0
+1900.0,Switzerland,3rd+ gen American,16348.0
+1900.0,Switzerland,Different origin (1st gen immigrant),6222.0
+1900.0,Switzerland,Different origin (2nd gen),13436.0
+1900.0,Switzerland,Same origin (1st gen immigrant),1904.0
+1900.0,Switzerland,Same origin (2nd gen),4816.0
+1900.0,Turkey,Different origin (2nd gen),101.0
+1900.0,Wales,3rd+ gen American,22462.0
+1900.0,Wales,Different origin (1st gen immigrant),4812.0
+1900.0,Wales,Different origin (2nd gen),11131.0
+1900.0,Wales,Same origin (1st gen immigrant),4811.0
+1900.0,Wales,Same origin (2nd gen),7818.0
+1900.0,West Indies,3rd+ gen American,1806.0
+1900.0,West Indies,Different origin (1st gen immigrant),101.0
+1900.0,West Indies,Different origin (2nd gen),400.0
+1900.0,West Indies,Same origin (1st gen immigrant),401.0
+1900.0,West Indies,Same origin (2nd gen),200.0
+1910.0,Abroad/At Sea,3rd+ gen American,6924.0
+1910.0,Abroad/At Sea,Different origin (1st gen immigrant),805.0
+1910.0,Abroad/At Sea,Different origin (2nd gen),2505.0
+1910.0,Africa,3rd+ gen American,905.0
+1910.0,Africa,Different origin (1st gen immigrant),101.0
+1910.0,Africa,Same origin (1st gen immigrant),100.0
+1910.0,Atlantic Islands,3rd+ gen American,100.0
+1910.0,Australia/New Zealand,3rd+ gen American,803.0
+1910.0,Australia/New Zealand,Different origin (2nd gen),201.0
+1910.0,Australia/New Zealand,Same origin (1st gen immigrant),100.0
+1910.0,Austria,3rd+ gen American,9526.0
+1910.0,Austria,Different origin (1st gen immigrant),6225.0
+1910.0,Austria,Different origin (2nd gen),15646.0
+1910.0,Austria,Same origin (1st gen immigrant),23274.0
+1910.0,Austria,Same origin (2nd gen),30682.0
+1910.0,Belgium,3rd+ gen American,3206.0
+1910.0,Belgium,Different origin (1st gen immigrant),1403.0
+1910.0,Belgium,Different origin (2nd gen),3006.0
+1910.0,Belgium,Same origin (1st gen immigrant),1302.0
+1910.0,Belgium,Same origin (2nd gen),2608.0
+1910.0,Bulgaria,3rd+ gen American,100.0
+1910.0,Bulgaria,Different origin (2nd gen),100.0
+1910.0,Canada,3rd+ gen American,193760.0
+1910.0,Canada,Different origin (1st gen immigrant),21272.0
+1910.0,Canada,Different origin (2nd gen),82844.0
+1910.0,Canada,Same origin (1st gen immigrant),68515.0
+1910.0,Canada,Same origin (2nd gen),68822.0
+1910.0,Central America,Different origin (2nd gen),100.0
+1910.0,"Central Europe, ns",Same origin (1st gen immigrant),100.0
+1910.0,China,3rd+ gen American,602.0
+1910.0,China,Different origin (1st gen immigrant),201.0
+1910.0,China,Different origin (2nd gen),100.0
+1910.0,China,Same origin (1st gen immigrant),1304.0
+1910.0,China,Same origin (2nd gen),1000.0
+1910.0,Cuba,3rd+ gen American,701.0
+1910.0,Cuba,Different origin (1st gen immigrant),100.0
+1910.0,Cuba,Different origin (2nd gen),300.0
+1910.0,Cuba,Same origin (1st gen immigrant),600.0
+1910.0,Cuba,Same origin (2nd gen),200.0
+1910.0,Czechoslovakia,3rd+ gen American,1306.0
+1910.0,Czechoslovakia,Different origin (1st gen immigrant),300.0
+1910.0,Czechoslovakia,Different origin (2nd gen),1605.0
+1910.0,Czechoslovakia,Same origin (1st gen immigrant),702.0
+1910.0,Czechoslovakia,Same origin (2nd gen),1604.0
+1910.0,Denmark,3rd+ gen American,16247.0
+1910.0,Denmark,Different origin (1st gen immigrant),5813.0
+1910.0,Denmark,Different origin (2nd gen),14153.0
+1910.0,Denmark,Same origin (1st gen immigrant),5210.0
+1910.0,Denmark,Same origin (2nd gen),7820.0
+1910.0,England,3rd+ gen American,362557.0
+1910.0,England,Different origin (1st gen immigrant),50663.0
+1910.0,England,Different origin (2nd gen),141933.0
+1910.0,England,Same origin (1st gen immigrant),35202.0
+1910.0,England,Same origin (2nd gen),77943.0
+1910.0,"Europe, ns",3rd+ gen American,803.0
+1910.0,"Europe, ns",Different origin (1st gen immigrant),101.0
+1910.0,"Europe, ns",Different origin (2nd gen),602.0
+1910.0,"Europe, ns",Same origin (1st gen immigrant),201.0
+1910.0,"Europe, ns",Same origin (2nd gen),602.0
+1910.0,Finland,3rd+ gen American,603.0
+1910.0,Finland,Different origin (1st gen immigrant),100.0
+1910.0,Finland,Different origin (2nd gen),302.0
+1910.0,Finland,Same origin (1st gen immigrant),1908.0
+1910.0,Finland,Same origin (2nd gen),202.0
+1910.0,France,3rd+ gen American,46020.0
+1910.0,France,Different origin (1st gen immigrant),13847.0
+1910.0,France,Different origin (2nd gen),35804.0
+1910.0,France,Same origin (1st gen immigrant),2706.0
+1910.0,France,Same origin (2nd gen),6226.0
+1910.0,Germany,3rd+ gen American,687950.0
+1910.0,Germany,Different origin (1st gen immigrant),113163.0
+1910.0,Germany,Different origin (2nd gen),261159.0
+1910.0,Germany,Same origin (1st gen immigrant),304157.0
+1910.0,Germany,Same origin (2nd gen),929662.0
+1910.0,Greece,3rd+ gen American,401.0
+1910.0,Greece,Different origin (2nd gen),201.0
+1910.0,Greece,Same origin (1st gen immigrant),100.0
+1910.0,Hungary,3rd+ gen American,902.0
+1910.0,Hungary,Different origin (1st gen immigrant),1403.0
+1910.0,Hungary,Different origin (2nd gen),1305.0
+1910.0,Hungary,Same origin (1st gen immigrant),3111.0
+1910.0,Hungary,Same origin (2nd gen),1406.0
+1910.0,Iceland,3rd+ gen American,200.0
+1910.0,Iceland,Different origin (2nd gen),100.0
+1910.0,India,3rd+ gen American,300.0
+1910.0,Ireland,3rd+ gen American,375468.0
+1910.0,Ireland,Different origin (1st gen immigrant),93673.0
+1910.0,Ireland,Different origin (2nd gen),199187.0
+1910.0,Ireland,Same origin (1st gen immigrant),105917.0
+1910.0,Ireland,Same origin (2nd gen),398596.0
+1910.0,Italy,3rd+ gen American,7520.0
+1910.0,Italy,Different origin (1st gen immigrant),1909.0
+1910.0,Italy,Different origin (2nd gen),6731.0
+1910.0,Italy,Same origin (1st gen immigrant),19571.0
+1910.0,Italy,Same origin (2nd gen),8230.0
+1910.0,Japan,Same origin (1st gen immigrant),100.0
+1910.0,Lithuania,Same origin (1st gen immigrant),100.0
+1910.0,Luxembourg,3rd+ gen American,200.0
+1910.0,Luxembourg,Different origin (2nd gen),500.0
+1910.0,Luxembourg,Same origin (2nd gen),604.0
+1910.0,Mexico,3rd+ gen American,8124.0
+1910.0,Mexico,Different origin (1st gen immigrant),502.0
+1910.0,Mexico,Different origin (2nd gen),801.0
+1910.0,Mexico,Same origin (1st gen immigrant),11029.0
+1910.0,Mexico,Same origin (2nd gen),13246.0
+1910.0,Netherlands,3rd+ gen American,14837.0
+1910.0,Netherlands,Different origin (1st gen immigrant),4516.0
+1910.0,Netherlands,Different origin (2nd gen),9738.0
+1910.0,Netherlands,Same origin (1st gen immigrant),8219.0
+1910.0,Netherlands,Same origin (2nd gen),14636.0
+1910.0,Norway,3rd+ gen American,25073.0
+1910.0,Norway,Different origin (1st gen immigrant),9631.0
+1910.0,Norway,Different origin (2nd gen),20154.0
+1910.0,Norway,Same origin (1st gen immigrant),27977.0
+1910.0,Norway,Same origin (2nd gen),48748.0
+1910.0,Pacific Islands,3rd+ gen American,100.0
+1910.0,Pacific Islands,Different origin (1st gen immigrant),100.0
+1910.0,Pacific Islands,Different origin (2nd gen),101.0
+1910.0,Philippines,3rd+ gen American,101.0
+1910.0,Philippines,Different origin (2nd gen),100.0
+1910.0,Poland,3rd+ gen American,904.0
+1910.0,Poland,Different origin (1st gen immigrant),1003.0
+1910.0,Poland,Different origin (2nd gen),1106.0
+1910.0,Poland,Same origin (1st gen immigrant),2204.0
+1910.0,Poland,Same origin (2nd gen),2004.0
+1910.0,Portugal,3rd+ gen American,2308.0
+1910.0,Portugal,Different origin (1st gen immigrant),701.0
+1910.0,Portugal,Different origin (2nd gen),1609.0
+1910.0,Portugal,Same origin (1st gen immigrant),3911.0
+1910.0,Portugal,Same origin (2nd gen),2008.0
+1910.0,Puerto Rico,3rd+ gen American,100.0
+1910.0,Romania,Different origin (1st gen immigrant),201.0
+1910.0,Romania,Different origin (2nd gen),300.0
+1910.0,Russia/USSR,3rd+ gen American,3915.0
+1910.0,Russia/USSR,Different origin (1st gen immigrant),4911.0
+1910.0,Russia/USSR,Different origin (2nd gen),4911.0
+1910.0,Russia/USSR,Same origin (1st gen immigrant),16949.0
+1910.0,Russia/USSR,Same origin (2nd gen),14042.0
+1910.0,Scotland,3rd+ gen American,101800.0
+1910.0,Scotland,Different origin (1st gen immigrant),18357.0
+1910.0,Scotland,Different origin (2nd gen),51846.0
+1910.0,Scotland,Same origin (1st gen immigrant),5919.0
+1910.0,Scotland,Same origin (2nd gen),12228.0
+1910.0,South America,3rd+ gen American,904.0
+1910.0,South America,Different origin (1st gen immigrant),301.0
+1910.0,South America,Different origin (2nd gen),100.0
+1910.0,South America,Same origin (1st gen immigrant),100.0
+1910.0,"Southern Europe, ns",Same origin (2nd gen),200.0
+1910.0,Spain,3rd+ gen American,2907.0
+1910.0,Spain,Different origin (1st gen immigrant),1104.0
+1910.0,Spain,Different origin (2nd gen),2206.0
+1910.0,Spain,Same origin (1st gen immigrant),100.0
+1910.0,Sweden,3rd+ gen American,31194.0
+1910.0,Sweden,Different origin (1st gen immigrant),7122.0
+1910.0,Sweden,Different origin (2nd gen),23067.0
+1910.0,Sweden,Same origin (1st gen immigrant),21461.0
+1910.0,Sweden,Same origin (2nd gen),18446.0
+1910.0,Switzerland,3rd+ gen American,32193.0
+1910.0,Switzerland,Different origin (1st gen immigrant),8116.0
+1910.0,Switzerland,Different origin (2nd gen),22368.0
+1910.0,Switzerland,Same origin (1st gen immigrant),4009.0
+1910.0,Switzerland,Same origin (2nd gen),7412.0
+1910.0,Syria,Same origin (2nd gen),200.0
+1910.0,Turkey,3rd+ gen American,301.0
+1910.0,Turkey,Different origin (1st gen immigrant),100.0
+1910.0,Turkey,Different origin (2nd gen),100.0
+1910.0,"United Kingdom, ns",3rd+ gen American,403.0
+1910.0,Wales,3rd+ gen American,38218.0
+1910.0,Wales,Different origin (1st gen immigrant),5512.0
+1910.0,Wales,Different origin (2nd gen),17749.0
+1910.0,Wales,Same origin (1st gen immigrant),6614.0
+1910.0,Wales,Same origin (2nd gen),11448.0
+1910.0,West Indies,3rd+ gen American,2709.0
+1910.0,West Indies,Different origin (1st gen immigrant),300.0
+1910.0,West Indies,Different origin (2nd gen),300.0
+1910.0,West Indies,Same origin (1st gen immigrant),903.0
+1910.0,West Indies,Same origin (2nd gen),1002.0
+1920.0,Abroad/At Sea,3rd+ gen American,7044.15
+1920.0,Abroad/At Sea,Different origin (1st gen immigrant),1408.89
+1920.0,Abroad/At Sea,Different origin (2nd gen),4020.74
+1920.0,Africa,3rd+ gen American,272.61
+1920.0,Africa,Different origin (2nd gen),225.28
+1920.0,Albania,Different origin (1st gen immigrant),100.73
+1920.0,"Asia Minor, ns",3rd+ gen American,107.66
+1920.0,Atlantic Islands,3rd+ gen American,403.58
+1920.0,Atlantic Islands,Different origin (1st gen immigrant),99.67
+1920.0,Atlantic Islands,Different origin (2nd gen),211.51999999999998
+1920.0,Australia/New Zealand,3rd+ gen American,1341.28
+1920.0,Australia/New Zealand,Different origin (1st gen immigrant),199.49
+1920.0,Australia/New Zealand,Different origin (2nd gen),571.46
+1920.0,Austria,3rd+ gen American,18444.69
+1920.0,Austria,Different origin (1st gen immigrant),14389.46
+1920.0,Austria,Different origin (2nd gen),25655.72
+1920.0,Austria,Same origin (1st gen immigrant),12015.03
+1920.0,Austria,Same origin (2nd gen),17433.04
+1920.0,Belgium,3rd+ gen American,6695.2
+1920.0,Belgium,Different origin (1st gen immigrant),2825.48
+1920.0,Belgium,Different origin (2nd gen),5783.72
+1920.0,Belgium,Same origin (1st gen immigrant),1276.73
+1920.0,Belgium,Same origin (2nd gen),4944.88
+1920.0,Bulgaria,3rd+ gen American,206.37
+1920.0,Canada,3rd+ gen American,286019.89
+1920.0,Canada,Different origin (1st gen immigrant),31876.37
+1920.0,Canada,Different origin (2nd gen),127873.8
+1920.0,Canada,Same origin (1st gen immigrant),76006.33
+1920.0,Canada,Same origin (2nd gen),107809.82
+1920.0,China,3rd+ gen American,802.6899999999999
+1920.0,China,Different origin (1st gen immigrant),102.62
+1920.0,China,Different origin (2nd gen),207.75
+1920.0,China,Same origin (1st gen immigrant),2059.75
+1920.0,China,Same origin (2nd gen),961.3199999999999
+1920.0,Cuba,3rd+ gen American,1601.3899999999999
+1920.0,Cuba,Different origin (1st gen immigrant),518.29
+1920.0,Cuba,Different origin (2nd gen),200.89
+1920.0,Cuba,Same origin (1st gen immigrant),335.86
+1920.0,Cuba,Same origin (2nd gen),939.52
+1920.0,Czechoslovakia,3rd+ gen American,18011.66
+1920.0,Czechoslovakia,Different origin (1st gen immigrant),7343.6
+1920.0,Czechoslovakia,Different origin (2nd gen),23270.08
+1920.0,Czechoslovakia,Same origin (1st gen immigrant),23030.07
+1920.0,Czechoslovakia,Same origin (2nd gen),51515.520000000004
+1920.0,Denmark,3rd+ gen American,45148.18
+1920.0,Denmark,Different origin (1st gen immigrant),8359.84
+1920.0,Denmark,Different origin (2nd gen),34139.13
+1920.0,Denmark,Same origin (1st gen immigrant),8468.13
+1920.0,Denmark,Same origin (2nd gen),15279.64
+1920.0,England,3rd+ gen American,418495.78
+1920.0,England,Different origin (1st gen immigrant),57499.33
+1920.0,England,Different origin (2nd gen),182920.64
+1920.0,England,Same origin (1st gen immigrant),31304.21
+1920.0,England,Same origin (2nd gen),74035.18000000001
+1920.0,"Europe, ns",3rd+ gen American,1638.24
+1920.0,"Europe, ns",Different origin (1st gen immigrant),505.24
+1920.0,"Europe, ns",Different origin (2nd gen),506.29
+1920.0,"Europe, ns",Same origin (1st gen immigrant),284.96000000000004
+1920.0,"Europe, ns",Same origin (2nd gen),201.2
+1920.0,Finland,3rd+ gen American,1153.54
+1920.0,Finland,Different origin (1st gen immigrant),936.24
+1920.0,Finland,Different origin (2nd gen),1918.76
+1920.0,Finland,Same origin (1st gen immigrant),2864.37
+1920.0,Finland,Same origin (2nd gen),3540.64
+1920.0,France,3rd+ gen American,89793.92
+1920.0,France,Different origin (1st gen immigrant),18459.15
+1920.0,France,Different origin (2nd gen),64000.08
+1920.0,France,Same origin (1st gen immigrant),4778.37
+1920.0,France,Same origin (2nd gen),13486.62
+1920.0,Germany,3rd+ gen American,886286.24
+1920.0,Germany,Different origin (1st gen immigrant),146474.05
+1920.0,Germany,Different origin (2nd gen),372150.11
+1920.0,Germany,Same origin (1st gen immigrant),219299.02
+1920.0,Germany,Same origin (2nd gen),913902.1900000001
+1920.0,Gibraltar,3rd+ gen American,84.01
+1920.0,Gibraltar,Different origin (2nd gen),208.11
+1920.0,Greece,3rd+ gen American,635.49
+1920.0,Greece,Different origin (1st gen immigrant),297.61
+1920.0,Greece,Different origin (2nd gen),506.95000000000005
+1920.0,Greece,Same origin (1st gen immigrant),103.49
+1920.0,Hungary,3rd+ gen American,2848.37
+1920.0,Hungary,Different origin (1st gen immigrant),2742.47
+1920.0,Hungary,Different origin (2nd gen),4936.15
+1920.0,Hungary,Same origin (1st gen immigrant),3608.21
+1920.0,Hungary,Same origin (2nd gen),1837.62
+1920.0,Iceland,3rd+ gen American,107.34
+1920.0,Iceland,Different origin (1st gen immigrant),97.59
+1920.0,Iceland,Different origin (2nd gen),300.54
+1920.0,Iceland,Same origin (1st gen immigrant),90.88
+1920.0,India,3rd+ gen American,423.86
+1920.0,Indonesia,Different origin (1st gen immigrant),216.76
+1920.0,Indonesia,Different origin (2nd gen),198.10000000000002
+1920.0,Iran,3rd+ gen American,109.62
+1920.0,Ireland,3rd+ gen American,436955.24
+1920.0,Ireland,Different origin (1st gen immigrant),91401.86
+1920.0,Ireland,Different origin (2nd gen),230279.07
+1920.0,Ireland,Same origin (1st gen immigrant),80768.26
+1920.0,Ireland,Same origin (2nd gen),387807.76
+1920.0,Israel/Palestine,3rd+ gen American,87.21
+1920.0,Italy,3rd+ gen American,15926.67
+1920.0,Italy,Different origin (1st gen immigrant),4936.02
+1920.0,Italy,Different origin (2nd gen),14277.89
+1920.0,Italy,Same origin (1st gen immigrant),54413.71
+1920.0,Italy,Same origin (2nd gen),30469.42
+1920.0,Japan,3rd+ gen American,103.23
+1920.0,Japan,Different origin (2nd gen),203.28
+1920.0,Japan,Same origin (1st gen immigrant),1691.96
+1920.0,Japan,Same origin (2nd gen),393.5
+1920.0,Korea,3rd+ gen American,101.04
+1920.0,Latvia,Different origin (1st gen immigrant),317.44
+1920.0,Latvia,Different origin (2nd gen),100.6
+1920.0,Liechtenstein,3rd+ gen American,101.35
+1920.0,Liechtenstein,Different origin (1st gen immigrant),98.48
+1920.0,Lithuania,3rd+ gen American,518.9300000000001
+1920.0,Lithuania,Different origin (1st gen immigrant),805.62
+1920.0,Lithuania,Different origin (2nd gen),1220.32
+1920.0,Lithuania,Same origin (1st gen immigrant),2404.18
+1920.0,Lithuania,Same origin (2nd gen),588.36
+1920.0,Luxembourg,3rd+ gen American,4816.56
+1920.0,Luxembourg,Different origin (1st gen immigrant),1746.0
+1920.0,Luxembourg,Different origin (2nd gen),8491.91
+1920.0,Luxembourg,Same origin (1st gen immigrant),301.42
+1920.0,Luxembourg,Same origin (2nd gen),3027.16
+1920.0,Mexico,3rd+ gen American,6736.07
+1920.0,Mexico,Different origin (1st gen immigrant),612.4200000000001
+1920.0,Mexico,Different origin (2nd gen),1297.86
+1920.0,Mexico,Same origin (1st gen immigrant),13377.16
+1920.0,Mexico,Same origin (2nd gen),13669.96
+1920.0,Netherlands,3rd+ gen American,29163.51
+1920.0,Netherlands,Different origin (1st gen immigrant),5643.22
+1920.0,Netherlands,Different origin (2nd gen),20154.99
+1920.0,Netherlands,Same origin (1st gen immigrant),11347.42
+1920.0,Netherlands,Same origin (2nd gen),22973.94
+1920.0,Norway,3rd+ gen American,50747.64
+1920.0,Norway,Different origin (1st gen immigrant),14465.68
+1920.0,Norway,Different origin (2nd gen),43014.06
+1920.0,Norway,Same origin (1st gen immigrant),32732.89
+1920.0,Norway,Same origin (2nd gen),76049.12
+1920.0,Pacific Islands,3rd+ gen American,95.71
+1920.0,Philippines,3rd+ gen American,98.78
+1920.0,Poland,3rd+ gen American,19178.61
+1920.0,Poland,Different origin (1st gen immigrant),13591.39
+1920.0,Poland,Different origin (2nd gen),36233.75
+1920.0,Poland,Same origin (1st gen immigrant),39585.47
+1920.0,Poland,Same origin (2nd gen),68498.4
+1920.0,Portugal,3rd+ gen American,4012.61
+1920.0,Portugal,Different origin (1st gen immigrant),1227.78
+1920.0,Portugal,Different origin (2nd gen),4882.95
+1920.0,Portugal,Same origin (1st gen immigrant),7153.76
+1920.0,Portugal,Same origin (2nd gen),6050.48
+1920.0,Puerto Rico,3rd+ gen American,499.24
+1920.0,Puerto Rico,Different origin (2nd gen),102.15
+1920.0,Romania,3rd+ gen American,217.06
+1920.0,Romania,Different origin (1st gen immigrant),925.12
+1920.0,Romania,Different origin (2nd gen),1624.67
+1920.0,Romania,Same origin (1st gen immigrant),798.56
+1920.0,Romania,Same origin (2nd gen),400.17999999999995
+1920.0,Russia/USSR,3rd+ gen American,9590.48
+1920.0,Russia/USSR,Different origin (1st gen immigrant),12981.09
+1920.0,Russia/USSR,Different origin (2nd gen),19264.11
+1920.0,Russia/USSR,Same origin (1st gen immigrant),35990.64
+1920.0,Russia/USSR,Same origin (2nd gen),48216.62
+1920.0,Scotland,3rd+ gen American,118297.77
+1920.0,Scotland,Different origin (1st gen immigrant),22324.41
+1920.0,Scotland,Different origin (2nd gen),67738.41
+1920.0,Scotland,Same origin (1st gen immigrant),4402.31
+1920.0,Scotland,Same origin (2nd gen),12424.66
+1920.0,South America,3rd+ gen American,2233.95
+1920.0,South America,Different origin (1st gen immigrant),100.95
+1920.0,South America,Different origin (2nd gen),515.29
+1920.0,Spain,3rd+ gen American,4042.82
+1920.0,Spain,Different origin (1st gen immigrant),503.06
+1920.0,Spain,Different origin (2nd gen),2339.92
+1920.0,Spain,Same origin (1st gen immigrant),300.74
+1920.0,Spain,Same origin (2nd gen),197.56
+1920.0,Sweden,3rd+ gen American,76949.34
+1920.0,Sweden,Different origin (1st gen immigrant),15932.95
+1920.0,Sweden,Different origin (2nd gen),55771.87
+1920.0,Sweden,Same origin (1st gen immigrant),31096.95
+1920.0,Sweden,Same origin (2nd gen),51059.24
+1920.0,Switzerland,3rd+ gen American,50081.95
+1920.0,Switzerland,Different origin (1st gen immigrant),11059.82
+1920.0,Switzerland,Different origin (2nd gen),36597.55
+1920.0,Switzerland,Same origin (1st gen immigrant),4689.62
+1920.0,Switzerland,Same origin (2nd gen),6949.28
+1920.0,Syria,3rd+ gen American,294.24
+1920.0,Syria,Different origin (1st gen immigrant),102.34
+1920.0,Syria,Different origin (2nd gen),199.95999999999998
+1920.0,Syria,Same origin (1st gen immigrant),611.02
+1920.0,Turkey,3rd+ gen American,196.05
+1920.0,Turkey,Different origin (1st gen immigrant),93.58
+1920.0,Turkey,Same origin (1st gen immigrant),102.7
+1920.0,US Virgin Islands,3rd+ gen American,104.86
+1920.0,US Virgin Islands,Different origin (2nd gen),98.78
+1920.0,US Virgin Islands,Same origin (1st gen immigrant),100.6
+1920.0,"United Kingdom, ns",3rd+ gen American,107.82
+1920.0,"United Kingdom, ns",Different origin (2nd gen),100.98
+1920.0,Wales,3rd+ gen American,43006.14
+1920.0,Wales,Different origin (1st gen immigrant),5185.78
+1920.0,Wales,Different origin (2nd gen),21500.12
+1920.0,Wales,Same origin (1st gen immigrant),4695.37
+1920.0,Wales,Same origin (2nd gen),9172.64
+1920.0,West Indies,3rd+ gen American,2696.04
+1920.0,West Indies,Different origin (1st gen immigrant),235.27
+1920.0,West Indies,Different origin (2nd gen),501.24
+1920.0,West Indies,Same origin (1st gen immigrant),894.57
+1920.0,West Indies,Same origin (2nd gen),267.8
+1920.0,Yugoslavia,3rd+ gen American,202.2
+1920.0,Yugoslavia,Different origin (1st gen immigrant),208.12
+1920.0,Yugoslavia,Different origin (2nd gen),504.09000000000003
+1920.0,Yugoslavia,Same origin (1st gen immigrant),1100.92
+1920.0,Yugoslavia,Same origin (2nd gen),809.62
+1930.0,Abroad/At Sea,3rd+ gen American,6964.6
+1930.0,Abroad/At Sea,Different origin (1st gen immigrant),1110.45
+1930.0,Abroad/At Sea,Different origin (2nd gen),3331.35
+1930.0,Abroad/At Sea,Same origin (1st gen immigrant),100.95
+1930.0,Africa,3rd+ gen American,908.5500000000001
+1930.0,Africa,Different origin (1st gen immigrant),403.8
+1930.0,Africa,Different origin (2nd gen),908.5500000000001
+1930.0,Africa,Same origin (2nd gen),201.9
+1930.0,Albania,3rd+ gen American,100.95
+1930.0,"Asia, ns",3rd+ gen American,100.4
+1930.0,"Asia, ns",Different origin (2nd gen),201.9
+1930.0,"Asia, ns",Same origin (2nd gen),200.8
+1930.0,Atlantic Islands,Different origin (2nd gen),100.95
+1930.0,Atlantic Islands,Same origin (1st gen immigrant),403.8
+1930.0,Australia/New Zealand,3rd+ gen American,3634.2000000000003
+1930.0,Australia/New Zealand,Different origin (1st gen immigrant),1110.45
+1930.0,Australia/New Zealand,Different origin (2nd gen),3129.4500000000003
+1930.0,Austria,3rd+ gen American,35735.75
+1930.0,Austria,Different origin (1st gen immigrant),23622.3
+1930.0,Austria,Different origin (2nd gen),51887.75
+1930.0,Austria,Same origin (1st gen immigrant),10800.7
+1930.0,Austria,Same origin (2nd gen),33111.6
+1930.0,Belgium,3rd+ gen American,10801.65
+1930.0,Belgium,Different origin (1st gen immigrant),2119.9500000000003
+1930.0,Belgium,Different origin (2nd gen),9893.1
+1930.0,Belgium,Same origin (1st gen immigrant),2220.9
+1930.0,Belgium,Same origin (2nd gen),4239.900000000001
+1930.0,Bulgaria,3rd+ gen American,201.9
+1930.0,Canada,3rd+ gen American,392993.85000000003
+1930.0,Canada,Different origin (1st gen immigrant),41288.0
+1930.0,Canada,Different origin (2nd gen),186049.9
+1930.0,Canada,Same origin (1st gen immigrant),87725.0
+1930.0,Canada,Same origin (2nd gen),156472.5
+1930.0,Central America,3rd+ gen American,100.95
+1930.0,Central America,Different origin (1st gen immigrant),100.95
+1930.0,Central America,Same origin (1st gen immigrant),100.95
+1930.0,"Central Europe, ns",3rd+ gen American,100.95
+1930.0,"Central Europe, ns",Different origin (2nd gen),201.9
+1930.0,"Central Europe, ns",Same origin (1st gen immigrant),504.75
+1930.0,China,3rd+ gen American,703.9000000000001
+1930.0,China,Different origin (1st gen immigrant),200.8
+1930.0,China,Different origin (2nd gen),602.95
+1930.0,China,Same origin (1st gen immigrant),3020.8
+1930.0,China,Same origin (2nd gen),2818.9
+1930.0,Cuba,3rd+ gen American,1110.45
+1930.0,Cuba,Different origin (1st gen immigrant),302.85
+1930.0,Cuba,Different origin (2nd gen),1413.3
+1930.0,Cuba,Same origin (1st gen immigrant),605.7
+1930.0,Cuba,Same origin (2nd gen),1615.2
+1930.0,Czechoslovakia,3rd+ gen American,39168.6
+1930.0,Czechoslovakia,Different origin (1st gen immigrant),12214.95
+1930.0,Czechoslovakia,Different origin (2nd gen),41894.25
+1930.0,Czechoslovakia,Same origin (1st gen immigrant),37654.35
+1930.0,Czechoslovakia,Same origin (2nd gen),90754.05
+1930.0,Denmark,3rd+ gen American,73590.5
+1930.0,Denmark,Different origin (1st gen immigrant),11506.800000000001
+1930.0,Denmark,Different origin (2nd gen),49263.05
+1930.0,Denmark,Same origin (1st gen immigrant),9691.2
+1930.0,Denmark,Same origin (2nd gen),17969.100000000002
+1930.0,England,3rd+ gen American,477592.25
+1930.0,England,Different origin (1st gen immigrant),56229.15
+1930.0,England,Different origin (2nd gen),212398.25
+1930.0,England,Same origin (1st gen immigrant),27761.25
+1930.0,England,Same origin (2nd gen),75509.5
+1930.0,Estonia,Different origin (1st gen immigrant),100.95
+1930.0,Estonia,Different origin (2nd gen),100.95
+1930.0,"Europe, ns",3rd+ gen American,2624.7000000000003
+1930.0,"Europe, ns",Different origin (1st gen immigrant),605.7
+1930.0,"Europe, ns",Different origin (2nd gen),1514.25
+1930.0,"Europe, ns",Same origin (1st gen immigrant),302.85
+1930.0,"Europe, ns",Same origin (2nd gen),2019.0
+1930.0,Finland,3rd+ gen American,6965.55
+1930.0,Finland,Different origin (1st gen immigrant),1615.2
+1930.0,Finland,Different origin (2nd gen),6763.650000000001
+1930.0,Finland,Same origin (1st gen immigrant),7773.150000000001
+1930.0,Finland,Same origin (2nd gen),9893.1
+1930.0,France,3rd+ gen American,87522.55
+1930.0,France,Different origin (1st gen immigrant),17564.350000000002
+1930.0,France,Different origin (2nd gen),61680.450000000004
+1930.0,France,Same origin (1st gen immigrant),4340.85
+1930.0,France,Same origin (2nd gen),8277.9
+1930.0,Germany,3rd+ gen American,1210285.3
+1930.0,Germany,Different origin (1st gen immigrant),153642.5
+1930.0,Germany,Different origin (2nd gen),465273.9
+1930.0,Germany,Same origin (1st gen immigrant),191098.35
+1930.0,Germany,Same origin (2nd gen),1036352.7000000001
+1930.0,Greece,3rd+ gen American,807.6
+1930.0,Greece,Different origin (2nd gen),605.7
+1930.0,Greece,Same origin (1st gen immigrant),1009.5
+1930.0,Hungary,3rd+ gen American,7268.400000000001
+1930.0,Hungary,Different origin (1st gen immigrant),8378.85
+1930.0,Hungary,Different origin (2nd gen),15344.4
+1930.0,Hungary,Same origin (1st gen immigrant),8378.85
+1930.0,Hungary,Same origin (2nd gen),8883.6
+1930.0,Iceland,3rd+ gen American,706.65
+1930.0,Iceland,Different origin (1st gen immigrant),201.9
+1930.0,Iceland,Different origin (2nd gen),504.75
+1930.0,Iceland,Same origin (2nd gen),605.7
+1930.0,India,3rd+ gen American,1615.2
+1930.0,India,Different origin (2nd gen),201.9
+1930.0,Iran,Different origin (2nd gen),100.95
+1930.0,Ireland,3rd+ gen American,483648.60000000003
+1930.0,Ireland,Different origin (1st gen immigrant),82475.2
+1930.0,Ireland,Different origin (2nd gen),267111.8
+1930.0,Ireland,Same origin (1st gen immigrant),60267.15
+1930.0,Ireland,Same origin (2nd gen),325664.7
+1930.0,Israel/Palestine,3rd+ gen American,100.95
+1930.0,Israel/Palestine,Different origin (2nd gen),100.95
+1930.0,Italy,3rd+ gen American,53604.450000000004
+1930.0,Italy,Different origin (1st gen immigrant),12114.0
+1930.0,Italy,Different origin (2nd gen),44720.3
+1930.0,Italy,Same origin (1st gen immigrant),133153.05000000002
+1930.0,Italy,Same origin (2nd gen),134061.6
+1930.0,Japan,3rd+ gen American,604.0500000000001
+1930.0,Japan,Different origin (2nd gen),200.8
+1930.0,Japan,Same origin (1st gen immigrant),4723.75
+1930.0,Japan,Same origin (2nd gen),5023.3
+1930.0,Korea,Same origin (1st gen immigrant),200.8
+1930.0,Korea,Same origin (2nd gen),200.8
+1930.0,Latvia,3rd+ gen American,100.95
+1930.0,Latvia,Different origin (1st gen immigrant),504.75
+1930.0,Latvia,Different origin (2nd gen),605.7
+1930.0,Latvia,Same origin (2nd gen),201.9
+1930.0,Liechtenstein,Different origin (2nd gen),100.95
+1930.0,Lithuania,3rd+ gen American,4946.55
+1930.0,Lithuania,Different origin (1st gen immigrant),2927.55
+1930.0,Lithuania,Different origin (2nd gen),7773.150000000001
+1930.0,Lithuania,Same origin (1st gen immigrant),6965.55
+1930.0,Lithuania,Same origin (2nd gen),7672.2
+1930.0,Luxembourg,3rd+ gen American,3937.05
+1930.0,Luxembourg,Different origin (1st gen immigrant),605.7
+1930.0,Luxembourg,Different origin (2nd gen),4744.650000000001
+1930.0,Luxembourg,Same origin (1st gen immigrant),403.8
+1930.0,Luxembourg,Same origin (2nd gen),1413.3
+1930.0,Malta,3rd+ gen American,100.95
+1930.0,Malta,Different origin (2nd gen),100.95
+1930.0,Mexico,3rd+ gen American,15041.550000000001
+1930.0,Mexico,Different origin (1st gen immigrant),1211.4
+1930.0,Mexico,Different origin (2nd gen),1514.25
+1930.0,Mexico,Same origin (1st gen immigrant),28871.7
+1930.0,Mexico,Same origin (2nd gen),35332.5
+1930.0,Netherlands,3rd+ gen American,40178.1
+1930.0,Netherlands,Different origin (1st gen immigrant),6359.85
+1930.0,Netherlands,Different origin (2nd gen),24228.0
+1930.0,Netherlands,Same origin (1st gen immigrant),10599.75
+1930.0,Netherlands,Same origin (2nd gen),37351.5
+1930.0,Norway,3rd+ gen American,102462.75
+1930.0,Norway,Different origin (1st gen immigrant),20288.100000000002
+1930.0,Norway,Different origin (2nd gen),77425.65000000001
+1930.0,Norway,Same origin (1st gen immigrant),29879.3
+1930.0,Norway,Same origin (2nd gen),105189.90000000001
+1930.0,Pacific Islands,3rd+ gen American,100.95
+1930.0,"Persian Gulf States, ns",Different origin (1st gen immigrant),100.95
+1930.0,Philippines,3rd+ gen American,403.8
+1930.0,Philippines,Different origin (2nd gen),302.85
+1930.0,Philippines,Same origin (1st gen immigrant),402.70000000000005
+1930.0,Poland,3rd+ gen American,39976.200000000004
+1930.0,Poland,Different origin (1st gen immigrant),21300.45
+1930.0,Poland,Different origin (2nd gen),61781.4
+1930.0,Poland,Same origin (1st gen immigrant),62891.85
+1930.0,Poland,Same origin (2nd gen),140320.5
+1930.0,Portugal,3rd+ gen American,9382.85
+1930.0,Portugal,Different origin (1st gen immigrant),2724.0
+1930.0,Portugal,Different origin (2nd gen),6863.5
+1930.0,Portugal,Same origin (1st gen immigrant),10797.800000000001
+1930.0,Portugal,Same origin (2nd gen),15721.800000000001
+1930.0,Puerto Rico,3rd+ gen American,403.25
+1930.0,Puerto Rico,Different origin (1st gen immigrant),100.4
+1930.0,Puerto Rico,Different origin (2nd gen),302.85
+1930.0,Puerto Rico,Same origin (1st gen immigrant),301.75
+1930.0,Puerto Rico,Same origin (2nd gen),200.8
+1930.0,Romania,3rd+ gen American,2019.0
+1930.0,Romania,Different origin (1st gen immigrant),4038.0
+1930.0,Romania,Different origin (2nd gen),7167.45
+1930.0,Romania,Same origin (1st gen immigrant),1716.15
+1930.0,Romania,Same origin (2nd gen),2422.8
+1930.0,Russia/USSR,3rd+ gen American,31293.55
+1930.0,Russia/USSR,Different origin (1st gen immigrant),27963.15
+1930.0,Russia/USSR,Different origin (2nd gen),58046.25
+1930.0,Russia/USSR,Same origin (1st gen immigrant),69352.65000000001
+1930.0,Russia/USSR,Same origin (2nd gen),135071.1
+1930.0,Scotland,3rd+ gen American,142035.15
+1930.0,Scotland,Different origin (1st gen immigrant),18574.25
+1930.0,Scotland,Different origin (2nd gen),81666.1
+1930.0,Scotland,Same origin (1st gen immigrant),5148.45
+1930.0,Scotland,Same origin (2nd gen),12719.7
+1930.0,South America,3rd+ gen American,1817.1000000000001
+1930.0,South America,Different origin (1st gen immigrant),302.85
+1930.0,South America,Different origin (2nd gen),1211.4
+1930.0,South America,Same origin (2nd gen),605.7
+1930.0,Spain,3rd+ gen American,5652.1
+1930.0,Spain,Different origin (1st gen immigrant),1312.3500000000001
+1930.0,Spain,Different origin (2nd gen),4239.35
+1930.0,Spain,Same origin (1st gen immigrant),908.5500000000001
+1930.0,Spain,Same origin (2nd gen),403.8
+1930.0,Sweden,3rd+ gen American,150516.45
+1930.0,Sweden,Different origin (1st gen immigrant),24429.9
+1930.0,Sweden,Different origin (2nd gen),105187.05
+1930.0,Sweden,Same origin (1st gen immigrant),34020.15
+1930.0,Sweden,Same origin (2nd gen),83182.8
+1930.0,Switzerland,3rd+ gen American,65112.75
+1930.0,Switzerland,Different origin (1st gen immigrant),10801.65
+1930.0,Switzerland,Different origin (2nd gen),43105.65
+1930.0,Switzerland,Same origin (1st gen immigrant),3432.3
+1930.0,Switzerland,Same origin (2nd gen),9085.5
+1930.0,Syria,3rd+ gen American,504.75
+1930.0,Syria,Different origin (1st gen immigrant),706.65
+1930.0,Syria,Different origin (2nd gen),1110.45
+1930.0,Syria,Same origin (1st gen immigrant),2321.85
+1930.0,Syria,Same origin (2nd gen),1817.1000000000001
+1930.0,Thailand,Different origin (2nd gen),100.95
+1930.0,Turkey,3rd+ gen American,302.85
+1930.0,Turkey,Different origin (1st gen immigrant),201.9
+1930.0,Turkey,Different origin (2nd gen),201.9
+1930.0,Turkey,Same origin (1st gen immigrant),605.7
+1930.0,Turkey,Same origin (2nd gen),201.9
+1930.0,US Virgin Islands,3rd+ gen American,201.9
+1930.0,US Virgin Islands,Different origin (1st gen immigrant),100.95
+1930.0,US Virgin Islands,Different origin (2nd gen),201.9
+1930.0,"United Kingdom, ns",3rd+ gen American,100.95
+1930.0,"United Kingdom, ns",Different origin (2nd gen),100.95
+1930.0,Wales,3rd+ gen American,53907.3
+1930.0,Wales,Different origin (1st gen immigrant),5754.150000000001
+1930.0,Wales,Different origin (2nd gen),26146.05
+1930.0,Wales,Same origin (1st gen immigrant),2119.9500000000003
+1930.0,Wales,Same origin (2nd gen),10700.7
+1930.0,West Indies,3rd+ gen American,4542.75
+1930.0,West Indies,Different origin (1st gen immigrant),605.7
+1930.0,West Indies,Different origin (2nd gen),1009.5
+1930.0,West Indies,Same origin (1st gen immigrant),807.6
+1930.0,West Indies,Same origin (2nd gen),807.6
+1930.0,Yugoslavia,3rd+ gen American,2220.9
+1930.0,Yugoslavia,Different origin (1st gen immigrant),2019.0
+1930.0,Yugoslavia,Different origin (2nd gen),3634.2000000000003
+1930.0,Yugoslavia,Same origin (1st gen immigrant),6965.55
+1930.0,Yugoslavia,Same origin (2nd gen),3230.4
+1940.0,Abroad/At Sea,3rd+ gen American,1300.0
+1940.0,Abroad/At Sea,Different origin (1st gen immigrant),200.0
+1940.0,Africa,3rd+ gen American,400.0
+1940.0,Africa,Different origin (1st gen immigrant),200.0
+1940.0,Albania,3rd+ gen American,100.0
+1940.0,"Asia, ns",3rd+ gen American,100.0
+1940.0,Atlantic Islands,3rd+ gen American,400.0
+1940.0,Australia/New Zealand,3rd+ gen American,2277.0
+1940.0,Australia/New Zealand,Different origin (1st gen immigrant),100.0
+1940.0,Austria,3rd+ gen American,60530.0
+1940.0,Austria,Different origin (1st gen immigrant),9174.0
+1940.0,Austria,Same origin (1st gen immigrant),4600.0
+1940.0,Belgium,3rd+ gen American,7938.0
+1940.0,Belgium,Different origin (1st gen immigrant),758.0
+1940.0,Belgium,Same origin (1st gen immigrant),600.0
+1940.0,Canada,3rd+ gen American,199070.0
+1940.0,Canada,Different origin (1st gen immigrant),9725.0
+1940.0,Canada,Same origin (1st gen immigrant),21365.0
+1940.0,Central America,3rd+ gen American,100.0
+1940.0,China,3rd+ gen American,700.0
+1940.0,China,Same origin (1st gen immigrant),300.0
+1940.0,Cuba,3rd+ gen American,1900.0
+1940.0,Cuba,Different origin (1st gen immigrant),100.0
+1940.0,Cuba,Same origin (1st gen immigrant),400.0
+1940.0,Czechoslovakia,3rd+ gen American,54284.0
+1940.0,Czechoslovakia,Different origin (1st gen immigrant),2700.0
+1940.0,Czechoslovakia,Same origin (1st gen immigrant),5000.0
+1940.0,Denmark,3rd+ gen American,46002.0
+1940.0,Denmark,Different origin (1st gen immigrant),3778.0
+1940.0,Denmark,Same origin (1st gen immigrant),2600.0
+1940.0,England,3rd+ gen American,203028.0
+1940.0,England,Different origin (1st gen immigrant),14900.0
+1940.0,England,Same origin (1st gen immigrant),7834.0
+1940.0,Estonia,3rd+ gen American,100.0
+1940.0,"Europe, ns",3rd+ gen American,1200.0
+1940.0,"Europe, ns",Different origin (1st gen immigrant),300.0
+1940.0,Finland,3rd+ gen American,16415.0
+1940.0,Finland,Different origin (1st gen immigrant),1100.0
+1940.0,Finland,Same origin (1st gen immigrant),2270.0
+1940.0,France,3rd+ gen American,36498.0
+1940.0,France,Different origin (1st gen immigrant),3800.0
+1940.0,France,Same origin (1st gen immigrant),700.0
+1940.0,Germany,3rd+ gen American,657264.0
+1940.0,Germany,Different origin (1st gen immigrant),33048.0
+1940.0,Germany,Same origin (1st gen immigrant),39852.0
+1940.0,Greece,3rd+ gen American,3658.0
+1940.0,Greece,Different origin (1st gen immigrant),500.0
+1940.0,Greece,Same origin (1st gen immigrant),1488.0
+1940.0,Hungary,3rd+ gen American,26296.0
+1940.0,Hungary,Different origin (1st gen immigrant),3087.0
+1940.0,Hungary,Same origin (1st gen immigrant),3700.0
+1940.0,Iceland,3rd+ gen American,400.0
+1940.0,India,3rd+ gen American,400.0
+1940.0,Ireland,3rd+ gen American,239754.0
+1940.0,Ireland,Different origin (1st gen immigrant),17220.0
+1940.0,Ireland,Same origin (1st gen immigrant),9777.0
+1940.0,Israel/Palestine,3rd+ gen American,300.0
+1940.0,Italy,3rd+ gen American,186922.0
+1940.0,Italy,Different origin (1st gen immigrant),7000.0
+1940.0,Italy,Same origin (1st gen immigrant),45278.0
+1940.0,Japan,3rd+ gen American,1000.0
+1940.0,Japan,Different origin (1st gen immigrant),100.0
+1940.0,Japan,Same origin (1st gen immigrant),900.0
+1940.0,Korea,Same origin (1st gen immigrant),100.0
+1940.0,Latvia,3rd+ gen American,800.0
+1940.0,Latvia,Different origin (1st gen immigrant),100.0
+1940.0,Lithuania,3rd+ gen American,18753.0
+1940.0,Lithuania,Different origin (1st gen immigrant),1670.0
+1940.0,Lithuania,Same origin (1st gen immigrant),1800.0
+1940.0,Luxembourg,3rd+ gen American,1500.0
+1940.0,Luxembourg,Different origin (1st gen immigrant),100.0
+1940.0,Mexico,3rd+ gen American,21425.0
+1940.0,Mexico,Different origin (1st gen immigrant),370.0
+1940.0,Mexico,Same origin (1st gen immigrant),7794.0
+1940.0,Missing,3rd+ gen American,714146.0
+1940.0,Missing,Different origin (1st gen immigrant),38611.0
+1940.0,Netherlands,3rd+ gen American,30987.0
+1940.0,Netherlands,Different origin (1st gen immigrant),800.0
+1940.0,Netherlands,Same origin (1st gen immigrant),3670.0
+1940.0,Norway,3rd+ gen American,86443.0
+1940.0,Norway,Different origin (1st gen immigrant),4900.0
+1940.0,Norway,Same origin (1st gen immigrant),7673.0
+1940.0,Philippines,3rd+ gen American,100.0
+1940.0,Philippines,Same origin (1st gen immigrant),100.0
+1940.0,Poland,3rd+ gen American,160363.0
+1940.0,Poland,Different origin (1st gen immigrant),10687.0
+1940.0,Poland,Same origin (1st gen immigrant),16431.0
+1940.0,Portugal,3rd+ gen American,11787.0
+1940.0,Portugal,Different origin (1st gen immigrant),787.0
+1940.0,Portugal,Same origin (1st gen immigrant),2177.0
+1940.0,Puerto Rico,3rd+ gen American,500.0
+1940.0,Puerto Rico,Same origin (1st gen immigrant),100.0
+1940.0,Romania,3rd+ gen American,8500.0
+1940.0,Romania,Different origin (1st gen immigrant),2300.0
+1940.0,Romania,Same origin (1st gen immigrant),900.0
+1940.0,Russia/USSR,3rd+ gen American,134988.0
+1940.0,Russia/USSR,Different origin (1st gen immigrant),15288.0
+1940.0,Russia/USSR,Same origin (1st gen immigrant),21453.0
+1940.0,Scotland,3rd+ gen American,55961.0
+1940.0,Scotland,Different origin (1st gen immigrant),4100.0
+1940.0,Scotland,Same origin (1st gen immigrant),1800.0
+1940.0,South America,3rd+ gen American,1642.0
+1940.0,South America,Different origin (1st gen immigrant),100.0
+1940.0,Spain,3rd+ gen American,3387.0
+1940.0,Spain,Different origin (1st gen immigrant),400.0
+1940.0,Spain,Same origin (1st gen immigrant),270.0
+1940.0,Sweden,3rd+ gen American,117163.0
+1940.0,Sweden,Different origin (1st gen immigrant),7688.0
+1940.0,Sweden,Same origin (1st gen immigrant),11287.0
+1940.0,Switzerland,3rd+ gen American,31728.0
+1940.0,Switzerland,Different origin (1st gen immigrant),1787.0
+1940.0,Switzerland,Same origin (1st gen immigrant),800.0
+1940.0,Syria,3rd+ gen American,3100.0
+1940.0,Syria,Different origin (1st gen immigrant),200.0
+1940.0,Syria,Same origin (1st gen immigrant),263.0
+1940.0,Turkey,3rd+ gen American,1000.0
+1940.0,Turkey,Different origin (1st gen immigrant),100.0
+1940.0,Turkey,Same origin (1st gen immigrant),700.0
+1940.0,US Virgin Islands,3rd+ gen American,300.0
+1940.0,Wales,3rd+ gen American,18527.0
+1940.0,Wales,Different origin (1st gen immigrant),1000.0
+1940.0,Wales,Same origin (1st gen immigrant),400.0
+1940.0,West Indies,3rd+ gen American,1456.0
+1940.0,West Indies,Different origin (1st gen immigrant),200.0
+1940.0,Yugoslavia,3rd+ gen American,12080.0
+1940.0,Yugoslavia,Different origin (1st gen immigrant),200.0
+1940.0,Yugoslavia,Same origin (1st gen immigrant),1664.0
+1950.0,Abroad/At Sea,3rd+ gen American,562.0
+1950.0,Africa,3rd+ gen American,220.0
+1950.0,Albania,3rd+ gen American,570.0
+1950.0,Albania,Different origin (1st gen immigrant),165.0
+1950.0,Albania,Same origin (1st gen immigrant),165.0
+1950.0,"Asia, ns",3rd+ gen American,413.0
+1950.0,"Asia, ns",Same origin (1st gen immigrant),47.0
+1950.0,Atlantic Islands,3rd+ gen American,926.0
+1950.0,Atlantic Islands,Same origin (1st gen immigrant),83.0
+1950.0,Australia/New Zealand,3rd+ gen American,3689.0
+1950.0,Australia/New Zealand,Different origin (1st gen immigrant),495.0
+1950.0,Austria,3rd+ gen American,138980.0
+1950.0,Austria,Different origin (1st gen immigrant),14790.0
+1950.0,Austria,Same origin (1st gen immigrant),5305.0
+1950.0,Belgium,3rd+ gen American,14615.0
+1950.0,Belgium,Different origin (1st gen immigrant),1375.0
+1950.0,Belgium,Same origin (1st gen immigrant),642.0
+1950.0,Bulgaria,3rd+ gen American,754.0
+1950.0,Bulgaria,Same origin (1st gen immigrant),110.0
+1950.0,Canada,3rd+ gen American,229441.0
+1950.0,Canada,Different origin (1st gen immigrant),8967.0
+1950.0,Canada,Same origin (1st gen immigrant),18462.0
+1950.0,Central America,3rd+ gen American,440.0
+1950.0,China,3rd+ gen American,2231.0
+1950.0,China,Same origin (1st gen immigrant),1096.0
+1950.0,Cuba,3rd+ gen American,2614.0
+1950.0,Cuba,Different origin (1st gen immigrant),223.0
+1950.0,Cuba,Same origin (1st gen immigrant),413.0
+1950.0,Czechoslovakia,3rd+ gen American,84599.0
+1950.0,Czechoslovakia,Different origin (1st gen immigrant),3306.0
+1950.0,Czechoslovakia,Same origin (1st gen immigrant),7499.0
+1950.0,Denmark,3rd+ gen American,65817.0
+1950.0,Denmark,Different origin (1st gen immigrant),3325.0
+1950.0,Denmark,Same origin (1st gen immigrant),1850.0
+1950.0,England,3rd+ gen American,248799.0
+1950.0,England,Different origin (1st gen immigrant),15636.0
+1950.0,England,Same origin (1st gen immigrant),6192.0
+1950.0,Estonia,3rd+ gen American,523.0
+1950.0,"Europe, ns",3rd+ gen American,9439.0
+1950.0,"Europe, ns",Different origin (1st gen immigrant),1158.0
+1950.0,"Europe, ns",Same origin (1st gen immigrant),587.0
+1950.0,Finland,3rd+ gen American,31510.0
+1950.0,Finland,Different origin (1st gen immigrant),1960.0
+1950.0,Finland,Same origin (1st gen immigrant),3276.0
+1950.0,France,3rd+ gen American,43122.0
+1950.0,France,Different origin (1st gen immigrant),3472.0
+1950.0,France,Same origin (1st gen immigrant),919.0
+1950.0,Germany,3rd+ gen American,735424.0
+1950.0,Germany,Different origin (1st gen immigrant),32433.0
+1950.0,Germany,Same origin (1st gen immigrant),28661.0
+1950.0,Greece,3rd+ gen American,17213.0
+1950.0,Greece,Different origin (1st gen immigrant),571.0
+1950.0,Greece,Same origin (1st gen immigrant),2478.0
+1950.0,Hungary,3rd+ gen American,66794.0
+1950.0,Hungary,Different origin (1st gen immigrant),6091.0
+1950.0,Hungary,Same origin (1st gen immigrant),3384.0
+1950.0,Iceland,3rd+ gen American,1147.0
+1950.0,Iceland,Different origin (1st gen immigrant),82.0
+1950.0,India,3rd+ gen American,764.0
+1950.0,Ireland,3rd+ gen American,275023.0
+1950.0,Ireland,Different origin (1st gen immigrant),15449.0
+1950.0,Ireland,Same origin (1st gen immigrant),6801.0
+1950.0,Israel/Palestine,3rd+ gen American,165.0
+1950.0,Italy,3rd+ gen American,425501.0
+1950.0,Italy,Different origin (1st gen immigrant),11481.0
+1950.0,Italy,Same origin (1st gen immigrant),54120.0
+1950.0,Japan,3rd+ gen American,8628.0
+1950.0,Japan,Same origin (1st gen immigrant),713.0
+1950.0,Korea,3rd+ gen American,385.0
+1950.0,Latvia,3rd+ gen American,2873.0
+1950.0,Latvia,Different origin (1st gen immigrant),479.0
+1950.0,Latvia,Same origin (1st gen immigrant),66.0
+1950.0,Lebanon,3rd+ gen American,507.0
+1950.0,Lebanon,Different origin (1st gen immigrant),165.0
+1950.0,Lebanon,Same origin (1st gen immigrant),82.0
+1950.0,Lithuania,3rd+ gen American,35606.0
+1950.0,Lithuania,Different origin (1st gen immigrant),2916.0
+1950.0,Lithuania,Same origin (1st gen immigrant),1510.0
+1950.0,Luxembourg,3rd+ gen American,3156.0
+1950.0,Luxembourg,Different origin (1st gen immigrant),165.0
+1950.0,Luxembourg,Same origin (1st gen immigrant),165.0
+1950.0,Mexico,3rd+ gen American,50342.0
+1950.0,Mexico,Different origin (1st gen immigrant),1136.0
+1950.0,Mexico,Same origin (1st gen immigrant),12841.0
+1950.0,Missing,3rd+ gen American,1148818.0
+1950.0,Missing,Different origin (1st gen immigrant),55198.0
+1950.0,Missing,Same origin (1st gen immigrant),3339.0
+1950.0,Netherlands,3rd+ gen American,51849.0
+1950.0,Netherlands,Different origin (1st gen immigrant),3342.0
+1950.0,Netherlands,Same origin (1st gen immigrant),4356.0
+1950.0,Norway,3rd+ gen American,122973.0
+1950.0,Norway,Different origin (1st gen immigrant),6173.0
+1950.0,Norway,Same origin (1st gen immigrant),5480.0
+1950.0,Pacific Islands,3rd+ gen American,110.0
+1950.0,Philippines,3rd+ gen American,82.0
+1950.0,Philippines,Same origin (1st gen immigrant),157.0
+1950.0,Poland,3rd+ gen American,320685.0
+1950.0,Poland,Different origin (1st gen immigrant),17678.0
+1950.0,Poland,Same origin (1st gen immigrant),18275.0
+1950.0,Portugal,3rd+ gen American,22671.0
+1950.0,Portugal,Different origin (1st gen immigrant),1680.0
+1950.0,Portugal,Same origin (1st gen immigrant),2374.0
+1950.0,Puerto Rico,3rd+ gen American,1419.0
+1950.0,Puerto Rico,Different origin (1st gen immigrant),276.0
+1950.0,Puerto Rico,Same origin (1st gen immigrant),479.0
+1950.0,Romania,3rd+ gen American,17119.0
+1950.0,Romania,Different origin (1st gen immigrant),2610.0
+1950.0,Romania,Same origin (1st gen immigrant),753.0
+1950.0,Russia/USSR,3rd+ gen American,277968.0
+1950.0,Russia/USSR,Different origin (1st gen immigrant),23611.0
+1950.0,Russia/USSR,Same origin (1st gen immigrant),28054.0
+1950.0,Scotland,3rd+ gen American,77269.0
+1950.0,Scotland,Different origin (1st gen immigrant),4352.0
+1950.0,Scotland,Same origin (1st gen immigrant),1209.0
+1950.0,South America,3rd+ gen American,2478.0
+1950.0,Spain,3rd+ gen American,8396.0
+1950.0,Spain,Different origin (1st gen immigrant),1209.0
+1950.0,Spain,Same origin (1st gen immigrant),671.0
+1950.0,Sweden,3rd+ gen American,165392.0
+1950.0,Sweden,Different origin (1st gen immigrant),9562.0
+1950.0,Sweden,Same origin (1st gen immigrant),10971.0
+1950.0,Switzerland,3rd+ gen American,37555.0
+1950.0,Switzerland,Different origin (1st gen immigrant),3619.0
+1950.0,Switzerland,Same origin (1st gen immigrant),1338.0
+1950.0,Syria,3rd+ gen American,11463.0
+1950.0,Syria,Different origin (1st gen immigrant),698.0
+1950.0,Syria,Same origin (1st gen immigrant),705.0
+1950.0,Turkey,3rd+ gen American,6331.0
+1950.0,Turkey,Different origin (1st gen immigrant),442.0
+1950.0,Turkey,Same origin (1st gen immigrant),507.0
+1950.0,US Virgin Islands,3rd+ gen American,214.0
+1950.0,Unknown,3rd+ gen American,110.0
+1950.0,Unknown,Different origin (1st gen immigrant),110.0
+1950.0,Wales,3rd+ gen American,21942.0
+1950.0,Wales,Different origin (1st gen immigrant),1204.0
+1950.0,Wales,Same origin (1st gen immigrant),770.0
+1950.0,West Indies,3rd+ gen American,2938.0
+1950.0,West Indies,Different origin (1st gen immigrant),55.0
+1950.0,West Indies,Same origin (1st gen immigrant),30.0
+1950.0,Yugoslavia,3rd+ gen American,27274.0
+1950.0,Yugoslavia,Different origin (1st gen immigrant),881.0
+1950.0,Yugoslavia,Same origin (1st gen immigrant),2307.0
+1960.0,Abroad/At Sea,3rd+ gen American,49908.0
+1960.0,Abroad/At Sea,Different origin (1st gen immigrant),8367.0
+1960.0,Abroad/At Sea,Different origin (2nd gen),32577.0
+1960.0,Abroad/At Sea,Same origin (1st gen immigrant),1491.0
+1960.0,Africa,3rd+ gen American,3189.0
+1960.0,Africa,Different origin (1st gen immigrant),498.0
+1960.0,Africa,Different origin (2nd gen),2590.0
+1960.0,Africa,Same origin (2nd gen),200.0
+1960.0,Albania,3rd+ gen American,2689.0
+1960.0,Albania,Different origin (1st gen immigrant),199.0
+1960.0,Albania,Different origin (2nd gen),1597.0
+1960.0,Albania,Same origin (1st gen immigrant),698.0
+1960.0,Albania,Same origin (2nd gen),998.0
+1960.0,"Asia, ns",3rd+ gen American,1393.0
+1960.0,"Asia, ns",Different origin (2nd gen),497.0
+1960.0,Atlantic Islands,3rd+ gen American,2092.0
+1960.0,Atlantic Islands,Different origin (1st gen immigrant),100.0
+1960.0,Atlantic Islands,Different origin (2nd gen),1292.0
+1960.0,Atlantic Islands,Same origin (1st gen immigrant),498.0
+1960.0,Atlantic Islands,Same origin (2nd gen),1988.0
+1960.0,Australia/New Zealand,3rd+ gen American,9664.0
+1960.0,Australia/New Zealand,Different origin (1st gen immigrant),499.0
+1960.0,Australia/New Zealand,Different origin (2nd gen),3892.0
+1960.0,Australia/New Zealand,Same origin (2nd gen),398.0
+1960.0,Austria,3rd+ gen American,207082.0
+1960.0,Austria,Different origin (1st gen immigrant),42863.0
+1960.0,Austria,Different origin (2nd gen),226204.0
+1960.0,Austria,Same origin (1st gen immigrant),10958.0
+1960.0,Austria,Same origin (2nd gen),70352.0
+1960.0,Belgium,3rd+ gen American,33756.0
+1960.0,Belgium,Different origin (1st gen immigrant),3186.0
+1960.0,Belgium,Different origin (2nd gen),13946.0
+1960.0,Belgium,Same origin (1st gen immigrant),1692.0
+1960.0,Belgium,Same origin (2nd gen),4384.0
+1960.0,Bulgaria,3rd+ gen American,4482.0
+1960.0,Bulgaria,Different origin (1st gen immigrant),99.0
+1960.0,Bulgaria,Different origin (2nd gen),1798.0
+1960.0,Bulgaria,Same origin (1st gen immigrant),99.0
+1960.0,Canada,3rd+ gen American,671666.0
+1960.0,Canada,Different origin (1st gen immigrant),37855.0
+1960.0,Canada,Different origin (2nd gen),236462.0
+1960.0,Canada,Same origin (1st gen immigrant),64831.0
+1960.0,Canada,Same origin (2nd gen),184132.0
+1960.0,Central America,3rd+ gen American,3388.0
+1960.0,Central America,Different origin (2nd gen),1394.0
+1960.0,China,3rd+ gen American,7275.0
+1960.0,China,Different origin (1st gen immigrant),1197.0
+1960.0,China,Different origin (2nd gen),2590.0
+1960.0,China,Same origin (1st gen immigrant),5380.0
+1960.0,China,Same origin (2nd gen),13556.0
+1960.0,Cuba,3rd+ gen American,5575.0
+1960.0,Cuba,Different origin (1st gen immigrant),1694.0
+1960.0,Cuba,Different origin (2nd gen),4181.0
+1960.0,Cuba,Same origin (1st gen immigrant),1796.0
+1960.0,Cuba,Same origin (2nd gen),1194.0
+1960.0,Czechoslovakia,3rd+ gen American,193136.0
+1960.0,Czechoslovakia,Different origin (1st gen immigrant),18432.0
+1960.0,Czechoslovakia,Different origin (2nd gen),140875.0
+1960.0,Czechoslovakia,Same origin (1st gen immigrant),21708.0
+1960.0,Czechoslovakia,Same origin (2nd gen),106362.0
+1960.0,Denmark,3rd+ gen American,125809.0
+1960.0,Denmark,Different origin (1st gen immigrant),9860.0
+1960.0,Denmark,Different origin (2nd gen),56896.0
+1960.0,Denmark,Same origin (1st gen immigrant),3983.0
+1960.0,Denmark,Same origin (2nd gen),15732.0
+1960.0,England,3rd+ gen American,481337.0
+1960.0,England,Different origin (1st gen immigrant),37443.0
+1960.0,England,Different origin (2nd gen),204334.0
+1960.0,England,Same origin (1st gen immigrant),12649.0
+1960.0,England,Same origin (2nd gen),41408.0
+1960.0,Estonia,3rd+ gen American,599.0
+1960.0,Estonia,Different origin (1st gen immigrant),199.0
+1960.0,Estonia,Different origin (2nd gen),1095.0
+1960.0,Estonia,Same origin (1st gen immigrant),100.0
+1960.0,"Europe, ns",3rd+ gen American,6771.0
+1960.0,"Europe, ns",Different origin (1st gen immigrant),1197.0
+1960.0,"Europe, ns",Different origin (2nd gen),3483.0
+1960.0,"Europe, ns",Same origin (1st gen immigrant),300.0
+1960.0,"Europe, ns",Same origin (2nd gen),3188.0
+1960.0,Finland,3rd+ gen American,51485.0
+1960.0,Finland,Different origin (1st gen immigrant),6866.0
+1960.0,Finland,Different origin (2nd gen),29987.0
+1960.0,Finland,Same origin (1st gen immigrant),4581.0
+1960.0,Finland,Same origin (2nd gen),32660.0
+1960.0,France,3rd+ gen American,79209.0
+1960.0,France,Different origin (1st gen immigrant),8272.0
+1960.0,France,Different origin (2nd gen),43352.0
+1960.0,France,Same origin (1st gen immigrant),796.0
+1960.0,France,Same origin (2nd gen),3578.0
+1960.0,Germany,3rd+ gen American,1143001.0
+1960.0,Germany,Different origin (1st gen immigrant),87363.0
+1960.0,Germany,Different origin (2nd gen),402006.0
+1960.0,Germany,Same origin (1st gen immigrant),47409.0
+1960.0,Germany,Same origin (2nd gen),416642.0
+1960.0,Greece,3rd+ gen American,47912.0
+1960.0,Greece,Different origin (1st gen immigrant),7277.0
+1960.0,Greece,Different origin (2nd gen),25013.0
+1960.0,Greece,Same origin (1st gen immigrant),13045.0
+1960.0,Greece,Same origin (2nd gen),34682.0
+1960.0,Guam,3rd+ gen American,598.0
+1960.0,Guam,Different origin (2nd gen),100.0
+1960.0,Hungary,3rd+ gen American,124147.0
+1960.0,Hungary,Different origin (1st gen immigrant),23817.0
+1960.0,Hungary,Different origin (2nd gen),121351.0
+1960.0,Hungary,Same origin (1st gen immigrant),10164.0
+1960.0,Hungary,Same origin (2nd gen),44224.0
+1960.0,Iceland,3rd+ gen American,1696.0
+1960.0,Iceland,Different origin (1st gen immigrant),497.0
+1960.0,Iceland,Different origin (2nd gen),897.0
+1960.0,Iceland,Same origin (1st gen immigrant),398.0
+1960.0,Iceland,Same origin (2nd gen),398.0
+1960.0,India,3rd+ gen American,2191.0
+1960.0,India,Different origin (1st gen immigrant),100.0
+1960.0,India,Different origin (2nd gen),597.0
+1960.0,Ireland,3rd+ gen American,464149.0
+1960.0,Ireland,Different origin (1st gen immigrant),38967.0
+1960.0,Ireland,Different origin (2nd gen),215085.0
+1960.0,Ireland,Same origin (1st gen immigrant),21418.0
+1960.0,Ireland,Same origin (2nd gen),141696.0
+1960.0,Israel/Palestine,3rd+ gen American,1892.0
+1960.0,Israel/Palestine,Different origin (1st gen immigrant),300.0
+1960.0,Israel/Palestine,Different origin (2nd gen),1693.0
+1960.0,Italy,3rd+ gen American,703835.0
+1960.0,Italy,Different origin (1st gen immigrant),63638.0
+1960.0,Italy,Different origin (2nd gen),341658.0
+1960.0,Italy,Same origin (1st gen immigrant),202299.0
+1960.0,Italy,Same origin (2nd gen),997636.0
+1960.0,Japan,3rd+ gen American,13854.0
+1960.0,Japan,Different origin (1st gen immigrant),2291.0
+1960.0,Japan,Different origin (2nd gen),4089.0
+1960.0,Japan,Same origin (1st gen immigrant),11661.0
+1960.0,Japan,Same origin (2nd gen),95450.0
+1960.0,Korea,3rd+ gen American,896.0
+1960.0,Korea,Different origin (1st gen immigrant),199.0
+1960.0,Korea,Different origin (2nd gen),598.0
+1960.0,Korea,Same origin (1st gen immigrant),99.0
+1960.0,Korea,Same origin (2nd gen),796.0
+1960.0,Latvia,3rd+ gen American,7175.0
+1960.0,Latvia,Different origin (1st gen immigrant),2389.0
+1960.0,Latvia,Different origin (2nd gen),13950.0
+1960.0,Latvia,Same origin (1st gen immigrant),100.0
+1960.0,Latvia,Same origin (2nd gen),596.0
+1960.0,Lebanon,3rd+ gen American,9463.0
+1960.0,Lebanon,Different origin (1st gen immigrant),1894.0
+1960.0,Lebanon,Different origin (2nd gen),4482.0
+1960.0,Lebanon,Same origin (1st gen immigrant),2992.0
+1960.0,Lebanon,Same origin (2nd gen),8578.0
+1960.0,Lithuania,3rd+ gen American,58476.0
+1960.0,Lithuania,Different origin (1st gen immigrant),12458.0
+1960.0,Lithuania,Different origin (2nd gen),86876.0
+1960.0,Lithuania,Same origin (1st gen immigrant),5279.0
+1960.0,Lithuania,Same origin (2nd gen),40658.0
+1960.0,Luxembourg,3rd+ gen American,5582.0
+1960.0,Luxembourg,Different origin (1st gen immigrant),397.0
+1960.0,Luxembourg,Different origin (2nd gen),5481.0
+1960.0,Luxembourg,Same origin (1st gen immigrant),200.0
+1960.0,Luxembourg,Same origin (2nd gen),1196.0
+1960.0,Mexico,3rd+ gen American,145763.0
+1960.0,Mexico,Different origin (1st gen immigrant),10663.0
+1960.0,Mexico,Different origin (2nd gen),14945.0
+1960.0,Mexico,Same origin (1st gen immigrant),78798.0
+1960.0,Mexico,Same origin (2nd gen),226110.0
+1960.0,Netherlands,3rd+ gen American,101837.0
+1960.0,Netherlands,Different origin (1st gen immigrant),5576.0
+1960.0,Netherlands,Different origin (2nd gen),37463.0
+1960.0,Netherlands,Same origin (1st gen immigrant),8065.0
+1960.0,Netherlands,Same origin (2nd gen),38652.0
+1960.0,Norway,3rd+ gen American,221267.0
+1960.0,Norway,Different origin (1st gen immigrant),19018.0
+1960.0,Norway,Different origin (2nd gen),100626.0
+1960.0,Norway,Same origin (1st gen immigrant),14250.0
+1960.0,Norway,Same origin (2nd gen),72704.0
+1960.0,Other US Possessions,3rd+ gen American,100.0
+1960.0,Other US Possessions,Different origin (1st gen immigrant),100.0
+1960.0,Pacific Islands,3rd+ gen American,895.0
+1960.0,Pacific Islands,Different origin (1st gen immigrant),399.0
+1960.0,Pacific Islands,Different origin (2nd gen),498.0
+1960.0,Pacific Islands,Same origin (1st gen immigrant),299.0
+1960.0,Pacific Islands,Same origin (2nd gen),800.0
+1960.0,Philippines,3rd+ gen American,7869.0
+1960.0,Philippines,Different origin (1st gen immigrant),398.0
+1960.0,Philippines,Different origin (2nd gen),3688.0
+1960.0,Philippines,Same origin (1st gen immigrant),4184.0
+1960.0,Philippines,Same origin (2nd gen),4778.0
+1960.0,Poland,3rd+ gen American,405519.0
+1960.0,Poland,Different origin (1st gen immigrant),63962.0
+1960.0,Poland,Different origin (2nd gen),410707.0
+1960.0,Poland,Same origin (1st gen immigrant),61260.0
+1960.0,Poland,Same origin (2nd gen),487500.0
+1960.0,Portugal,3rd+ gen American,47226.0
+1960.0,Portugal,Different origin (1st gen immigrant),5478.0
+1960.0,Portugal,Different origin (2nd gen),25799.0
+1960.0,Portugal,Same origin (1st gen immigrant),12257.0
+1960.0,Portugal,Same origin (2nd gen),46014.0
+1960.0,Puerto Rico,3rd+ gen American,7677.0
+1960.0,Puerto Rico,Different origin (1st gen immigrant),1197.0
+1960.0,Puerto Rico,Different origin (2nd gen),3886.0
+1960.0,Puerto Rico,Same origin (1st gen immigrant),6183.0
+1960.0,Puerto Rico,Same origin (2nd gen),4388.0
+1960.0,Romania,3rd+ gen American,27494.0
+1960.0,Romania,Different origin (1st gen immigrant),12649.0
+1960.0,Romania,Different origin (2nd gen),52095.0
+1960.0,Romania,Same origin (1st gen immigrant),2393.0
+1960.0,Romania,Same origin (2nd gen),7964.0
+1960.0,Russia/USSR,3rd+ gen American,277025.0
+1960.0,Russia/USSR,Different origin (1st gen immigrant),80862.0
+1960.0,Russia/USSR,Different origin (2nd gen),312418.0
+1960.0,Russia/USSR,Same origin (1st gen immigrant),63833.0
+1960.0,Russia/USSR,Same origin (2nd gen),444648.0
+1960.0,Scotland,3rd+ gen American,159570.0
+1960.0,Scotland,Different origin (1st gen immigrant),11249.0
+1960.0,Scotland,Different origin (2nd gen),67156.0
+1960.0,Scotland,Same origin (1st gen immigrant),3091.0
+1960.0,Scotland,Same origin (2nd gen),8172.0
+1960.0,South America,3rd+ gen American,10658.0
+1960.0,South America,Different origin (1st gen immigrant),1693.0
+1960.0,South America,Different origin (2nd gen),8567.0
+1960.0,South America,Same origin (1st gen immigrant),100.0
+1960.0,South America,Same origin (2nd gen),200.0
+1960.0,"Southwest Asia, ns",3rd+ gen American,1297.0
+1960.0,"Southwest Asia, ns",Different origin (1st gen immigrant),300.0
+1960.0,"Southwest Asia, ns",Different origin (2nd gen),1095.0
+1960.0,"Southwest Asia, ns",Same origin (1st gen immigrant),99.0
+1960.0,"Southwest Asia, ns",Same origin (2nd gen),596.0
+1960.0,Spain,3rd+ gen American,22412.0
+1960.0,Spain,Different origin (1st gen immigrant),4484.0
+1960.0,Spain,Different origin (2nd gen),13940.0
+1960.0,Spain,Same origin (1st gen immigrant),2789.0
+1960.0,Spain,Same origin (2nd gen),4982.0
+1960.0,Sweden,3rd+ gen American,311315.0
+1960.0,Sweden,Different origin (1st gen immigrant),28293.0
+1960.0,Sweden,Different origin (2nd gen),144570.0
+1960.0,Sweden,Same origin (1st gen immigrant),19522.0
+1960.0,Sweden,Same origin (2nd gen),84290.0
+1960.0,Switzerland,3rd+ gen American,86584.0
+1960.0,Switzerland,Different origin (1st gen immigrant),6569.0
+1960.0,Switzerland,Different origin (2nd gen),29797.0
+1960.0,Switzerland,Same origin (1st gen immigrant),1495.0
+1960.0,Switzerland,Same origin (2nd gen),5788.0
+1960.0,Syria,3rd+ gen American,17933.0
+1960.0,Syria,Different origin (1st gen immigrant),1793.0
+1960.0,Syria,Different origin (2nd gen),8966.0
+1960.0,Syria,Same origin (1st gen immigrant),994.0
+1960.0,Syria,Same origin (2nd gen),8362.0
+1960.0,Turkey,3rd+ gen American,8964.0
+1960.0,Turkey,Different origin (1st gen immigrant),1893.0
+1960.0,Turkey,Different origin (2nd gen),6873.0
+1960.0,Turkey,Same origin (1st gen immigrant),1694.0
+1960.0,Turkey,Same origin (2nd gen),7172.0
+1960.0,US Virgin Islands,3rd+ gen American,897.0
+1960.0,US Virgin Islands,Different origin (2nd gen),198.0
+1960.0,US Virgin Islands,Same origin (1st gen immigrant),100.0
+1960.0,US Virgin Islands,Same origin (2nd gen),198.0
+1960.0,Wales,3rd+ gen American,44227.0
+1960.0,Wales,Different origin (1st gen immigrant),2688.0
+1960.0,Wales,Different origin (2nd gen),19430.0
+1960.0,Wales,Same origin (1st gen immigrant),400.0
+1960.0,Wales,Same origin (2nd gen),2394.0
+1960.0,West Indies,3rd+ gen American,22714.0
+1960.0,West Indies,Different origin (1st gen immigrant),1990.0
+1960.0,West Indies,Different origin (2nd gen),3180.0
+1960.0,West Indies,Same origin (1st gen immigrant),3685.0
+1960.0,West Indies,Same origin (2nd gen),6378.0
+1960.0,Yugoslavia,3rd+ gen American,72793.0
+1960.0,Yugoslavia,Different origin (1st gen immigrant),6277.0
+1960.0,Yugoslavia,Different origin (2nd gen),62654.0
+1960.0,Yugoslavia,Same origin (1st gen immigrant),7671.0
+1960.0,Yugoslavia,Same origin (2nd gen),37254.0
