@@ -670,12 +670,14 @@ def generate_summary(mother, father, year):
             lines.append("")
 
     # ==================== COMPARATIVE CONTEXT ====================
-    lines.append("---")
-    lines.append("")
-    lines.append("#### Comparative Context")
-    lines.append("")
-
-    if mother != 'Any' and father != 'Any' and mother != father:
+    # Skip this section entirely for Any x Any (info already in Findings)
+    if mother == 'Any' and father == 'Any':
+        pass  # No comparative context needed
+    elif mother != 'Any' and father != 'Any' and mother != father:
+        lines.append("---")
+        lines.append("")
+        lines.append("#### Comparative Context")
+        lines.append("")
         mother_is_american = mother == 'US-born'
         father_is_american = father == 'US-born'
 
@@ -720,6 +722,11 @@ def generate_summary(mother, father, year):
                 lines.append("")
 
     elif mother != 'Any' and father != 'Any' and mother == father:
+        lines.append("---")
+        lines.append("")
+        lines.append("#### Comparative Context")
+        lines.append("")
+
         overall_stats = get_comparison_stats('Any', 'Any', year)
         comparison_origins = ['Ireland', 'Germany', 'Italy', 'Poland', 'England', 'Russia/USSR', 'Sweden', 'Norway']
         comparison_origins = [o for o in comparison_origins if o != mother and o in mother_origins][:4]
@@ -758,6 +765,11 @@ def generate_summary(mother, father, year):
                 lines.append(f"**Below-average mainstream integration:** {mother_dem}-Americans married 3rd+ generation Americans at rates {abs(diff):.0f} percentage points below average.")
 
     elif mother != 'Any' or father != 'Any':
+        lines.append("---")
+        lines.append("")
+        lines.append("#### Comparative Context")
+        lines.append("")
+
         specific_origin = mother if mother != 'Any' else father
         specific_dem = get_demonym(specific_origin)
         parent_type = "mother" if mother != 'Any' else "father"
@@ -774,12 +786,6 @@ def generate_summary(mother, father, year):
             lines.append(f"| **{specific_dem} {parent_type} x Any {other_parent}** | {third_gen_pct:.0f}% | {relevant_pct + same_pct:.0f}% |")
             lines.append(f"| {specific_dem} x {specific_dem} (both parents) | {same_origin_stats['third_gen']:.0f}% | {same_origin_stats['same']:.0f}% |")
             lines.append("")
-
-    else:
-        non_heritage_pct = third_gen_pct + diff_pct  # Married completely outside immigrant heritage
-
-        # Key insight - use non_heritage_pct (third_gen + diff)
-        lines.append(f"**A majority married outside their parents' immigrant communities:** {non_heritage_pct:.1f}% of children of immigrants married someone unconnected to their parents' specific heritage - either a 3rd+ generation American ({third_gen_pct:.1f}%) or someone from a different immigrant background ({diff_pct:.1f}%).")
 
     return "\n".join(lines)
 
