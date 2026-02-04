@@ -358,8 +358,8 @@ def generate_summary(mother, father, year):
         subject = f"children of **{father_dem}** fathers (with any foreign-born mother)"
         subject_short = f"children of {father_dem} fathers"
     else:
-        subject = "all second-generation Americans (US-born children of immigrants)"
-        subject_short = "second-generation Americans"
+        subject = "all married second-generation Americans (US-born children of immigrants)"
+        subject_short = "married second-generation Americans"
 
     # Get year range from data
     df = get_filtered_marriage_data(mother, father, year)
@@ -392,6 +392,14 @@ def generate_summary(mother, father, year):
         lines.append("")
     else:
         lines.append(f"*Based on {weighted_n:,.0f} individuals ({unweighted_n:,} census records)*")
+        lines.append("")
+
+    # Add year-specific methodology notes
+    if year == 'All':
+        lines.append("*Note: When pooling across census years, some individuals may appear in multiple censuses. Select a single year for a cross-sectional snapshot without repeated observations.*")
+        lines.append("")
+    else:
+        lines.append(f"*This {year} cross-section provides a snapshot free from repeated observations across census years.*")
         lines.append("")
 
     # Calculate percentages
@@ -535,6 +543,11 @@ def generate_summary(mother, father, year):
     else:
         heritage_total = same_pct + mother_pct + father_pct + both_pct
 
+        # Calculate mixed-origin parent statistics
+        mixed_origin_df = df[df['MOTHER_ORIGIN'] != df['FATHER_ORIGIN']]
+        mixed_origin_weighted = mixed_origin_df['WEIGHTED_COUNT'].sum()
+        mixed_origin_pct = (mixed_origin_weighted / total * 100) if total > 0 else 0
+
         if heritage_total > third_gen_pct and heritage_total > diff_pct:
             lines.append(f"**Heritage-based marriages led:** {heritage_total:.1f}% married someone connected to their immigrant heritage - the largest category.")
         elif third_gen_pct > heritage_total and third_gen_pct > diff_pct:
@@ -543,16 +556,29 @@ def generate_summary(mother, father, year):
             lines.append(f"**Balanced patterns:** Marriage to 3rd+ gen Americans ({third_gen_pct:.1f}%) and heritage-based marriages ({heritage_total:.1f}%) occurred at similar rates.")
         lines.append("")
 
-        lines.append(f"**3rd+ generation American:** {third_gen_pct:.1f}%")
-        lines.append("")
         lines.append(f"**Heritage-based marriages:** {heritage_total:.1f}%")
         if same_pct >= 0.5:
             lines.append(f"  - {same_pct:.1f}% married someone matching both parents' origins")
         if mother_pct + father_pct + both_pct >= 0.5:
             lines.append(f"  - {mother_pct + father_pct + both_pct:.1f}% married someone matching one parent's origin (among those with mixed-origin parents)")
         lines.append("")
+        lines.append(f"**3rd+ generation American:** {third_gen_pct:.1f}%")
+        lines.append("")
         if diff_pct >= 0.5:
             lines.append(f"**Other immigrant backgrounds:** {diff_pct:.1f}%")
+            lines.append("")
+
+        # Add mixed-origin parent context
+        if mixed_origin_pct >= 0.5:
+            lines.append("---")
+            lines.append("")
+            lines.append("#### Mixed-Origin Families")
+            lines.append("")
+            lines.append(f"**{mixed_origin_pct:.1f}%** of married second-generation Americans had parents from different countries (mixed-origin parents).")
+            if both_pct >= 0.1:
+                # Calculate what % of mixed-origin individuals married someone sharing both heritages
+                both_of_mixed_pct = (both_pct / mixed_origin_pct * 100) if mixed_origin_pct > 0 else 0
+                lines.append(f"Among this group, {both_pct:.1f}% of the total population ({both_of_mixed_pct:.1f}% of those with mixed-origin parents) married someone who shared both of their parents' heritages.")
             lines.append("")
 
     # ==================== TOP SPOUSE BACKGROUNDS ====================
@@ -622,6 +648,32 @@ def generate_summary(mother, father, year):
                 lines.append(f"- Heritage-based marriage {direction} from {first_ethnic:.0f}% to {last_ethnic:.0f}% ({'+' if change_ethnic > 0 else ''}{change_ethnic:.0f} points)")
             else:
                 lines.append(f"- Heritage-based marriage remained relatively stable (~{(first_ethnic + last_ethnic)/2:.0f}%)")
+            lines.append("")
+
+            # Add robustness check showing single-year consistency
+            lines.append("**Robustness Check (Single-Year Cross-Sections):**")
+            lines.append("")
+            lines.append("*The following table shows marriage patterns for each census year independently, avoiding any potential repeated observations:*")
+            lines.append("")
+            lines.append("| Year | 3rd+ Gen | Heritage-Based | Other Immigrant |")
+            lines.append("|------|----------|----------------|-----------------|")
+            for yr in years_list:
+                yr_third = trends[yr]['third_gen']
+                yr_ethnic = trends[yr]['ethnic_total']
+                yr_other = 100 - yr_third - yr_ethnic
+                lines.append(f"| {yr} | {yr_third:.0f}% | {yr_ethnic:.0f}% | {yr_other:.0f}% |")
+            lines.append("")
+
+            # Calculate consistency
+            third_vals = [trends[yr]['third_gen'] for yr in years_list]
+            ethnic_vals = [trends[yr]['ethnic_total'] for yr in years_list]
+            third_range = max(third_vals) - min(third_vals)
+            ethnic_range = max(ethnic_vals) - min(ethnic_vals)
+
+            if third_range <= 10 and ethnic_range <= 10:
+                lines.append("*Results are consistent across individual census years, supporting the validity of the pooled analysis.*")
+            else:
+                lines.append(f"*Note: Some variation across years (3rd+ gen range: {third_range:.0f}pp, heritage range: {ethnic_range:.0f}pp). Consider examining individual years for more precise estimates.*")
             lines.append("")
 
     # ==================== COMPARATIVE CONTEXT ====================
@@ -734,7 +786,7 @@ def generate_summary(mother, father, year):
         non_heritage_pct = third_gen_pct + diff_pct  # Married completely outside immigrant heritage
 
         # Key insight - use non_heritage_pct (third_gen + diff)
-        lines.append(f"**A majority married outside immigrant communities:** {non_heritage_pct:.1f}% of children of immigrants married someone with no connection to their parents' heritage - either a 3rd+ generation American ({third_gen_pct:.1f}%) or someone from a completely different immigrant background ({diff_pct:.1f}%).")
+        lines.append(f"**A majority married outside their parents' immigrant communities:** {non_heritage_pct:.1f}% of children of immigrants married someone unconnected to their parents' specific heritage - either a 3rd+ generation American ({third_gen_pct:.1f}%) or someone from a different immigrant background ({diff_pct:.1f}%).")
 
     return "\n".join(lines)
 
@@ -769,8 +821,8 @@ body {
 .subtitle {
     font-family: 'Hanken Grotesk', sans-serif;
     font-size: 1.2rem;
-    font-weight: 300;
-    color: #78a0a3;
+    font-weight: 400;
+    color: #348397;
     margin: 0;
 }
 
@@ -1156,6 +1208,7 @@ app.layout = html.Div([
                         html.Li([html.Strong("\"3rd+ generation\" is a residual category: "), "It includes anyone whose grandparents' origins cannot be traced through parent birthplace."]),
                         html.Li([html.Strong("Boundary changes: "), "European borders shifted dramatically during this period. \"Germany,\" \"Poland,\" \"Austria,\" and \"Russia\" may reflect different territories across census years."]),
                         html.Li([html.Strong("Selection into marriage: "), "This analysis captures who ", html.Em("was"), " married at census time, not marriage formation rates."]),
+                        html.Li([html.Strong("Potential repeated observations: "), "When viewing \"All Years,\" individuals who remained married across multiple census years may be counted more than once. Historical census microdata lacks longitudinal person identifiers, making individual-level deduplication infeasible. As a result, older birth cohorts (who could appear in more censuses) may be over-represented in pooled analyses. For robustness, users can select individual census years to examine cross-sectional snapshots free from this issue."]),
                     ], style={'marginBottom': '1.25rem', 'paddingLeft': '1.5rem'}),
 
                     html.H4("Citation", style={'color': COLORS['dark_teal'], 'marginBottom': '0.5rem', 'fontFamily': 'Neuton, serif'}),
@@ -1164,6 +1217,21 @@ app.layout = html.Div([
                         "Steven Ruggles, Sarah Flood, Matthew Sobek, et al. ",
                         html.Em("IPUMS USA: Version 15.0"), " [dataset]. Minneapolis, MN: IPUMS, 2024. ",
                         html.A("https://doi.org/10.18128/D010.V15.0", href="https://doi.org/10.18128/D010.V15.0", target="_blank", style={'color': COLORS['medium_teal']})
+                    ], style={
+                        'borderLeft': f'3px solid {COLORS["gold"]}',
+                        'paddingLeft': '1rem',
+                        'marginLeft': '0',
+                        'fontSize': '0.9rem',
+                        'backgroundColor': COLORS['very_light_gold'],
+                        'padding': '0.75rem 1rem',
+                        'borderRadius': '0 4px 4px 0',
+                    }),
+
+                    html.P("To cite this dashboard:", style={'marginTop': '1rem', 'marginBottom': '0.25rem'}),
+                    html.Blockquote([
+                        "Guerra, Gil. ",
+                        html.Em("Marriage and the Melting Pot, 1880-1930"),
+                        " [interactive dashboard]. Washington, DC: Niskanen Center, 2025. [URL of dashboard]"
                     ], style={
                         'borderLeft': f'3px solid {COLORS["gold"]}',
                         'paddingLeft': '1rem',
