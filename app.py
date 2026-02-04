@@ -548,8 +548,15 @@ def generate_summary(mother, father, year):
         mixed_origin_weighted = mixed_origin_df['WEIGHTED_COUNT'].sum()
         mixed_origin_pct = (mixed_origin_weighted / total * 100) if total > 0 else 0
 
+        # Calculate the "outside community" total
+        outside_community_pct = third_gen_pct + diff_pct
+
         if heritage_total > third_gen_pct and heritage_total > diff_pct:
-            lines.append(f"**Heritage-based marriages led:** {heritage_total:.1f}% married someone connected to their immigrant heritage - the largest category.")
+            # Heritage-based is largest single category, but check if majority married outside
+            if outside_community_pct > 50:
+                lines.append(f"**Heritage-based marriages were the most common category** at {heritage_total:.1f}%, but a majority ({outside_community_pct:.1f}%) married outside their parents' immigrant communities - either a 3rd+ generation American ({third_gen_pct:.1f}%) or someone from a different immigrant background ({diff_pct:.1f}%).")
+            else:
+                lines.append(f"**Heritage-based marriages led:** {heritage_total:.1f}% married someone connected to their immigrant heritage - the largest category.")
         elif third_gen_pct > heritage_total and third_gen_pct > diff_pct:
             lines.append(f"**Mainstream assimilation led:** {third_gen_pct:.1f}% married a 3rd+ generation American - the largest category.")
         else:
@@ -562,11 +569,11 @@ def generate_summary(mother, father, year):
         if mother_pct + father_pct + both_pct >= 0.5:
             lines.append(f"  - {mother_pct + father_pct + both_pct:.1f}% married someone matching one parent's origin (among those with mixed-origin parents)")
         lines.append("")
-        lines.append(f"**3rd+ generation American:** {third_gen_pct:.1f}%")
-        lines.append("")
+        lines.append(f"**Married outside parents' communities:** {outside_community_pct:.1f}%")
+        lines.append(f"  - {third_gen_pct:.1f}% married a 3rd+ generation American")
         if diff_pct >= 0.5:
-            lines.append(f"**Other immigrant backgrounds:** {diff_pct:.1f}%")
-            lines.append("")
+            lines.append(f"  - {diff_pct:.1f}% married someone from a different immigrant background")
+        lines.append("")
 
         # Add mixed-origin parent context
         if mixed_origin_pct >= 0.5:
@@ -650,10 +657,8 @@ def generate_summary(mother, father, year):
                 lines.append(f"- Heritage-based marriage remained relatively stable (~{(first_ethnic + last_ethnic)/2:.0f}%)")
             lines.append("")
 
-            # Add robustness check showing single-year consistency
-            lines.append("**Robustness Check (Single-Year Cross-Sections):**")
-            lines.append("")
-            lines.append("*The following table shows marriage patterns for each census year independently, avoiding any potential repeated observations:*")
+            # Show marriage patterns by census year
+            lines.append("**Marriage Patterns by Census Year:**")
             lines.append("")
             lines.append("| Year | 3rd+ Gen | Heritage-Based | Other Immigrant |")
             lines.append("|------|----------|----------------|-----------------|")
@@ -662,18 +667,6 @@ def generate_summary(mother, father, year):
                 yr_ethnic = trends[yr]['ethnic_total']
                 yr_other = 100 - yr_third - yr_ethnic
                 lines.append(f"| {yr} | {yr_third:.0f}% | {yr_ethnic:.0f}% | {yr_other:.0f}% |")
-            lines.append("")
-
-            # Calculate consistency
-            third_vals = [trends[yr]['third_gen'] for yr in years_list]
-            ethnic_vals = [trends[yr]['ethnic_total'] for yr in years_list]
-            third_range = max(third_vals) - min(third_vals)
-            ethnic_range = max(ethnic_vals) - min(ethnic_vals)
-
-            if third_range <= 10 and ethnic_range <= 10:
-                lines.append("*Results are consistent across individual census years, supporting the validity of the pooled analysis.*")
-            else:
-                lines.append(f"*Note: Some variation across years (3rd+ gen range: {third_range:.0f}pp, heritage range: {ethnic_range:.0f}pp). Consider examining individual years for more precise estimates.*")
             lines.append("")
 
     # ==================== COMPARATIVE CONTEXT ====================
