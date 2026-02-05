@@ -510,6 +510,101 @@ def detect_anomalies(year='All'):
     return anomalies
 
 
+def get_single_origin_overview(origin, year='All'):
+    """Get marriage outcomes for all parent combinations involving a single origin."""
+    df = DATA['marriage_agg'].copy()
+    if year != 'All':
+        df = df[df['YEAR'] == int(year)]
+
+    # Filter to combinations where either mother OR father is the selected origin
+    df = df[(df['MOTHER_ORIGIN'] == origin) | (df['FATHER_ORIGIN'] == origin)]
+    df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
+    df = df[~df['FATHER_ORIGIN'].isin(NON_COUNTRIES)]
+
+    results = []
+    MIN_SAMPLE = 20000
+
+    # Get unique combinations
+    combinations = df.groupby(['MOTHER_ORIGIN', 'FATHER_ORIGIN']).agg({
+        'WEIGHTED_COUNT': 'sum',
+        'UNWEIGHTED_N': 'sum'
+    }).reset_index()
+
+    for _, row in combinations.iterrows():
+        mother = row['MOTHER_ORIGIN']
+        father = row['FATHER_ORIGIN']
+        total = row['WEIGHTED_COUNT']
+
+        if total < MIN_SAMPLE:
+            continue
+
+        # Get marriage type breakdown
+        combo_df = df[(df['MOTHER_ORIGIN'] == mother) & (df['FATHER_ORIGIN'] == father)]
+        stats = combo_df.groupby('MARRIAGE_TYPE')['WEIGHTED_COUNT'].sum()
+        pcts = (stats / total * 100).to_dict()
+
+        same_origin_rate = sum(v for k, v in pcts.items() if 'same origin' in k)
+        third_gen_rate = sum(v for k, v in pcts.items() if '3rd+ gen' in k)
+        heritage_rate = sum(v for k, v in pcts.items()
+                          if any(x in k for x in ['same origin', "mother's origin", "father's origin", 'both heritages']))
+        diff_origin_rate = sum(v for k, v in pcts.items() if 'different origin' in k)
+
+        # Create label
+        if mother == father:
+            label = f"{get_demonym(mother)} x {get_demonym(father)}"
+            combo_type = "same"
+        elif mother == origin:
+            label = f"{get_demonym(mother)} mom x {get_demonym(father)} dad"
+            combo_type = "mother"
+        else:
+            label = f"{get_demonym(mother)} mom x {get_demonym(father)} dad"
+            combo_type = "father"
+
+        results.append({
+            'mother': mother,
+            'father': father,
+            'label': label,
+            'combo_type': combo_type,
+            'population': total,
+            'same_origin_rate': same_origin_rate,
+            'third_gen_rate': third_gen_rate,
+            'heritage_rate': heritage_rate,
+            'diff_origin_rate': diff_origin_rate
+        })
+
+    # Sort by population
+    results.sort(key=lambda x: x['population'], reverse=True)
+    return results
+
+
+def get_available_origins_for_overview():
+    """Get list of origins with enough data for single-origin overview."""
+    df = DATA['marriage_agg'].copy()
+
+    # Get origins that appear as either mother or father with substantial data
+    mother_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
+    father_totals = df.groupby('FATHER_ORIGIN')['WEIGHTED_COUNT'].sum()
+
+    MIN_SAMPLE = 100000
+
+    valid_origins = set()
+    for origin in mother_totals[mother_totals >= MIN_SAMPLE].index:
+        if origin not in NON_COUNTRIES:
+            valid_origins.add(origin)
+    for origin in father_totals[father_totals >= MIN_SAMPLE].index:
+        if origin not in NON_COUNTRIES:
+            valid_origins.add(origin)
+
+    # Sort by total population
+    origin_list = []
+    for origin in valid_origins:
+        total = mother_totals.get(origin, 0) + father_totals.get(origin, 0)
+        origin_list.append((origin, total))
+
+    origin_list.sort(key=lambda x: x[1], reverse=True)
+    return [o[0] for o in origin_list]
+
+
 def get_top_spouse_backgrounds(mother, father, year, exclude_heritage=None, top_n=5):
     """Get top spouse backgrounds from aggregated data."""
     df = get_filtered_spouse_data(mother, father, year)
@@ -1421,6 +1516,7 @@ app.layout = html.Div([
                 dbc.Tab(label="Spouse Generation", tab_id="tab-spouse-gen"),
                 dbc.Tab(label="Origin Heatmap", tab_id="tab-heatmap"),
                 dbc.Tab(label="Population vs Retention", tab_id="tab-scatter"),
+                dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
             ], id='viz-tabs', active_tab='tab-main', className='mb-0'),
 
             html.Div([html.Div(id='tab-content')], className='brand-card mb-4',
@@ -1708,7 +1804,36 @@ def render_tab_content(active_tab, mother, father, year):
                        children=[dcc.Graph(id='scatter-chart', figure=create_scatter_chart(year),
                                           config={'displayModeBar': True})])
         ], style={'padding': '1rem'})
+    elif active_tab == 'tab-single-origin':
+        available_origins = get_available_origins_for_overview()
+        default_origin = available_origins[0] if available_origins else 'Germany'
+        return html.Div([
+            html.P("Select an origin to see marriage patterns across all parent combinations involving that heritage. "
+                   "Compare how children with same-origin vs mixed-origin parents differ in their marriage choices.",
+                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
+            html.Div([
+                html.Label("Select Origin:", style={'fontWeight': '500', 'marginRight': '10px', 'color': COLORS['dark_teal']}),
+                dcc.Dropdown(
+                    id='single-origin-dropdown',
+                    options=[{'label': o, 'value': o} for o in available_origins],
+                    value=default_origin,
+                    style={'width': '200px', 'display': 'inline-block', 'verticalAlign': 'middle'}
+                ),
+            ], style={'marginBottom': '1rem'}),
+            dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                       children=[html.Div(id='single-origin-chart-container')])
+        ], style={'padding': '1rem'})
     return html.Div()
+
+
+@callback(Output('single-origin-chart-container', 'children'),
+          [Input('single-origin-dropdown', 'value'), Input('year-dropdown', 'value')])
+def update_single_origin_chart(origin, year):
+    """Update the single origin overview chart."""
+    if not origin:
+        return html.P("Please select an origin", style={'color': COLORS['muted_teal']})
+    return dcc.Graph(id='single-origin-chart', figure=create_single_origin_chart(origin, year),
+                     config={'displayModeBar': True})
 
 
 def create_main_chart(mother, father, year):
@@ -1992,6 +2117,58 @@ def create_scatter_chart(year):
         yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 100]),
         height=500, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         showlegend=False
+    )
+    return fig
+
+
+def create_single_origin_chart(origin, year):
+    """Create grouped bar chart showing marriage patterns for all combinations involving an origin."""
+    data = get_single_origin_overview(origin, year)
+
+    if not data:
+        fig = go.Figure()
+        fig.add_annotation(text=f"No data available for {origin}", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    df = pd.DataFrame(data)
+
+    # Sort by same_origin_rate for clearer presentation
+    df = df.sort_values('same_origin_rate', ascending=True)
+
+    fig = go.Figure()
+
+    # Add bars for different marriage outcome categories
+    fig.add_trace(go.Bar(
+        y=df['label'], x=df['same_origin_rate'], name='Same Origin',
+        orientation='h', marker_color=COLORS['dark_teal'],
+        text=[f"{v:.1f}%" for v in df['same_origin_rate']], textposition='inside'
+    ))
+
+    fig.add_trace(go.Bar(
+        y=df['label'], x=df['diff_origin_rate'], name='Different Origin',
+        orientation='h', marker_color=COLORS['medium_teal'],
+        text=[f"{v:.1f}%" for v in df['diff_origin_rate']], textposition='inside'
+    ))
+
+    fig.add_trace(go.Bar(
+        y=df['label'], x=df['third_gen_rate'], name='3rd+ Gen American',
+        orientation='h', marker_color=COLORS['light_teal'],
+        text=[f"{v:.1f}%" for v in df['third_gen_rate']], textposition='inside'
+    ))
+
+    dem = get_demonym(origin)
+    fig.update_layout(
+        title=dict(text=f"Marriage Patterns: All {dem} Parent Combinations",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Percentage",
+        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 105], ticksuffix='%'),
+        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11)),
+        barmode='stack',
+        height=max(400, len(df) * 45 + 120),
+        margin=dict(l=220, r=60, t=80, b=60),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='center', x=0.5)
     )
     return fig
 
