@@ -289,7 +289,7 @@ def get_year_composition(mother, father):
 
 
 def get_integration_ranking(year='All'):
-    """Get all same-origin groups ranked by integration (openness to cross-ethnic marriage)."""
+    """Get all same-origin groups ranked by outmarriage rates."""
     df = DATA['marriage_agg'].copy()
     if year != 'All':
         df = df[df['YEAR'] == int(year)]
@@ -299,7 +299,7 @@ def get_integration_ranking(year='All'):
     df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
 
     results = []
-    MIN_SAMPLE = 50000  # Minimum weighted sample for inclusion
+    MIN_SAMPLE = 20000  # Lowered to include more countries
 
     for origin in df['MOTHER_ORIGIN'].unique():
         origin_df = df[df['MOTHER_ORIGIN'] == origin]
@@ -511,7 +511,13 @@ def detect_anomalies(year='All'):
 
 
 def get_single_origin_overview(origin, year='All'):
-    """Get marriage outcomes for all parent combinations involving a single origin."""
+    """Get marriage outcomes for all parent combinations involving a single origin.
+
+    Returns categories that sum to 100%:
+    - heritage_rate: Married within immigrant heritage (same, mother's, father's, or both heritages)
+    - diff_origin_rate: Married different immigrant origin
+    - third_gen_rate: Married 3rd+ gen American
+    """
     df = DATA['marriage_agg'].copy()
     if year != 'All':
         df = df[df['YEAR'] == int(year)]
@@ -543,11 +549,14 @@ def get_single_origin_overview(origin, year='All'):
         stats = combo_df.groupby('MARRIAGE_TYPE')['WEIGHTED_COUNT'].sum()
         pcts = (stats / total * 100).to_dict()
 
-        same_origin_rate = sum(v for k, v in pcts.items() if 'same origin' in k)
-        third_gen_rate = sum(v for k, v in pcts.items() if '3rd+ gen' in k)
+        # Calculate categories that sum to 100%
+        # Heritage-based: same origin, mother's origin, father's origin, both heritages
         heritage_rate = sum(v for k, v in pcts.items()
                           if any(x in k for x in ['same origin', "mother's origin", "father's origin", 'both heritages']))
+        # Different immigrant origin
         diff_origin_rate = sum(v for k, v in pcts.items() if 'different origin' in k)
+        # 3rd+ gen American
+        third_gen_rate = sum(v for k, v in pcts.items() if '3rd+ gen' in k)
 
         # Create label
         if mother == father:
@@ -566,10 +575,9 @@ def get_single_origin_overview(origin, year='All'):
             'label': label,
             'combo_type': combo_type,
             'population': total,
-            'same_origin_rate': same_origin_rate,
-            'third_gen_rate': third_gen_rate,
             'heritage_rate': heritage_rate,
-            'diff_origin_rate': diff_origin_rate
+            'diff_origin_rate': diff_origin_rate,
+            'third_gen_rate': third_gen_rate,
         })
 
     # Sort by population
@@ -930,34 +938,6 @@ def generate_summary(mother, father, year):
                 both_of_mixed_pct = (both_pct / mixed_origin_pct * 100) if mixed_origin_pct > 0 else 0
                 lines.append(f"Among this group, {both_pct:.1f}% of the total population ({both_of_mixed_pct:.1f}% of those with mixed-origin parents) married someone who shared both of their parents' heritages.")
             lines.append("")
-
-        # Add notable patterns / anomalies for Any x Any view
-        if year == 'All':
-            anomalies = detect_anomalies()
-            if anomalies:
-                lines.append("---")
-                lines.append("")
-                lines.append("#### Notable Patterns")
-                lines.append("")
-
-                # Counter-trend groups (increased or stable while others declined)
-                counter_trend = [a for a in anomalies if a['type'] == 'counter_trend']
-                if counter_trend:
-                    for anomaly in counter_trend:
-                        lines.append(f"**{anomaly['demonym']} exception:** While most groups showed declining ethnic retention "
-                                    f"(average: {anomaly['avg_change']:.0f}pp), **{anomaly['demonym']}-Americans** bucked the trend with "
-                                    f"a {'+' if anomaly['change'] >= 0 else ''}{anomaly['change']:.0f}pp change "
-                                    f"({anomaly['first_rate']:.0f}% in {anomaly['first_year']} to {anomaly['last_rate']:.0f}% in {anomaly['last_year']}).")
-                        lines.append("")
-
-                # Consistently high retention groups
-                consistently_high = [a for a in anomalies if a['type'] == 'consistently_high']
-                if consistently_high:
-                    high_groups = ", ".join([f"**{a['demonym']}** ({a['last_rate']:.0f}%)" for a in consistently_high])
-                    lines.append(f"**Late-arriving groups maintained high retention:** {high_groups} showed consistently high "
-                                f"heritage-based marriage rates throughout this period. This likely reflects chain migration patterns, "
-                                f"concentrated settlement in ethnic enclaves, and more recent arrival timing (peak immigration 1900-1914 for Southern/Eastern Europeans).")
-                    lines.append("")
 
     # ==================== TOP SPOUSE BACKGROUNDS ====================
     if mother != 'Any' and father != 'Any' and mother == father:
@@ -1508,15 +1488,15 @@ app.layout = html.Div([
                 ], className='brand-card-body')
             ], className='brand-card summary-card mb-4'),
 
-            # Visualization Tabs
+            # Selection-Based Visualization Tabs (respond to heritage dropdowns)
+            html.Div([
+                html.Div("Your Selection", className='brand-card-header',
+                        style={'fontSize': '1rem', 'padding': '0.6rem 1.25rem'}),
+            ], style={'marginBottom': '0'}),
             dbc.Tabs([
                 dbc.Tab(label="Main Chart", tab_id="tab-main"),
                 dbc.Tab(label="Trends Over Time", tab_id="tab-trends"),
-                dbc.Tab(label="Integration Ranking", tab_id="tab-ranking"),
                 dbc.Tab(label="Spouse Generation", tab_id="tab-spouse-gen"),
-                dbc.Tab(label="Origin Heatmap", tab_id="tab-heatmap"),
-                dbc.Tab(label="Population vs Retention", tab_id="tab-scatter"),
-                dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
             ], id='viz-tabs', active_tab='tab-main', className='mb-0'),
 
             html.Div([html.Div(id='tab-content')], className='brand-card mb-4',
@@ -1530,6 +1510,20 @@ app.layout = html.Div([
                                children=[html.Div(id='spouse-table', style={'maxHeight': '400px', 'overflowY': 'auto'})])
                 ], className='brand-card-body')
             ], className='brand-card mb-4'),
+
+            # Compare All Groups Section
+            html.Div([
+                html.Div("Compare All Groups", className='brand-card-header',
+                        style={'fontSize': '1rem', 'padding': '0.6rem 1.25rem'}),
+            ], style={'marginBottom': '0'}),
+            dbc.Tabs([
+                dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
+                dbc.Tab(label="Origin Heatmap", tab_id="tab-heatmap"),
+                dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
+            ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
+
+            html.Div([html.Div(id='overview-tab-content')], className='brand-card mb-4',
+                    style={'borderRadius': '0 0 16px 16px'}),
 
             # Methodology
             html.Div([
@@ -1756,6 +1750,7 @@ def update_summary(mother, father, year):
           [Input('viz-tabs', 'active_tab'), Input('mother-dropdown', 'value'),
            Input('father-dropdown', 'value'), Input('year-dropdown', 'value')])
 def render_tab_content(active_tab, mother, father, year):
+    """Render selection-based tabs that respond to heritage dropdowns."""
     if active_tab == 'tab-main':
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
@@ -1768,23 +1763,42 @@ def render_tab_content(active_tab, mother, father, year):
                        children=[dcc.Graph(id='time-chart', figure=create_time_chart(mother, father),
                                           config={'displayModeBar': True})])
         ], style={'padding': '1rem'})
-    elif active_tab == 'tab-ranking':
-        return html.Div([
-            html.P("Ranking of ethnic groups by openness to cross-ethnic marriage (100% - same-origin rate). "
-                   "Higher values indicate more integration with other groups.",
-                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
-            dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[dcc.Graph(id='ranking-chart', figure=create_ranking_chart(year),
-                                          config={'displayModeBar': True})])
-        ], style={'padding': '1rem'})
     elif active_tab == 'tab-spouse-gen':
         return html.Div([
             html.P("Distribution of spouse generations for the current selection. Shows whether children of immigrants "
-                   "married fresh immigrants (1st gen), fellow second-generation Americans (2nd gen), or established Americans (3rd+ gen).",
+                   "married recent immigrants (1st gen), fellow second-generation Americans (2nd gen), or established Americans (3rd+ gen).",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[dcc.Graph(id='spouse-gen-chart', figure=create_spouse_gen_chart(mother, father, year),
                                           config={'displayModeBar': True})])
+        ], style={'padding': '1rem'})
+    return html.Div()
+
+
+@callback(Output('overview-tab-content', 'children'),
+          [Input('overview-tabs', 'active_tab'), Input('year-dropdown', 'value')])
+def render_overview_tab_content(active_tab, year):
+    """Render overview tabs that show cross-group comparisons."""
+    if active_tab == 'tab-outmarriage':
+        return html.Div([
+            html.P("Outmarriage rates by ethnic group. Higher rates indicate more marriages outside one's own ethnic community.",
+                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
+            html.Div([
+                html.Label("Sort by:", style={'fontWeight': '500', 'marginRight': '10px', 'color': COLORS['dark_teal']}),
+                dcc.Dropdown(
+                    id='outmarriage-sort-dropdown',
+                    options=[
+                        {'label': 'Total Outmarriage Rate', 'value': 'total'},
+                        {'label': 'Outmarriage to 3rd+ Gen Americans', 'value': 'american'},
+                        {'label': 'Outmarriage to Different Immigrant Groups', 'value': 'other_immigrant'},
+                    ],
+                    value='total',
+                    style={'width': '300px', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    clearable=False
+                ),
+            ], style={'marginBottom': '1rem'}),
+            dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                       children=[html.Div(id='outmarriage-chart-container')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
         return html.Div([
@@ -1793,15 +1807,6 @@ def render_tab_content(active_tab, mother, father, year):
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
-                                          config={'displayModeBar': True})])
-        ], style={'padding': '1rem'})
-    elif active_tab == 'tab-scatter':
-        return html.Div([
-            html.P("Relationship between population size and ethnic retention. Each bubble represents a same-origin "
-                   "group (e.g., German×German parents). Larger populations don't necessarily mean higher retention.",
-                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
-            dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[dcc.Graph(id='scatter-chart', figure=create_scatter_chart(year),
                                           config={'displayModeBar': True})])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-single-origin':
@@ -1824,6 +1829,14 @@ def render_tab_content(active_tab, mother, father, year):
                        children=[html.Div(id='single-origin-chart-container')])
         ], style={'padding': '1rem'})
     return html.Div()
+
+
+@callback(Output('outmarriage-chart-container', 'children'),
+          [Input('outmarriage-sort-dropdown', 'value'), Input('year-dropdown', 'value')])
+def update_outmarriage_chart(sort_by, year):
+    """Update the outmarriage rates chart based on sorting selection."""
+    return dcc.Graph(id='outmarriage-chart', figure=create_outmarriage_chart(year, sort_by),
+                     config={'displayModeBar': True})
 
 
 @callback(Output('single-origin-chart-container', 'children'),
@@ -1946,47 +1959,70 @@ def create_time_chart(mother, father):
     return fig
 
 
-def create_ranking_chart(year):
-    """Create horizontal bar chart ranking groups by integration (openness to cross-ethnic marriage)."""
+def create_outmarriage_chart(year, sort_by='total'):
+    """Create horizontal bar chart showing outmarriage rates with different sorting options."""
     ranking = get_integration_ranking(year)
 
     if not ranking:
         fig = go.Figure()
-        fig.add_annotation(text="No data available for ranking", x=0.5, y=0.5, showarrow=False)
+        fig.add_annotation(text="No data available", x=0.5, y=0.5, showarrow=False)
         fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
         return fig
 
-    # Take top 15 groups
-    ranking = ranking[:15]
+    # Sort by selected metric
+    if sort_by == 'american':
+        ranking.sort(key=lambda x: x['third_gen_rate'], reverse=True)
+        title = "Outmarriage Rates: Into American Mainstream"
+        xaxis_title = "Outmarriage to 3rd+ Gen Americans (%)"
+        value_key = 'third_gen_rate'
+    elif sort_by == 'other_immigrant':
+        ranking.sort(key=lambda x: x['diff_origin_rate'], reverse=True)
+        title = "Outmarriage Rates: Into Other Immigrant Groups"
+        xaxis_title = "Outmarriage to Different Immigrant Groups (%)"
+        value_key = 'diff_origin_rate'
+    else:  # total
+        ranking.sort(key=lambda x: x['integration_rate'], reverse=True)
+        title = "Outmarriage Rates: Total (Outside Own Ethnic Group)"
+        xaxis_title = "Total Outmarriage Rate (%)"
+        value_key = 'integration_rate'
 
     # Reverse for horizontal bar chart (so highest is at top)
     ranking = ranking[::-1]
 
     demonyms = [r['demonym'] + '-Americans' for r in ranking]
-    integration_rates = [r['integration_rate'] for r in ranking]
+    values = [r[value_key] for r in ranking]
     populations = [r['population'] for r in ranking]
 
-    # Color gradient from insular (dark teal) to integrated (light teal)
-    colors = [COLORS['medium_teal'] if r['integration_rate'] > 50 else COLORS['dark_teal'] for r in ranking]
+    # Create hover text with breakdown
+    hover_texts = []
+    for r in ranking:
+        hover_texts.append(
+            f"<b>{r['demonym']}-Americans</b><br>"
+            f"Total outmarriage: {r['integration_rate']:.1f}%<br>"
+            f"  To 3rd+ gen Americans: {r['third_gen_rate']:.1f}%<br>"
+            f"  To other immigrant groups: {r['diff_origin_rate']:.1f}%<br>"
+            f"Population: {r['population']:,.0f}"
+        )
 
     fig = go.Figure(go.Bar(
-        x=integration_rates,
+        x=values,
         y=demonyms,
         orientation='h',
-        marker_color=colors,
-        text=[f"{r:.0f}%" for r in integration_rates],
+        marker_color=COLORS['medium_teal'],
+        text=[f"{v:.0f}%" for v in values],
         textposition='outside',
-        hovertemplate="<b>%{y}</b><br>Integration rate: %{x:.1f}%<br>Population: %{customdata:,.0f}<extra></extra>",
-        customdata=populations
+        hovertemplate="%{customdata}<extra></extra>",
+        customdata=hover_texts
     ))
 
     fig.update_layout(
-        title=dict(text="Community Integration Ranking", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Cross-Ethnic Marriage Rate (%)",
-        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 100]),
+        title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title=xaxis_title,
+        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(values) * 1.15 if values else 100]),
         yaxis=dict(gridcolor=COLORS['light_gray']),
-        height=500, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=150)
+        height=max(400, len(ranking) * 28 + 100),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=150, r=60)
     )
     return fig
 
@@ -2122,7 +2158,13 @@ def create_scatter_chart(year):
 
 
 def create_single_origin_chart(origin, year):
-    """Create grouped bar chart showing marriage patterns for all combinations involving an origin."""
+    """Create stacked bar chart showing marriage patterns for all combinations involving an origin.
+
+    Categories sum to 100%:
+    - Within Heritage: Married within immigrant heritage (same, mother's, father's, or both)
+    - Different Immigrant: Married different immigrant origin
+    - 3rd+ Gen American: Married established American
+    """
     data = get_single_origin_overview(origin, year)
 
     if not data:
@@ -2133,35 +2175,38 @@ def create_single_origin_chart(origin, year):
 
     df = pd.DataFrame(data)
 
-    # Sort by same_origin_rate for clearer presentation
-    df = df.sort_values('same_origin_rate', ascending=True)
+    # Sort by heritage rate for clearer presentation
+    df = df.sort_values('heritage_rate', ascending=True)
 
     fig = go.Figure()
 
-    # Add bars for different marriage outcome categories
+    # Add bars for different marriage outcome categories (these sum to 100%)
     fig.add_trace(go.Bar(
-        y=df['label'], x=df['same_origin_rate'], name='Same Origin',
+        y=df['label'], x=df['heritage_rate'], name='Within Heritage',
         orientation='h', marker_color=COLORS['dark_teal'],
-        text=[f"{v:.1f}%" for v in df['same_origin_rate']], textposition='inside'
+        text=[f"{v:.0f}%" if v >= 5 else "" for v in df['heritage_rate']], textposition='inside',
+        hovertemplate="<b>%{y}</b><br>Within Heritage: %{x:.1f}%<extra></extra>"
     ))
 
     fig.add_trace(go.Bar(
-        y=df['label'], x=df['diff_origin_rate'], name='Different Origin',
+        y=df['label'], x=df['diff_origin_rate'], name='Different Immigrant',
         orientation='h', marker_color=COLORS['medium_teal'],
-        text=[f"{v:.1f}%" for v in df['diff_origin_rate']], textposition='inside'
+        text=[f"{v:.0f}%" if v >= 5 else "" for v in df['diff_origin_rate']], textposition='inside',
+        hovertemplate="<b>%{y}</b><br>Different Immigrant: %{x:.1f}%<extra></extra>"
     ))
 
     fig.add_trace(go.Bar(
         y=df['label'], x=df['third_gen_rate'], name='3rd+ Gen American',
         orientation='h', marker_color=COLORS['light_teal'],
-        text=[f"{v:.1f}%" for v in df['third_gen_rate']], textposition='inside'
+        text=[f"{v:.0f}%" if v >= 5 else "" for v in df['third_gen_rate']], textposition='inside',
+        hovertemplate="<b>%{y}</b><br>3rd+ Gen American: %{x:.1f}%<extra></extra>"
     ))
 
     dem = get_demonym(origin)
     fig.update_layout(
         title=dict(text=f"Marriage Patterns: All {dem} Parent Combinations",
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Percentage",
+        xaxis_title="Percentage (categories sum to 100%)",
         xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 105], ticksuffix='%'),
         yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11)),
         barmode='stack',
