@@ -1490,17 +1490,30 @@ app.layout = html.Div([
 
             # Selection-Based Visualization Tabs (respond to heritage dropdowns)
             html.Div([
-                html.Div("Your Selection", className='brand-card-header',
-                        style={'fontSize': '1rem', 'padding': '0.6rem 1.25rem'}),
-            ], style={'marginBottom': '0'}),
-            dbc.Tabs([
-                dbc.Tab(label="Main Chart", tab_id="tab-main"),
-                dbc.Tab(label="Trends Over Time", tab_id="tab-trends"),
-                dbc.Tab(label="Spouse Generation", tab_id="tab-spouse-gen"),
-            ], id='viz-tabs', active_tab='tab-main', className='mb-0'),
-
-            html.Div([html.Div(id='tab-content')], className='brand-card mb-4',
-                    style={'borderRadius': '0 0 16px 16px'}),
+                html.Div([
+                    html.Span("Your Selection", style={
+                        'fontFamily': 'Neuton, serif',
+                        'fontSize': '1.1rem',
+                        'fontWeight': '600',
+                        'color': COLORS['dark_teal'],
+                        'textTransform': 'uppercase',
+                        'letterSpacing': '0.05em'
+                    }),
+                    html.Span(" — responds to heritage selections above", style={
+                        'fontFamily': 'Hanken Grotesk, sans-serif',
+                        'fontSize': '0.85rem',
+                        'color': COLORS['muted_teal'],
+                        'marginLeft': '0.5rem'
+                    })
+                ], style={'marginBottom': '0.75rem'}),
+                dbc.Tabs([
+                    dbc.Tab(label="Main Chart", tab_id="tab-main"),
+                    dbc.Tab(label="Trends Over Time", tab_id="tab-trends"),
+                    dbc.Tab(label="Spouse Generation", tab_id="tab-spouse-gen"),
+                ], id='viz-tabs', active_tab='tab-main', className='mb-0'),
+                html.Div([html.Div(id='tab-content')], className='brand-card',
+                        style={'borderRadius': '0 0 16px 16px'})
+            ], className='mb-4'),
 
             # Spouse Backgrounds Table
             html.Div([
@@ -1513,17 +1526,30 @@ app.layout = html.Div([
 
             # Compare All Groups Section
             html.Div([
-                html.Div("Compare All Groups", className='brand-card-header',
-                        style={'fontSize': '1rem', 'padding': '0.6rem 1.25rem'}),
-            ], style={'marginBottom': '0'}),
-            dbc.Tabs([
-                dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
-                dbc.Tab(label="Origin Heatmap", tab_id="tab-heatmap"),
-                dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
-            ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
-
-            html.Div([html.Div(id='overview-tab-content')], className='brand-card mb-4',
-                    style={'borderRadius': '0 0 16px 16px'}),
+                html.Div([
+                    html.Span("Compare All Groups", style={
+                        'fontFamily': 'Neuton, serif',
+                        'fontSize': '1.1rem',
+                        'fontWeight': '600',
+                        'color': COLORS['dark_teal'],
+                        'textTransform': 'uppercase',
+                        'letterSpacing': '0.05em'
+                    }),
+                    html.Span(" — cross-group comparisons", style={
+                        'fontFamily': 'Hanken Grotesk, sans-serif',
+                        'fontSize': '0.85rem',
+                        'color': COLORS['muted_teal'],
+                        'marginLeft': '0.5rem'
+                    })
+                ], style={'marginBottom': '0.75rem'}),
+                dbc.Tabs([
+                    dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
+                    dbc.Tab(label="Origin Heatmap", tab_id="tab-heatmap"),
+                    dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
+                ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
+                html.Div([html.Div(id='overview-tab-content')], className='brand-card',
+                        style={'borderRadius': '0 0 16px 16px'})
+            ], className='mb-4'),
 
             # Methodology
             html.Div([
@@ -1813,7 +1839,7 @@ def render_overview_tab_content(active_tab, year):
         available_origins = get_available_origins_for_overview()
         default_origin = available_origins[0] if available_origins else 'Germany'
         return html.Div([
-            html.P("Select an origin to see marriage patterns across all parent combinations involving that heritage. "
+            html.P("Select an origin to see marriage patterns for the most common parent combinations involving that heritage. "
                    "Compare how children with same-origin vs mixed-origin parents differ in their marriage choices.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             html.Div([
@@ -2204,7 +2230,7 @@ def create_single_origin_chart(origin, year):
 
     dem = get_demonym(origin)
     fig.update_layout(
-        title=dict(text=f"Marriage Patterns: All {dem} Parent Combinations",
+        title=dict(text=f"Marriage Patterns: Most Common {dem} Parent Combinations",
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Percentage (categories sum to 100%)",
         xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 105], ticksuffix='%'),
