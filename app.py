@@ -529,8 +529,8 @@ def get_network_data(year='All'):
     return nodes, edges, positions
 
 
-def _compute_force_layout(nodes, edges, iterations=200):
-    """Force-directed layout with stronger clustering for connected groups."""
+def _compute_force_layout(nodes, edges, iterations=300):
+    """Force-directed layout optimized for visible cluster triangulation."""
     import random
     random.seed(42)  # For reproducibility
 
@@ -538,28 +538,27 @@ def _compute_force_layout(nodes, edges, iterations=200):
     if n == 0:
         return {}
 
-    # Initialize positions in a circle for more even starting distribution
-    pos = {}
-    for i, node in enumerate(nodes):
-        angle = 2 * np.pi * i / n
-        pos[node['id']] = [np.cos(angle) * 0.8, np.sin(angle) * 0.8]
-
-    # Build adjacency with weights
+    # Build adjacency with weights first (needed for smart initialization)
     adj = {node['id']: {} for node in nodes}
     for edge in edges:
         s, t, w = edge['source'], edge['target'], edge['weight']
         if s in adj and t in adj:
-            adj[s][t] = adj[s].get(t, 0) + w
-            adj[t][s] = adj[t].get(s, 0) + w
+            adj[s][t] = w
+            adj[t][s] = w
 
-    # Force-directed iterations
-    k = 0.8 / np.sqrt(n)  # Optimal distance (slightly smaller for tighter clusters)
-    temp = 0.3
+    # Initialize with random positions
+    pos = {}
+    for node in nodes:
+        pos[node['id']] = [random.uniform(-1, 1), random.uniform(-1, 1)]
+
+    # Force-directed iterations with parameters tuned for triangulation
+    k = 0.4  # Target edge length - smaller = tighter clusters
+    temp = 1.0  # Start with high temperature
 
     for iteration in range(iterations):
         displacement = {node['id']: [0.0, 0.0] for node in nodes}
 
-        # Repulsive forces (all pairs) - weaker between connected nodes
+        # Repulsive forces between ALL pairs (keeps unconnected nodes apart)
         for i, n1 in enumerate(nodes):
             for n2 in nodes[i+1:]:
                 id1, id2 = n1['id'], n2['id']
@@ -567,17 +566,20 @@ def _compute_force_layout(nodes, edges, iterations=200):
                 dy = pos[id1][1] - pos[id2][1]
                 dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
 
-                # Reduce repulsion between connected nodes
-                connected = id2 in adj[id1]
-                repulsion_factor = 0.3 if connected else 1.0
+                # Standard repulsion - stronger for unconnected pairs
+                if id2 in adj[id1]:
+                    # Connected: minimal repulsion (just prevent overlap)
+                    force = (k * 0.3) ** 2 / dist
+                else:
+                    # Unconnected: strong repulsion to separate clusters
+                    force = (k * 1.5) ** 2 / dist
 
-                force = k * k / dist * repulsion_factor
                 displacement[id1][0] += dx / dist * force
                 displacement[id1][1] += dy / dist * force
                 displacement[id2][0] -= dx / dist * force
                 displacement[id2][1] -= dy / dist * force
 
-        # Attractive forces (connected pairs) - stronger pull
+        # Attractive forces - STRONG pull for connected pairs
         for edge in edges:
             s, t, w = edge['source'], edge['target'], edge['weight']
             if s not in pos or t not in pos:
@@ -585,25 +587,40 @@ def _compute_force_layout(nodes, edges, iterations=200):
             dx = pos[s][0] - pos[t][0]
             dy = pos[s][1] - pos[t][1]
             dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
-            # Stronger attraction: weight has more influence
-            force = dist * dist / k * (w / 5)
+
+            # Strong spring attraction - weight amplifies attraction
+            # Higher affinity = stronger pull together
+            attraction_strength = 0.5 * (1 + w / 2)  # Scale with edge weight
+            force = dist * attraction_strength
+
             displacement[s][0] -= dx / dist * force
             displacement[s][1] -= dy / dist * force
             displacement[t][0] += dx / dist * force
             displacement[t][1] += dy / dist * force
 
-        # Apply displacements with temperature
+        # Apply displacements with temperature limiting
         for node in nodes:
             nid = node['id']
-            disp_len = max(np.sqrt(displacement[nid][0]**2 + displacement[nid][1]**2), 0.01)
-            pos[nid][0] += displacement[nid][0] / disp_len * min(disp_len, temp)
-            pos[nid][1] += displacement[nid][1] / disp_len * min(disp_len, temp)
-            # Keep within bounds
-            pos[nid][0] = max(-1.5, min(1.5, pos[nid][0]))
-            pos[nid][1] = max(-1.5, min(1.5, pos[nid][1]))
+            disp_len = np.sqrt(displacement[nid][0]**2 + displacement[nid][1]**2)
+            if disp_len > 0.01:
+                # Limit movement by temperature
+                scale = min(disp_len, temp) / disp_len
+                pos[nid][0] += displacement[nid][0] * scale
+                pos[nid][1] += displacement[nid][1] * scale
 
-        # Slower cooling for more refinement
-        temp *= 0.97
+            # Soft bounds - keep nodes from flying too far
+            pos[nid][0] = max(-2.5, min(2.5, pos[nid][0]))
+            pos[nid][1] = max(-2.5, min(2.5, pos[nid][1]))
+
+        # Gradual cooling
+        temp *= 0.985
+
+    # Center the layout
+    avg_x = np.mean([pos[node['id']][0] for node in nodes])
+    avg_y = np.mean([pos[node['id']][1] for node in nodes])
+    for node in nodes:
+        pos[node['id']][0] -= avg_x
+        pos[node['id']][1] -= avg_y
 
     return pos
 
