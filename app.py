@@ -529,16 +529,16 @@ def get_network_data(year='All'):
     return nodes, edges, positions
 
 
-def _compute_force_layout(nodes, edges, iterations=300):
-    """Force-directed layout optimized for visible cluster triangulation."""
+def _compute_force_layout(nodes, edges, iterations=500):
+    """Spring-based layout with target distances based on connection strength."""
     import random
-    random.seed(42)  # For reproducibility
+    random.seed(42)
 
     n = len(nodes)
     if n == 0:
         return {}
 
-    # Build adjacency with weights first (needed for smart initialization)
+    # Build adjacency
     adj = {node['id']: {} for node in nodes}
     for edge in edges:
         s, t, w = edge['source'], edge['target'], edge['weight']
@@ -546,81 +546,72 @@ def _compute_force_layout(nodes, edges, iterations=300):
             adj[s][t] = w
             adj[t][s] = w
 
-    # Initialize with random positions
+    # Initialize in a small random cluster
     pos = {}
     for node in nodes:
-        pos[node['id']] = [random.uniform(-1, 1), random.uniform(-1, 1)]
+        pos[node['id']] = [random.gauss(0, 0.3), random.gauss(0, 0.3)]
 
-    # Force-directed iterations with parameters tuned for triangulation
-    k = 0.4  # Target edge length - smaller = tighter clusters
-    temp = 1.0  # Start with high temperature
+    # Spring layout parameters
+    ideal_edge_length = 0.4
+    repulsion_radius = 1.5
 
     for iteration in range(iterations):
-        displacement = {node['id']: [0.0, 0.0] for node in nodes}
+        # Decreasing step size
+        step = 0.05 * (1 - iteration / iterations) + 0.005
 
-        # Repulsive forces between ALL pairs (keeps unconnected nodes apart)
+        force = {node['id']: [0.0, 0.0] for node in nodes}
+
+        # Process all pairs
         for i, n1 in enumerate(nodes):
-            for n2 in nodes[i+1:]:
+            for j, n2 in enumerate(nodes):
+                if i >= j:
+                    continue
+
                 id1, id2 = n1['id'], n2['id']
-                dx = pos[id1][0] - pos[id2][0]
-                dy = pos[id1][1] - pos[id2][1]
-                dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
+                dx = pos[id2][0] - pos[id1][0]
+                dy = pos[id2][1] - pos[id1][1]
+                dist = np.sqrt(dx*dx + dy*dy)
 
-                # Standard repulsion - stronger for unconnected pairs
+                if dist < 0.001:
+                    dx, dy = random.gauss(0, 0.01), random.gauss(0, 0.01)
+                    dist = 0.01
+
+                ux, uy = dx / dist, dy / dist
+
                 if id2 in adj[id1]:
-                    # Connected: minimal repulsion (just prevent overlap)
-                    force = (k * 0.3) ** 2 / dist
+                    # Connected: spring to target distance (closer for higher weight)
+                    weight = adj[id1][id2]
+                    target = ideal_edge_length / (0.5 + weight * 0.2)
+                    # Spring force proportional to displacement from target
+                    f = (dist - target) * 0.3
                 else:
-                    # Unconnected: strong repulsion to separate clusters
-                    force = (k * 1.5) ** 2 / dist
+                    # Not connected: only repel if too close
+                    if dist < repulsion_radius:
+                        f = -0.1 * (repulsion_radius - dist)
+                    else:
+                        f = 0
 
-                displacement[id1][0] += dx / dist * force
-                displacement[id1][1] += dy / dist * force
-                displacement[id2][0] -= dx / dist * force
-                displacement[id2][1] -= dy / dist * force
+                force[id1][0] += f * ux
+                force[id1][1] += f * uy
+                force[id2][0] -= f * ux
+                force[id2][1] -= f * uy
 
-        # Attractive forces - STRONG pull for connected pairs
-        for edge in edges:
-            s, t, w = edge['source'], edge['target'], edge['weight']
-            if s not in pos or t not in pos:
-                continue
-            dx = pos[s][0] - pos[t][0]
-            dy = pos[s][1] - pos[t][1]
-            dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
-
-            # Strong spring attraction - weight amplifies attraction
-            # Higher affinity = stronger pull together
-            attraction_strength = 0.5 * (1 + w / 2)  # Scale with edge weight
-            force = dist * attraction_strength
-
-            displacement[s][0] -= dx / dist * force
-            displacement[s][1] -= dy / dist * force
-            displacement[t][0] += dx / dist * force
-            displacement[t][1] += dy / dist * force
-
-        # Apply displacements with temperature limiting
+        # Apply forces
         for node in nodes:
             nid = node['id']
-            disp_len = np.sqrt(displacement[nid][0]**2 + displacement[nid][1]**2)
-            if disp_len > 0.01:
-                # Limit movement by temperature
-                scale = min(disp_len, temp) / disp_len
-                pos[nid][0] += displacement[nid][0] * scale
-                pos[nid][1] += displacement[nid][1] * scale
+            pos[nid][0] += force[nid][0] * step
+            pos[nid][1] += force[nid][1] * step
 
-            # Soft bounds - keep nodes from flying too far
-            pos[nid][0] = max(-2.5, min(2.5, pos[nid][0]))
-            pos[nid][1] = max(-2.5, min(2.5, pos[nid][1]))
+    # Center and normalize
+    xs = [pos[n['id']][0] for n in nodes]
+    ys = [pos[n['id']][1] for n in nodes]
+    cx, cy = np.mean(xs), np.mean(ys)
+    max_r = max(np.sqrt((x-cx)**2 + (y-cy)**2) for x, y in zip(xs, ys))
+    scale = 1.5 / max_r if max_r > 0 else 1
 
-        # Gradual cooling
-        temp *= 0.985
-
-    # Center the layout
-    avg_x = np.mean([pos[node['id']][0] for node in nodes])
-    avg_y = np.mean([pos[node['id']][1] for node in nodes])
     for node in nodes:
-        pos[node['id']][0] -= avg_x
-        pos[node['id']][1] -= avg_y
+        pos[node['id']][0] = (pos[node['id']][0] - cx) * scale
+        pos[node['id']][1] = (pos[node['id']][1] - cy) * scale
 
     return pos
 
