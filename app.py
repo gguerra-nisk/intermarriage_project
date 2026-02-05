@@ -951,13 +951,13 @@ def generate_summary(mother, father, year):
             # Find the dominant year
             max_year = max(year_comp.keys(), key=lambda y: year_comp[y]['pct'])
             max_pct = year_comp[max_year]['pct']
-            year_breakdown = ", ".join([f"{yr}: {data['pct']:.0f}%" for yr, data in sorted(year_comp.items())])
-            lines.append(f"*Year composition: {year_breakdown}*")
+            year_breakdown = ", ".join([f"{data['pct']:.0f}% from {yr}" for yr, data in sorted(year_comp.items())])
+            lines.append(f"*This pooled sample draws from multiple censuses: {year_breakdown}.*")
             if max_pct > 40:
-                lines.append(f"*Note: {max_year} contributes {max_pct:.0f}% of the pooled sample. Select individual years for temporal specificity.*")
+                lines.append(f"*The {max_year} census contributes the largest share ({max_pct:.0f}%). Select individual years above for temporal specificity.*")
             lines.append("")
     else:
-        lines.append(f"*This {year} cross-section provides a snapshot free from repeated observations across census years.*")
+        lines.append(f"*Showing {year} census data only, providing a single point-in-time snapshot.*")
         lines.append("")
 
     # Calculate percentages
