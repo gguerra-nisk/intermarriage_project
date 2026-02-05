@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import urlencode, parse_qs
 import json
 import os
+from scipy.spatial.distance import pdist, squareform
 
 import dash
 from dash import dcc, html, callback, Input, Output, State, ctx, no_update
@@ -407,6 +408,147 @@ def get_clustering_data(year='All'):
     pivot_pct = pivot.div(pivot.sum(axis=1), axis=0) * 100
 
     return pivot_pct, major_parents, major_spouses
+
+
+def get_network_data(year='All'):
+    """Get network graph data for ethnic clustering visualization.
+
+    Returns nodes (ethnic groups) and edges (intermarriage connections).
+    Uses force-directed layout to position groups that intermarried closer together.
+    """
+    df = DATA['spouse_bg'].copy()
+    if year != 'All':
+        df = df[df['YEAR'] == int(year)]
+
+    # Filter to same-origin parents
+    df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
+    df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
+
+    # Get spouse heritage (exclude 3rd+ gen American for cleaner network)
+    def get_spouse_heritage(row):
+        if row['SPOUSE_GEN'] == '3rd+ gen American':
+            return None  # Exclude from network
+        elif row['SPOUSE_GEN'] == '1st gen immigrant':
+            return row['SPOUSE_COUNTRY']
+        else:
+            if str(row['SPOUSE_FATHER']) not in ['US-born', 'Unknown', 'N/A', 'nan']:
+                return row['SPOUSE_FATHER']
+            elif str(row['SPOUSE_MOTHER']) not in ['US-born', 'Unknown', 'N/A', 'nan']:
+                return row['SPOUSE_MOTHER']
+            return None
+
+    df['SPOUSE_HERITAGE'] = df.apply(get_spouse_heritage, axis=1)
+    df = df[df['SPOUSE_HERITAGE'].notna()]
+    df = df[~df['SPOUSE_HERITAGE'].isin(['Unknown', 'N/A', 'US-born'])]
+
+    # Get groups with substantial data
+    MIN_SAMPLE = 50000
+    parent_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
+    major_groups = parent_totals[parent_totals >= MIN_SAMPLE].index.tolist()
+
+    # Build edge data (cross-group marriages only)
+    edges = []
+    for parent in major_groups:
+        parent_df = df[df['MOTHER_ORIGIN'] == parent]
+        total = parent_df['WEIGHTED_COUNT'].sum()
+        if total == 0:
+            continue
+
+        spouse_counts = parent_df.groupby('SPOUSE_HERITAGE')['WEIGHTED_COUNT'].sum()
+
+        for spouse, count in spouse_counts.items():
+            if spouse in major_groups and spouse != parent:
+                rate = count / total * 100
+                if rate >= 1:  # Only show connections >= 1%
+                    edges.append({
+                        'source': parent,
+                        'target': spouse,
+                        'weight': rate
+                    })
+
+    # Get node populations
+    nodes = []
+    for group in major_groups:
+        pop = parent_totals.get(group, 0)
+        nodes.append({
+            'id': group,
+            'label': get_demonym(group),
+            'population': pop
+        })
+
+    # Compute positions using force-directed layout
+    positions = _compute_force_layout(nodes, edges)
+
+    return nodes, edges, positions
+
+
+def _compute_force_layout(nodes, edges, iterations=100):
+    """Simple force-directed layout algorithm."""
+    import random
+    random.seed(42)  # For reproducibility
+
+    n = len(nodes)
+    if n == 0:
+        return {}
+
+    # Initialize random positions
+    pos = {node['id']: [random.uniform(-1, 1), random.uniform(-1, 1)] for node in nodes}
+
+    # Build adjacency with weights
+    adj = {node['id']: {} for node in nodes}
+    for edge in edges:
+        s, t, w = edge['source'], edge['target'], edge['weight']
+        if s in adj and t in adj:
+            adj[s][t] = adj[s].get(t, 0) + w
+            adj[t][s] = adj[t].get(s, 0) + w
+
+    # Force-directed iterations
+    k = 1.0 / np.sqrt(n)  # Optimal distance
+    temp = 0.5
+
+    for _ in range(iterations):
+        displacement = {node['id']: [0.0, 0.0] for node in nodes}
+
+        # Repulsive forces (all pairs)
+        for i, n1 in enumerate(nodes):
+            for n2 in nodes[i+1:]:
+                id1, id2 = n1['id'], n2['id']
+                dx = pos[id1][0] - pos[id2][0]
+                dy = pos[id1][1] - pos[id2][1]
+                dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
+                force = k * k / dist
+                displacement[id1][0] += dx / dist * force
+                displacement[id1][1] += dy / dist * force
+                displacement[id2][0] -= dx / dist * force
+                displacement[id2][1] -= dy / dist * force
+
+        # Attractive forces (connected pairs)
+        for edge in edges:
+            s, t, w = edge['source'], edge['target'], edge['weight']
+            if s not in pos or t not in pos:
+                continue
+            dx = pos[s][0] - pos[t][0]
+            dy = pos[s][1] - pos[t][1]
+            dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
+            force = dist * dist / k * (w / 10)  # Weight influences attraction
+            displacement[s][0] -= dx / dist * force
+            displacement[s][1] -= dy / dist * force
+            displacement[t][0] += dx / dist * force
+            displacement[t][1] += dy / dist * force
+
+        # Apply displacements with temperature
+        for node in nodes:
+            nid = node['id']
+            disp_len = max(np.sqrt(displacement[nid][0]**2 + displacement[nid][1]**2), 0.01)
+            pos[nid][0] += displacement[nid][0] / disp_len * min(disp_len, temp)
+            pos[nid][1] += displacement[nid][1] / disp_len * min(disp_len, temp)
+            # Keep within bounds
+            pos[nid][0] = max(-2, min(2, pos[nid][0]))
+            pos[nid][1] = max(-2, min(2, pos[nid][1]))
+
+        temp *= 0.95  # Cool down
+
+    return pos
 
 
 def get_scatter_data(year='All'):
@@ -1549,7 +1691,7 @@ app.layout = html.Div([
                 ], style={'marginBottom': '0.75rem'}),
                 dbc.Tabs([
                     dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
-                    dbc.Tab(label="Origin Heatmap", tab_id="tab-heatmap"),
+                    dbc.Tab(label="Clustering Network", tab_id="tab-heatmap"),
                     dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
                 ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
                 html.Div([html.Div(id='overview-tab-content')], className='brand-card',
@@ -1833,8 +1975,8 @@ def render_overview_tab_content(active_tab, year):
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
         return html.Div([
-            html.P("Ethnic clustering: for children of same-origin parents, this shows who they married. "
-                   "Darker cells indicate higher marriage rates. The diagonal shows in-group marriage; off-diagonal shows cross-group patterns.",
+            html.P("Network showing which ethnic groups intermarried. Groups that frequently married each other are positioned closer together. "
+                   "Node size reflects population; line thickness shows intermarriage rate.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
@@ -2098,61 +2240,91 @@ def create_spouse_gen_chart(mother, father, year):
 
 
 def create_heatmap_chart(year):
-    """Create heatmap showing ethnic clustering: who did children of each group marry?"""
+    """Create network graph showing ethnic clustering patterns."""
     try:
-        pivot_pct, major_parents, major_spouses = get_clustering_data(year)
-    except Exception:
+        nodes, edges, positions = get_network_data(year)
+    except Exception as e:
         fig = go.Figure()
         fig.add_annotation(text="Insufficient data for clustering analysis", x=0.5, y=0.5, showarrow=False)
         fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
         return fig
 
-    if pivot_pct.empty:
+    if not nodes or not edges:
         fig = go.Figure()
-        fig.add_annotation(text="Insufficient data for clustering analysis", x=0.5, y=0.5, showarrow=False)
+        fig.add_annotation(text="Insufficient data for network visualization", x=0.5, y=0.5, showarrow=False)
         fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
         return fig
 
-    # Convert index/columns to demonyms
-    pivot_pct.index = [get_demonym(o) for o in pivot_pct.index]
-    pivot_pct.columns = [get_demonym(o) if o != 'American' else '3rd+ Gen American' for o in pivot_pct.columns]
+    fig = go.Figure()
 
-    # Sort rows by same-origin marriage rate (diagonal) - groups that cluster with themselves
-    # Sort columns to put 'American' last, then by total marriages into that group
-    col_order = sorted([c for c in pivot_pct.columns if c != '3rd+ Gen American'],
-                       key=lambda c: pivot_pct[c].sum(), reverse=True)
-    if '3rd+ Gen American' in pivot_pct.columns:
-        col_order.append('3rd+ Gen American')
+    # Draw edges (connections between groups)
+    max_weight = max(e['weight'] for e in edges) if edges else 1
+    for edge in edges:
+        x0, y0 = positions[edge['source']]
+        x1, y1 = positions[edge['target']]
+        # Line width proportional to marriage rate
+        width = max(0.5, edge['weight'] / max_weight * 6)
+        # Opacity based on weight
+        opacity = min(0.8, 0.2 + edge['weight'] / max_weight * 0.6)
 
-    # Sort rows by how much they marry within own group (diagonal values)
-    row_diag = {}
-    for idx in pivot_pct.index:
-        # Find matching column (same demonym)
-        matching_col = idx if idx in pivot_pct.columns else None
-        row_diag[idx] = pivot_pct.loc[idx, matching_col] if matching_col else 0
-    row_order = sorted(pivot_pct.index, key=lambda r: row_diag.get(r, 0), reverse=True)
+        fig.add_trace(go.Scatter(
+            x=[x0, x1], y=[y0, y1],
+            mode='lines',
+            line=dict(width=width, color=COLORS['medium_teal']),
+            opacity=opacity,
+            hoverinfo='skip',
+            showlegend=False
+        ))
 
-    pivot_pct = pivot_pct.reindex(index=row_order, columns=col_order)
+    # Draw nodes
+    max_pop = max(n['population'] for n in nodes) if nodes else 1
+    node_x = [positions[n['id']][0] for n in nodes]
+    node_y = [positions[n['id']][1] for n in nodes]
+    node_sizes = [15 + 35 * (n['population'] / max_pop) for n in nodes]
+    node_labels = [n['label'] for n in nodes]
+    node_pops = [n['population'] for n in nodes]
 
-    fig = go.Figure(data=go.Heatmap(
-        z=pivot_pct.values,
-        x=pivot_pct.columns.tolist(),
-        y=pivot_pct.index.tolist(),
-        colorscale=[[0, COLORS['white']], [0.15, COLORS['very_light_teal']],
-                    [0.4, COLORS['medium_teal']], [1, COLORS['dark_teal']]],
-        hovertemplate="<b>%{y} parents</b><br>Married %{x}: %{z:.1f}%<extra></extra>",
-        colorbar=dict(title="Marriage<br>Rate (%)", ticksuffix="%")
+    # Node colors - use a gradient based on population
+    node_colors = [COLORS['dark_teal'] for _ in nodes]
+
+    fig.add_trace(go.Scatter(
+        x=node_x, y=node_y,
+        mode='markers+text',
+        marker=dict(
+            size=node_sizes,
+            color=node_colors,
+            line=dict(width=2, color='white')
+        ),
+        text=node_labels,
+        textposition='top center',
+        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
+        hovertemplate="<b>%{text}</b><br>Population: %{customdata:,.0f}<extra></extra>",
+        customdata=node_pops,
+        showlegend=False
     ))
 
     fig.update_layout(
-        title=dict(text="Ethnic Clustering: Who Did Each Group Marry?",
-                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Spouse's Heritage",
-        yaxis_title="Parents' Origin (same-origin only)",
-        height=550, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(tickangle=45, side='bottom'),
-        yaxis=dict(autorange='reversed'),
-        margin=dict(b=120, l=120)
+        title=dict(
+            text="Ethnic Clustering Network",
+            font=dict(family='Neuton', size=22, color=COLORS['dark_teal']),
+            x=0
+        ),
+        showlegend=False,
+        hovermode='closest',
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False),
+        height=550,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=40, r=40, t=80, b=40),
+        annotations=[
+            dict(
+                text="Node size = population · Line thickness = intermarriage rate · Connected groups married each other",
+                xref='paper', yref='paper', x=0.5, y=-0.02,
+                showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
+                xanchor='center'
+            )
+        ]
     )
     return fig
 
