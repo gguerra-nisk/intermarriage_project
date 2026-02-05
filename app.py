@@ -1383,14 +1383,17 @@ body {
     margin: 0;
 }
 
-/* Filter Section */
+/* Filter Section - Sticky */
 .filter-section {
     background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
     border-radius: 16px;
     padding: 1.25rem 1.5rem 1rem 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(12, 42, 48, 0.25);
-    position: relative;
+    position: sticky;
+    top: 10px;
+    z-index: 100;
+    overflow: hidden;
 }
 
 .filter-section::before {
@@ -1401,7 +1404,43 @@ body {
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, #7dceda 0%, #bca45e 50%, #7dceda 100%);
-    border-radius: 16px 16px 0 0;
+}
+
+/* Anchor link navigation */
+.anchor-nav {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(12, 42, 48, 0.08);
+}
+
+.anchor-link {
+    color: #348397;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.anchor-link:hover {
+    background: rgba(52, 131, 151, 0.1);
+    color: #194852;
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Scroll margin for anchored sections */
+[id] {
+    scroll-margin-top: 180px;
 }
 
 .filter-label {
@@ -1769,18 +1808,19 @@ app.layout = html.Div([
                 html.Div([
                     html.P([
                         "This dashboard explores the marriage patterns of second-generation Americans—U.S.-born individuals with at least one immigrant parent—using census data from 1880 to 1930."
-                    ], style={'marginBottom': '0.75rem'}),
+                    ], style={'marginBottom': '0.5rem'}),
                     html.P([
                         html.Strong("To begin:"),
-                        " Select the parental origins you want to explore using the filters below. Choose \"Quick Presets\" to see common combinations, or build your own selection. The dashboard will show marriage patterns for your chosen group across all available census years."
+                        " Select the parental origins you want to explore using the filters below. Choose \"Quick Presets\" to see common combinations, or build your own selection."
                     ], style={'marginBottom': '0'})
                 ], style={
-                    'maxWidth': '800px',
+                    'maxWidth': '900px',
                     'margin': '1rem auto 0 auto',
+                    'padding': '0 1rem',
                     'color': COLORS['dark_teal'],
                     'fontSize': '0.95rem',
                     'lineHeight': '1.6',
-                    'textAlign': 'center'
+                    'textAlign': 'left'
                 }),
             ], className='header-section'),
 
@@ -1830,6 +1870,15 @@ app.layout = html.Div([
                 ]),
             ], className='filter-section'),
 
+            # Anchor Navigation
+            html.Div([
+                html.A("Charts", href='#charts', className='anchor-link'),
+                html.A("Analysis", href='#analysis', className='anchor-link'),
+                html.A("Spouse Backgrounds", href='#spouse-table', className='anchor-link'),
+                html.A("Compare Groups", href='#compare', className='anchor-link'),
+                html.A("Methodology", href='#methodology', className='anchor-link'),
+            ], className='anchor-nav'),
+
             # Key Stats Row
             dbc.Row([
                 dbc.Col([
@@ -1875,7 +1924,7 @@ app.layout = html.Div([
                 ], id='viz-tabs', active_tab='tab-main', className='mb-0'),
                 html.Div([html.Div(id='tab-content')], className='brand-card',
                         style={'borderRadius': '0 0 16px 16px'})
-            ], className='mb-4'),
+            ], id='charts', className='mb-4'),
 
             # Summary Card - Now collapsible and after the chart
             html.Div([
@@ -1889,16 +1938,16 @@ app.layout = html.Div([
                     dcc.Loading(type='circle', color=COLORS['medium_teal'],
                                children=[dcc.Markdown(id='auto-summary', className='summary-markdown')])
                 ], id='summary-body', className='brand-card-body')
-            ], className='brand-card summary-card mb-4'),
+            ], id='analysis', className='brand-card summary-card mb-4'),
 
             # Spouse Backgrounds Table
             html.Div([
                 html.Div("Spouse Backgrounds (Top 15)", className='brand-card-header-light'),
                 html.Div([
                     dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                               children=[html.Div(id='spouse-table', style={'maxHeight': '400px', 'overflowY': 'auto'})])
+                               children=[html.Div(id='spouse-table-content', style={'maxHeight': '400px', 'overflowY': 'auto'})])
                 ], className='brand-card-body')
-            ], className='brand-card mb-4'),
+            ], id='spouse-table', className='brand-card mb-4'),
 
             # Compare All Groups Section
             html.Div([
@@ -1913,7 +1962,7 @@ app.layout = html.Div([
                 ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
                 html.Div([html.Div(id='overview-tab-content')], className='brand-card',
                         style={'borderRadius': '0 0 16px 16px'})
-            ], className='mb-4'),
+            ], id='compare', className='mb-4'),
 
             # Methodology
             html.Div([
@@ -2009,7 +2058,7 @@ app.layout = html.Div([
                         " (Anthropic), an AI-assisted coding tool. Claude assisted with data processing pipeline development, debugging, visualization design, and methodology refinement. The underlying analysis logic and research design were directed by the researcher."
                     ], style={'marginBottom': '0'}),
                 ], className='brand-card-body', style={'fontSize': '0.95rem', 'lineHeight': '1.6'})
-            ], className='brand-card mb-4'),
+            ], id='methodology', className='brand-card mb-4'),
 
             # Feedback
             html.Div([
@@ -2563,11 +2612,12 @@ def create_heatmap_chart(year):
             showlegend=False
         ))
 
-    # Draw nodes with improved styling
+    # Draw nodes with improved styling - smaller nodes to avoid label overlap
     max_pop = max(n['population'] for n in nodes) if nodes else 1
     node_x = [positions[n['id']][0] for n in nodes]
     node_y = [positions[n['id']][1] for n in nodes]
-    node_sizes = [20 + 30 * np.sqrt(n['population'] / max_pop) for n in nodes]
+    # Reduced node sizes: was 20+30, now 12+18 (max ~30px instead of ~50px)
+    node_sizes = [12 + 18 * np.sqrt(n['population'] / max_pop) for n in nodes]
     node_labels = [n['label'] for n in nodes]
 
     # Build rich hover text with connections
@@ -2581,22 +2631,33 @@ def create_heatmap_chart(year):
             f"<br><b>Affinities:</b><br>{conn_str}"
         )
 
+    # Draw nodes (markers only, no text)
     fig.add_trace(go.Scatter(
         x=node_x, y=node_y,
-        mode='markers+text',
+        mode='markers',
         marker=dict(
             size=node_sizes,
             color=COLORS['dark_teal'],
-            line=dict(width=3, color=COLORS['white']),
-            opacity=0.9
+            line=dict(width=2, color=COLORS['white']),
+            opacity=0.85
         ),
-        text=node_labels,
-        textposition='top center',
-        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal'], weight='bold'),
         hovertemplate="%{customdata}<extra></extra>",
         customdata=hover_texts,
         showlegend=False
     ))
+
+    # Add labels as separate annotations for better positioning control
+    for i, n in enumerate(nodes):
+        fig.add_annotation(
+            x=node_x[i],
+            y=node_y[i],
+            text=node_labels[i],
+            showarrow=False,
+            yshift=node_sizes[i]/2 + 12,  # Position above node with dynamic offset
+            font=dict(family='Hanken Grotesk', size=10, color=COLORS['dark_teal']),
+            bgcolor='rgba(255,255,255,0.8)',
+            borderpad=2
+        )
 
     fig.update_layout(
         title=dict(
@@ -2732,7 +2793,7 @@ def create_single_origin_chart(origin, year):
     return fig
 
 
-@callback(Output('spouse-table', 'children'),
+@callback(Output('spouse-table-content', 'children'),
           [Input('mother-dropdown', 'value'), Input('father-dropdown', 'value'), Input('year-dropdown', 'value')])
 def update_table(mother, father, year):
     df = get_filtered_spouse_data(mother, father, year)
