@@ -352,56 +352,61 @@ def get_spouse_generation_data(mother, father, year):
     return result
 
 
-def get_heatmap_data(year='All'):
-    """Get same-origin marriage rates for all origin pair combinations."""
-    df = DATA['marriage_agg'].copy()
+def get_clustering_data(year='All'):
+    """Get marriage clustering data: who did children of each group marry?
+
+    Returns a matrix showing what % of children from same-origin Group X
+    married someone from Group Y (including 3rd+ gen Americans).
+    """
+    df = DATA['spouse_bg'].copy()
     if year != 'All':
         df = df[df['YEAR'] == int(year)]
 
-    # Filter out non-countries
+    # Filter to same-origin parents for cleaner clustering view
+    df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
     df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
-    df = df[~df['FATHER_ORIGIN'].isin(NON_COUNTRIES)]
 
-    # Get major origins (those with substantial data)
+    # Determine spouse heritage
+    def get_spouse_heritage(row):
+        if row['SPOUSE_GEN'] == '3rd+ gen American':
+            return 'American'
+        elif row['SPOUSE_GEN'] == '1st gen immigrant':
+            return row['SPOUSE_COUNTRY']
+        else:  # 2nd gen - use primary parent origin
+            if str(row['SPOUSE_FATHER']) not in ['US-born', 'Unknown', 'N/A', 'nan']:
+                return row['SPOUSE_FATHER']
+            elif str(row['SPOUSE_MOTHER']) not in ['US-born', 'Unknown', 'N/A', 'nan']:
+                return row['SPOUSE_MOTHER']
+            return 'Unknown'
+
+    df['SPOUSE_HERITAGE'] = df.apply(get_spouse_heritage, axis=1)
+
+    # Filter out unknown spouse heritage
+    df = df[~df['SPOUSE_HERITAGE'].isin(['Unknown', 'N/A', 'US-born'])]
+
+    # Get major parent origins (those with substantial data)
     MIN_SAMPLE = 100000
-    origin_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
-    major_origins = origin_totals[origin_totals >= MIN_SAMPLE].index.tolist()
+    parent_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
+    major_parents = parent_totals[parent_totals >= MIN_SAMPLE].index.tolist()
 
-    # Also check father origins
-    father_totals = df.groupby('FATHER_ORIGIN')['WEIGHTED_COUNT'].sum()
-    major_father_origins = father_totals[father_totals >= MIN_SAMPLE].index.tolist()
+    # Get major spouse heritages
+    spouse_totals = df.groupby('SPOUSE_HERITAGE')['WEIGHTED_COUNT'].sum()
+    major_spouses = spouse_totals[spouse_totals >= 50000].index.tolist()
 
-    # Use union of major origins
-    major_origins = list(set(major_origins) | set(major_father_origins))
-    major_origins.sort()
+    # Ensure 'American' is included if present
+    if 'American' in spouse_totals.index and 'American' not in major_spouses:
+        major_spouses.append('American')
 
-    # Build heatmap matrix
-    heatmap_data = []
+    # Build clustering matrix
+    clustering = df[df['MOTHER_ORIGIN'].isin(major_parents) & df['SPOUSE_HERITAGE'].isin(major_spouses)]
+    clustering = clustering.groupby(['MOTHER_ORIGIN', 'SPOUSE_HERITAGE'])['WEIGHTED_COUNT'].sum().reset_index()
 
-    for mother in major_origins:
-        for father in major_origins:
-            pair_df = df[(df['MOTHER_ORIGIN'] == mother) & (df['FATHER_ORIGIN'] == father)]
-            total = pair_df['WEIGHTED_COUNT'].sum()
+    # Pivot and convert to percentages
+    pivot = clustering.pivot_table(index='MOTHER_ORIGIN', columns='SPOUSE_HERITAGE',
+                                   values='WEIGHTED_COUNT', fill_value=0)
+    pivot_pct = pivot.div(pivot.sum(axis=1), axis=0) * 100
 
-            if total < 10000:  # Skip very small samples
-                continue
-
-            stats = pair_df.groupby('MARRIAGE_TYPE')['WEIGHTED_COUNT'].sum()
-            pcts = (stats / total * 100).to_dict()
-
-            heritage_rate = sum(v for k, v in pcts.items()
-                               if any(x in k for x in ['same origin', "mother's origin", "father's origin", 'both heritages']))
-
-            heatmap_data.append({
-                'mother': mother,
-                'father': father,
-                'mother_dem': get_demonym(mother),
-                'father_dem': get_demonym(father),
-                'heritage_rate': heritage_rate,
-                'population': total
-            })
-
-    return heatmap_data, major_origins
+    return pivot_pct, major_parents, major_spouses
 
 
 def get_scatter_data(year='All'):
@@ -1828,8 +1833,8 @@ def render_overview_tab_content(active_tab, year):
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
         return html.Div([
-            html.P("Heritage-based marriage rates for different parent origin combinations. Darker colors indicate "
-                   "higher rates of marrying within immigrant heritage.",
+            html.P("Ethnic clustering: for children of same-origin parents, this shows who they married. "
+                   "Darker cells indicate higher marriage rates. The diagonal shows in-group marriage; off-diagonal shows cross-group patterns.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
@@ -1839,8 +1844,8 @@ def render_overview_tab_content(active_tab, year):
         available_origins = get_available_origins_for_overview()
         default_origin = available_origins[0] if available_origins else 'Germany'
         return html.Div([
-            html.P("Select an origin to see marriage patterns for the most common parent combinations involving that heritage. "
-                   "Compare how children with same-origin vs mixed-origin parents differ in their marriage choices.",
+            html.P("Select an origin to see marriage patterns for the most common immigrant parent combinations involving that heritage "
+                   "(excludes US-born parents). Compare how children with same-origin vs mixed-origin parents differ in their marriage choices.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             html.Div([
                 html.Label("Select Origin:", style={'fontWeight': '500', 'marginRight': '10px', 'color': COLORS['dark_teal']}),
@@ -2093,45 +2098,61 @@ def create_spouse_gen_chart(mother, father, year):
 
 
 def create_heatmap_chart(year):
-    """Create heatmap showing heritage-based marriage rates for origin pair combinations."""
-    heatmap_data, major_origins = get_heatmap_data(year)
-
-    if not heatmap_data:
+    """Create heatmap showing ethnic clustering: who did children of each group marry?"""
+    try:
+        pivot_pct, major_parents, major_spouses = get_clustering_data(year)
+    except Exception:
         fig = go.Figure()
-        fig.add_annotation(text="Insufficient data for heatmap", x=0.5, y=0.5, showarrow=False)
+        fig.add_annotation(text="Insufficient data for clustering analysis", x=0.5, y=0.5, showarrow=False)
         fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
         return fig
 
-    # Get demonyms for labels
-    origin_demonyms = {o: get_demonym(o) for o in major_origins}
+    if pivot_pct.empty:
+        fig = go.Figure()
+        fig.add_annotation(text="Insufficient data for clustering analysis", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
 
-    # Create matrix
-    df_heat = pd.DataFrame(heatmap_data)
+    # Convert index/columns to demonyms
+    pivot_pct.index = [get_demonym(o) for o in pivot_pct.index]
+    pivot_pct.columns = [get_demonym(o) if o != 'American' else '3rd+ Gen American' for o in pivot_pct.columns]
 
-    # Pivot to matrix form
-    pivot = df_heat.pivot_table(index='mother_dem', columns='father_dem', values='heritage_rate', aggfunc='mean')
+    # Sort rows by same-origin marriage rate (diagonal) - groups that cluster with themselves
+    # Sort columns to put 'American' last, then by total marriages into that group
+    col_order = sorted([c for c in pivot_pct.columns if c != '3rd+ Gen American'],
+                       key=lambda c: pivot_pct[c].sum(), reverse=True)
+    if '3rd+ Gen American' in pivot_pct.columns:
+        col_order.append('3rd+ Gen American')
 
-    # Sort by average heritage rate
-    row_order = pivot.mean(axis=1).sort_values(ascending=False).index.tolist()
-    col_order = pivot.mean(axis=0).sort_values(ascending=False).index.tolist()
-    pivot = pivot.reindex(index=row_order, columns=col_order)
+    # Sort rows by how much they marry within own group (diagonal values)
+    row_diag = {}
+    for idx in pivot_pct.index:
+        # Find matching column (same demonym)
+        matching_col = idx if idx in pivot_pct.columns else None
+        row_diag[idx] = pivot_pct.loc[idx, matching_col] if matching_col else 0
+    row_order = sorted(pivot_pct.index, key=lambda r: row_diag.get(r, 0), reverse=True)
+
+    pivot_pct = pivot_pct.reindex(index=row_order, columns=col_order)
 
     fig = go.Figure(data=go.Heatmap(
-        z=pivot.values,
-        x=pivot.columns.tolist(),
-        y=pivot.index.tolist(),
-        colorscale=[[0, COLORS['very_light_teal']], [0.5, COLORS['medium_teal']], [1, COLORS['dark_teal']]],
-        hovertemplate="Mother: %{y}<br>Father: %{x}<br>Heritage rate: %{z:.1f}%<extra></extra>",
-        colorbar=dict(title="Heritage<br>Rate (%)", ticksuffix="%")
+        z=pivot_pct.values,
+        x=pivot_pct.columns.tolist(),
+        y=pivot_pct.index.tolist(),
+        colorscale=[[0, COLORS['white']], [0.15, COLORS['very_light_teal']],
+                    [0.4, COLORS['medium_teal']], [1, COLORS['dark_teal']]],
+        hovertemplate="<b>%{y} parents</b><br>Married %{x}: %{z:.1f}%<extra></extra>",
+        colorbar=dict(title="Marriage<br>Rate (%)", ticksuffix="%")
     ))
 
     fig.update_layout(
-        title=dict(text="Heritage-Based Marriage Rates by Parent Origins", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Father's Origin",
-        yaxis_title="Mother's Origin",
-        height=600, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(tickangle=45),
-        margin=dict(b=120)
+        title=dict(text="Ethnic Clustering: Who Did Each Group Marry?",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Spouse's Heritage",
+        yaxis_title="Parents' Origin (same-origin only)",
+        height=550, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(tickangle=45, side='bottom'),
+        yaxis=dict(autorange='reversed'),
+        margin=dict(b=120, l=120)
     )
     return fig
 
