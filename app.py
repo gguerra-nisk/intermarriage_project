@@ -529,8 +529,8 @@ def get_network_data(year='All'):
     return nodes, edges, positions
 
 
-def _compute_force_layout(nodes, edges, iterations=100):
-    """Simple force-directed layout algorithm."""
+def _compute_force_layout(nodes, edges, iterations=200):
+    """Force-directed layout with stronger clustering for connected groups."""
     import random
     random.seed(42)  # For reproducibility
 
@@ -538,8 +538,11 @@ def _compute_force_layout(nodes, edges, iterations=100):
     if n == 0:
         return {}
 
-    # Initialize random positions
-    pos = {node['id']: [random.uniform(-1, 1), random.uniform(-1, 1)] for node in nodes}
+    # Initialize positions in a circle for more even starting distribution
+    pos = {}
+    for i, node in enumerate(nodes):
+        angle = 2 * np.pi * i / n
+        pos[node['id']] = [np.cos(angle) * 0.8, np.sin(angle) * 0.8]
 
     # Build adjacency with weights
     adj = {node['id']: {} for node in nodes}
@@ -550,26 +553,31 @@ def _compute_force_layout(nodes, edges, iterations=100):
             adj[t][s] = adj[t].get(s, 0) + w
 
     # Force-directed iterations
-    k = 1.0 / np.sqrt(n)  # Optimal distance
-    temp = 0.5
+    k = 0.8 / np.sqrt(n)  # Optimal distance (slightly smaller for tighter clusters)
+    temp = 0.3
 
-    for _ in range(iterations):
+    for iteration in range(iterations):
         displacement = {node['id']: [0.0, 0.0] for node in nodes}
 
-        # Repulsive forces (all pairs)
+        # Repulsive forces (all pairs) - weaker between connected nodes
         for i, n1 in enumerate(nodes):
             for n2 in nodes[i+1:]:
                 id1, id2 = n1['id'], n2['id']
                 dx = pos[id1][0] - pos[id2][0]
                 dy = pos[id1][1] - pos[id2][1]
                 dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
-                force = k * k / dist
+
+                # Reduce repulsion between connected nodes
+                connected = id2 in adj[id1]
+                repulsion_factor = 0.3 if connected else 1.0
+
+                force = k * k / dist * repulsion_factor
                 displacement[id1][0] += dx / dist * force
                 displacement[id1][1] += dy / dist * force
                 displacement[id2][0] -= dx / dist * force
                 displacement[id2][1] -= dy / dist * force
 
-        # Attractive forces (connected pairs)
+        # Attractive forces (connected pairs) - stronger pull
         for edge in edges:
             s, t, w = edge['source'], edge['target'], edge['weight']
             if s not in pos or t not in pos:
@@ -577,7 +585,8 @@ def _compute_force_layout(nodes, edges, iterations=100):
             dx = pos[s][0] - pos[t][0]
             dy = pos[s][1] - pos[t][1]
             dist = max(np.sqrt(dx*dx + dy*dy), 0.01)
-            force = dist * dist / k * (w / 10)  # Weight influences attraction
+            # Stronger attraction: weight has more influence
+            force = dist * dist / k * (w / 5)
             displacement[s][0] -= dx / dist * force
             displacement[s][1] -= dy / dist * force
             displacement[t][0] += dx / dist * force
@@ -590,10 +599,11 @@ def _compute_force_layout(nodes, edges, iterations=100):
             pos[nid][0] += displacement[nid][0] / disp_len * min(disp_len, temp)
             pos[nid][1] += displacement[nid][1] / disp_len * min(disp_len, temp)
             # Keep within bounds
-            pos[nid][0] = max(-2, min(2, pos[nid][0]))
-            pos[nid][1] = max(-2, min(2, pos[nid][1]))
+            pos[nid][0] = max(-1.5, min(1.5, pos[nid][0]))
+            pos[nid][1] = max(-1.5, min(1.5, pos[nid][1]))
 
-        temp *= 0.95  # Cool down
+        # Slower cooling for more refinement
+        temp *= 0.97
 
     return pos
 
@@ -2612,12 +2622,12 @@ def create_heatmap_chart(year):
             showlegend=False
         ))
 
-    # Draw nodes with improved styling - smaller nodes to avoid label overlap
+    # Draw nodes - uniform small size for cleaner look
     max_pop = max(n['population'] for n in nodes) if nodes else 1
     node_x = [positions[n['id']][0] for n in nodes]
     node_y = [positions[n['id']][1] for n in nodes]
-    # Reduced node sizes: was 20+30, now 12+18 (max ~30px instead of ~50px)
-    node_sizes = [12 + 18 * np.sqrt(n['population'] / max_pop) for n in nodes]
+    # Smaller, more uniform nodes (size based on population but constrained)
+    node_sizes = [10 + 12 * np.sqrt(n['population'] / max_pop) for n in nodes]
     node_labels = [n['label'] for n in nodes]
 
     # Build rich hover text with connections
@@ -2631,7 +2641,7 @@ def create_heatmap_chart(year):
             f"<br><b>Affinities:</b><br>{conn_str}"
         )
 
-    # Draw nodes (markers only, no text)
+    # Draw nodes (markers only)
     fig.add_trace(go.Scatter(
         x=node_x, y=node_y,
         mode='markers',
@@ -2639,27 +2649,62 @@ def create_heatmap_chart(year):
             size=node_sizes,
             color=COLORS['dark_teal'],
             line=dict(width=2, color=COLORS['white']),
-            opacity=0.85
+            opacity=0.9
         ),
         hovertemplate="%{customdata}<extra></extra>",
         customdata=hover_texts,
         showlegend=False
     ))
 
-    # Build all annotations - node labels + footer note
+    # Calculate smart label positions - place labels away from graph center
+    # to avoid overlapping with other nodes
+    center_x = np.mean(node_x)
+    center_y = np.mean(node_y)
+
     all_annotations = []
 
-    # Add labels for each node
     for i, n in enumerate(nodes):
+        x, y = node_x[i], node_y[i]
+
+        # Calculate direction away from center
+        dx = x - center_x
+        dy = y - center_y
+        dist_from_center = np.sqrt(dx*dx + dy*dy)
+
+        if dist_from_center > 0.01:
+            # Normalize and extend outward
+            dx_norm = dx / dist_from_center
+            dy_norm = dy / dist_from_center
+        else:
+            dx_norm, dy_norm = 0, 1
+
+        # Place label outside the node, away from center
+        label_offset = 0.12  # Distance from node in data coordinates
+
+        # Determine text anchor based on position relative to center
+        if abs(dx_norm) > abs(dy_norm):
+            # More horizontal - anchor left or right
+            xanchor = 'left' if dx_norm > 0 else 'right'
+            yanchor = 'middle'
+            label_x = x + dx_norm * label_offset
+            label_y = y
+        else:
+            # More vertical - anchor top or bottom
+            xanchor = 'center'
+            yanchor = 'bottom' if dy_norm > 0 else 'top'
+            label_x = x
+            label_y = y + dy_norm * label_offset
+
         all_annotations.append(dict(
-            x=node_x[i],
-            y=node_y[i],
+            x=label_x,
+            y=label_y,
             text=node_labels[i],
             showarrow=False,
-            yshift=node_sizes[i]/2 + 12,  # Position above node with dynamic offset
-            font=dict(family='Hanken Grotesk', size=10, color=COLORS['dark_teal']),
-            bgcolor='rgba(255,255,255,0.8)',
-            borderpad=2
+            xanchor=xanchor,
+            yanchor=yanchor,
+            font=dict(family='Hanken Grotesk', size=9, color=COLORS['dark_teal']),
+            bgcolor='rgba(255,255,255,0.85)',
+            borderpad=3
         ))
 
     # Add footer note
