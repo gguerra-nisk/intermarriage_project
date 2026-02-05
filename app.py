@@ -1416,32 +1416,93 @@ body {
     background: linear-gradient(90deg, #7dceda 0%, #bca45e 50%, #7dceda 100%);
 }
 
-/* Anchor link navigation */
+/* Anchor link navigation - full width bar */
 .anchor-nav {
     display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding: 0.75rem 1rem;
-    background: rgba(255,255,255,0.95);
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(12, 42, 48, 0.08);
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 16px rgba(12, 42, 48, 0.15);
+    overflow: hidden;
 }
 
 .anchor-link {
-    color: #348397;
+    color: rgba(255,255,255,0.85);
     text-decoration: none;
     font-size: 0.85rem;
-    font-weight: 500;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
     transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    flex: 1;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.anchor-link:last-child {
+    border-right: none;
 }
 
 .anchor-link:hover {
-    background: rgba(52, 131, 151, 0.1);
-    color: #194852;
+    background: rgba(125, 206, 218, 0.2);
+    color: #ffffff;
 }
+
+/* Action buttons - visible on light background */
+.action-btn {
+    background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
+    color: #ffffff !important;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Hanken Grotesk', sans-serif;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(12, 42, 48, 0.25);
+}
+
+/* Social share buttons */
+.social-share {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    color: #ffffff !important;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.social-btn-twitter { background: #1DA1F2; }
+.social-btn-linkedin { background: #0A66C2; }
+.social-btn-facebook { background: #1877F2; }
+.social-btn-email { background: #6c757d; }
 
 /* Smooth scroll behavior */
 html {
@@ -1811,8 +1872,14 @@ app.layout = html.Div([
 
     html.Div([
         dbc.Container([
-            # Header
+            # Header with Logo
             html.Div([
+                # Logo placeholder - replace src with actual Niskanen logo URL
+                html.Div([
+                    html.Img(src='/assets/niskanen-logo.png', alt='Niskanen Center',
+                            style={'height': '50px', 'marginBottom': '0.75rem'},
+                            id='niskanen-logo'),
+                ], style={'textAlign': 'center'}),
                 html.H1("Marriage and the Melting Pot, 1880-1930", className='main-title text-center'),
                 html.P("Whom did the US-born children of immigrants marry?", className='subtitle text-center'),
                 html.Div([
@@ -1911,13 +1978,19 @@ app.layout = html.Div([
                 ], md=2, sm=4, xs=6),
                 dbc.Col([
                     html.Div([
-                        html.Button("Download CSV", id='download-csv-btn', className='brand-btn brand-btn-secondary me-2',
-                                   style={'padding': '0.5rem 0.8rem', 'fontSize': '0.85rem'}),
+                        # Action buttons
+                        html.Button("Download CSV", id='download-csv-btn', className='action-btn me-2'),
                         dcc.Download(id='download-csv'),
-                        html.Button("Share Link", id='copy-link-btn', className='brand-btn brand-btn-secondary',
-                                   style={'padding': '0.5rem 0.8rem', 'fontSize': '0.85rem'}),
-                        html.Span(id='link-copied-msg', style={'marginLeft': '8px', 'color': COLORS['green'], 'fontWeight': '600', 'fontSize': '0.85rem'}),
-                    ], className='text-end pt-2')
+                        html.Button("Copy Link", id='copy-link-btn', className='action-btn me-3'),
+                        html.Span(id='link-copied-msg', style={'marginRight': '1rem', 'color': COLORS['green'], 'fontWeight': '600', 'fontSize': '0.85rem'}),
+                        # Social share buttons
+                        html.Span([
+                            html.A("X", href='#', id='share-twitter', className='social-btn social-btn-twitter', title='Share on X/Twitter', target='_blank'),
+                            html.A("in", href='#', id='share-linkedin', className='social-btn social-btn-linkedin', title='Share on LinkedIn', target='_blank'),
+                            html.A("f", href='#', id='share-facebook', className='social-btn social-btn-facebook', title='Share on Facebook', target='_blank'),
+                            html.A("✉", href='#', id='share-email', className='social-btn social-btn-email', title='Share via Email'),
+                        ], className='social-share'),
+                    ], className='d-flex align-items-center justify-content-end pt-2')
                 ], md=6, sm=12, xs=12),
             ], className='mb-4 align-items-center'),
 
@@ -2164,6 +2237,32 @@ def reset_filters(n_clicks):
           [Input('copy-link-btn', 'n_clicks')], [State('url', 'href')], prevent_initial_call=True)
 def copy_link(n_clicks, href):
     return (href, "Copied!") if n_clicks else (no_update, "")
+
+
+# Social share button URLs
+@callback(
+    [Output('share-twitter', 'href'),
+     Output('share-linkedin', 'href'),
+     Output('share-facebook', 'href'),
+     Output('share-email', 'href')],
+    [Input('url', 'href')]
+)
+def update_social_links(href):
+    if not href:
+        href = "https://www.niskanencenter.org/intermarriage-dashboard/"
+
+    title = "Marriage and the Melting Pot, 1880-1930 - Niskanen Center"
+    description = "Explore marriage patterns of second-generation Americans using census data from 1880-1930."
+
+    # URL encode the parameters
+    from urllib.parse import quote
+
+    twitter_url = f"https://twitter.com/intent/tweet?url={quote(href)}&text={quote(title)}"
+    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={quote(href)}"
+    facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={quote(href)}"
+    email_url = f"mailto:?subject={quote(title)}&body={quote(description + chr(10) + chr(10) + href)}"
+
+    return twitter_url, linkedin_url, facebook_url, email_url
 
 
 @callback(
