@@ -414,6 +414,8 @@ def get_network_data(year='All'):
     """Get network graph data for ethnic clustering visualization.
 
     Returns nodes (ethnic groups) and edges (intermarriage connections).
+    Edge weights are symmetric (average of both directions) and represent
+    mutual intermarriage affinity, adjusted for group size.
     Uses force-directed layout to position groups that intermarried closer together.
     """
     df = DATA['spouse_bg'].copy()
@@ -423,6 +425,10 @@ def get_network_data(year='All'):
     # Filter to same-origin parents
     df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
     df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
+
+    # Exclude groups that don't cluster well with European immigrants
+    EXCLUDED_FROM_NETWORK = {'Mexico', 'Cuba', 'West Indies', 'China', 'Japan'}
+    df = df[~df['MOTHER_ORIGIN'].isin(EXCLUDED_FROM_NETWORK)]
 
     # Get spouse heritage (exclude 3rd+ gen American for cleaner network)
     def get_spouse_heritage(row):
@@ -439,15 +445,15 @@ def get_network_data(year='All'):
 
     df['SPOUSE_HERITAGE'] = df.apply(get_spouse_heritage, axis=1)
     df = df[df['SPOUSE_HERITAGE'].notna()]
-    df = df[~df['SPOUSE_HERITAGE'].isin(['Unknown', 'N/A', 'US-born'])]
+    df = df[~df['SPOUSE_HERITAGE'].isin(['Unknown', 'N/A', 'US-born'] + list(EXCLUDED_FROM_NETWORK))]
 
     # Get groups with substantial data
     MIN_SAMPLE = 50000
     parent_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
     major_groups = parent_totals[parent_totals >= MIN_SAMPLE].index.tolist()
 
-    # Build edge data (cross-group marriages only)
-    edges = []
+    # Calculate directed rates for all pairs
+    directed_rates = {}
     for parent in major_groups:
         parent_df = df[df['MOTHER_ORIGIN'] == parent]
         total = parent_df['WEIGHTED_COUNT'].sum()
@@ -459,16 +465,37 @@ def get_network_data(year='All'):
         for spouse, count in spouse_counts.items():
             if spouse in major_groups and spouse != parent:
                 rate = count / total * 100
-                if rate >= 1:  # Only show connections >= 1%
-                    edges.append({
-                        'source': parent,
-                        'target': spouse,
-                        'weight': rate
-                    })
+                directed_rates[(parent, spouse)] = rate
 
-    # Get node populations
+    # Build symmetric edges (average of both directions)
+    edges = []
+    seen_pairs = set()
+    for (source, target), rate in directed_rates.items():
+        pair = tuple(sorted([source, target]))
+        if pair in seen_pairs:
+            continue
+        seen_pairs.add(pair)
+
+        # Get rate in both directions and average
+        rate_ab = directed_rates.get((source, target), 0)
+        rate_ba = directed_rates.get((target, source), 0)
+        avg_rate = (rate_ab + rate_ba) / 2
+
+        if avg_rate >= 1.5:  # Threshold for showing connection
+            edges.append({
+                'source': pair[0],
+                'target': pair[1],
+                'weight': avg_rate
+            })
+
+    # Only include nodes that have at least one edge
+    connected_groups = set()
+    for edge in edges:
+        connected_groups.add(edge['source'])
+        connected_groups.add(edge['target'])
+
     nodes = []
-    for group in major_groups:
+    for group in connected_groups:
         pop = parent_totals.get(group, 0)
         nodes.append({
             'id': group,
