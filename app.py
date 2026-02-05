@@ -414,9 +414,9 @@ def get_network_data(year='All'):
     """Get network graph data for ethnic clustering visualization.
 
     Returns nodes (ethnic groups) and edges (intermarriage connections).
-    Edge weights are symmetric (average of both directions) and represent
-    mutual intermarriage affinity, adjusted for group size.
-    Uses force-directed layout to position groups that intermarried closer together.
+    Edge weights are POPULATION-ADJUSTED AFFINITY: observed rate / expected rate.
+    Affinity > 1 means groups married MORE than random chance would predict.
+    This corrects for large groups (like Germans) dominating raw percentages.
     """
     df = DATA['spouse_bg'].copy()
     if year != 'All':
@@ -452,8 +452,13 @@ def get_network_data(year='All'):
     parent_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
     major_groups = parent_totals[parent_totals >= MIN_SAMPLE].index.tolist()
 
-    # Calculate directed rates for all pairs
-    directed_rates = {}
+    # Calculate market share for each group (expected rate if random matching)
+    spouse_totals = df.groupby('SPOUSE_HERITAGE')['WEIGHTED_COUNT'].sum()
+    total_market = spouse_totals.sum()
+    market_share = spouse_totals / total_market
+
+    # Calculate population-adjusted affinity for all pairs
+    directed_affinity = {}
     for parent in major_groups:
         parent_df = df[df['MOTHER_ORIGIN'] == parent]
         total = parent_df['WEIGHTED_COUNT'].sum()
@@ -464,28 +469,32 @@ def get_network_data(year='All'):
 
         for spouse, count in spouse_counts.items():
             if spouse in major_groups and spouse != parent:
-                rate = count / total * 100
-                directed_rates[(parent, spouse)] = rate
+                observed_rate = count / total
+                expected_rate = market_share.get(spouse, 0)
+                if expected_rate > 0:
+                    affinity = observed_rate / expected_rate
+                    directed_affinity[(parent, spouse)] = affinity
 
-    # Build symmetric edges (average of both directions)
+    # Build symmetric edges (average affinity of both directions)
     edges = []
     seen_pairs = set()
-    for (source, target), rate in directed_rates.items():
+    for (source, target), affinity in directed_affinity.items():
         pair = tuple(sorted([source, target]))
         if pair in seen_pairs:
             continue
         seen_pairs.add(pair)
 
-        # Get rate in both directions and average
-        rate_ab = directed_rates.get((source, target), 0)
-        rate_ba = directed_rates.get((target, source), 0)
-        avg_rate = (rate_ab + rate_ba) / 2
+        # Get affinity in both directions and average
+        aff_ab = directed_affinity.get((source, target), 0)
+        aff_ba = directed_affinity.get((target, source), 0)
+        avg_affinity = (aff_ab + aff_ba) / 2
 
-        if avg_rate >= 1.5:  # Threshold for showing connection
+        # Only show edges where groups married MORE than random chance (affinity > 1)
+        if avg_affinity >= 1.0:
             edges.append({
                 'source': pair[0],
                 'target': pair[1],
-                'weight': avg_rate
+                'weight': avg_affinity
             })
 
     # Only include nodes that have at least one edge
@@ -2002,8 +2011,8 @@ def render_overview_tab_content(active_tab, year):
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
         return html.Div([
-            html.P("Network showing which ethnic groups intermarried. Groups that frequently married each other are positioned closer together. "
-                   "Node size reflects population; line thickness shows intermarriage rate.",
+            html.P("Network showing true ethnic affinity, adjusted for population size. Connections only appear when groups married "
+                   "MORE than random chance would predict. This corrects for large groups like Germans appearing in many marriages simply due to their size.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
@@ -2332,7 +2341,7 @@ def create_heatmap_chart(year):
 
     fig.update_layout(
         title=dict(
-            text="Ethnic Clustering Network",
+            text="Ethnic Clustering Network (Population-Adjusted)",
             font=dict(family='Neuton', size=22, color=COLORS['dark_teal']),
             x=0
         ),
@@ -2343,11 +2352,11 @@ def create_heatmap_chart(year):
         height=550,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=40, t=80, b=40),
+        margin=dict(l=40, r=40, t=80, b=60),
         annotations=[
             dict(
-                text="Node size = population · Line thickness = intermarriage rate · Connected groups married each other",
-                xref='paper', yref='paper', x=0.5, y=-0.02,
+                text="Connected groups married more than random chance would predict · Line thickness = affinity strength",
+                xref='paper', yref='paper', x=0.5, y=-0.05,
                 showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
                 xanchor='center'
             )
