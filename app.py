@@ -503,17 +503,28 @@ def get_network_data(year='All'):
         connected_groups.add(edge['source'])
         connected_groups.add(edge['target'])
 
+    # Build connection info for each node (for tooltips)
+    node_connections = {g: [] for g in connected_groups}
+    for edge in edges:
+        src, tgt, wt = edge['source'], edge['target'], edge['weight']
+        node_connections[src].append((tgt, wt))
+        node_connections[tgt].append((src, wt))
+
     nodes = []
     for group in connected_groups:
         pop = parent_totals.get(group, 0)
+        # Sort connections by affinity strength
+        conns = sorted(node_connections[group], key=lambda x: x[1], reverse=True)
+        conn_text = [f"{get_demonym(c)}: {w:.1f}x" for c, w in conns[:5]]
         nodes.append({
             'id': group,
             'label': get_demonym(group),
-            'population': pop
+            'population': pop,
+            'connections': conn_text
         })
 
-    # Compute positions using force-directed layout
-    positions = _compute_force_layout(nodes, edges)
+    # Compute positions using force-directed layout (more iterations for better spacing)
+    positions = _compute_force_layout(nodes, edges, iterations=150)
 
     return nodes, edges, positions
 
@@ -2011,8 +2022,8 @@ def render_overview_tab_content(active_tab, year):
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
         return html.Div([
-            html.P("Network showing true ethnic affinity, adjusted for population size. Connections only appear when groups married "
-                   "MORE than random chance would predict. This corrects for large groups like Germans appearing in many marriages simply due to their size.",
+            html.P("Which ethnic groups had marriage affinities with each other? This network shows connections between second-generation Americans "
+                   "(children of same-origin immigrant parents) who intermarried at higher rates than population sizes alone would predict.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
@@ -2293,55 +2304,77 @@ def create_heatmap_chart(year):
 
     fig = go.Figure()
 
-    # Draw edges (connections between groups)
+    # Draw edges with curved paths for cleaner look
     max_weight = max(e['weight'] for e in edges) if edges else 1
+    min_weight = min(e['weight'] for e in edges) if edges else 1
+
     for edge in edges:
         x0, y0 = positions[edge['source']]
         x1, y1 = positions[edge['target']]
-        # Line width proportional to marriage rate
-        width = max(0.5, edge['weight'] / max_weight * 6)
-        # Opacity based on weight
-        opacity = min(0.8, 0.2 + edge['weight'] / max_weight * 0.6)
+
+        # Normalize weight for visual scaling
+        norm_weight = (edge['weight'] - min_weight) / (max_weight - min_weight) if max_weight > min_weight else 0.5
+        width = 1 + norm_weight * 5
+        opacity = 0.3 + norm_weight * 0.5
+
+        # Create slight curve using bezier-like path
+        mid_x = (x0 + x1) / 2
+        mid_y = (y0 + y1) / 2
+        # Offset midpoint perpendicular to line
+        dx, dy = x1 - x0, y1 - y0
+        length = np.sqrt(dx*dx + dy*dy)
+        if length > 0:
+            offset = 0.05 * length
+            mid_x += -dy / length * offset
+            mid_y += dx / length * offset
 
         fig.add_trace(go.Scatter(
-            x=[x0, x1], y=[y0, y1],
+            x=[x0, mid_x, x1], y=[y0, mid_y, y1],
             mode='lines',
-            line=dict(width=width, color=COLORS['medium_teal']),
+            line=dict(width=width, color=COLORS['light_teal'], shape='spline'),
             opacity=opacity,
             hoverinfo='skip',
             showlegend=False
         ))
 
-    # Draw nodes
+    # Draw nodes with improved styling
     max_pop = max(n['population'] for n in nodes) if nodes else 1
     node_x = [positions[n['id']][0] for n in nodes]
     node_y = [positions[n['id']][1] for n in nodes]
-    node_sizes = [15 + 35 * (n['population'] / max_pop) for n in nodes]
+    node_sizes = [20 + 30 * np.sqrt(n['population'] / max_pop) for n in nodes]
     node_labels = [n['label'] for n in nodes]
-    node_pops = [n['population'] for n in nodes]
 
-    # Node colors - use a gradient based on population
-    node_colors = [COLORS['dark_teal'] for _ in nodes]
+    # Build rich hover text with connections
+    hover_texts = []
+    for n in nodes:
+        conn_list = n.get('connections', [])
+        conn_str = '<br>'.join(conn_list) if conn_list else 'No strong connections'
+        hover_texts.append(
+            f"<b>{n['label']}-Americans</b><br>"
+            f"Population: {n['population']:,.0f}<br>"
+            f"<br><b>Affinities:</b><br>{conn_str}"
+        )
 
     fig.add_trace(go.Scatter(
         x=node_x, y=node_y,
         mode='markers+text',
         marker=dict(
             size=node_sizes,
-            color=node_colors,
-            line=dict(width=2, color='white')
+            color=COLORS['dark_teal'],
+            line=dict(width=3, color=COLORS['white']),
+            opacity=0.9
         ),
         text=node_labels,
         textposition='top center',
-        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
-        hovertemplate="<b>%{text}</b><br>Population: %{customdata:,.0f}<extra></extra>",
-        customdata=node_pops,
+        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal'], weight='bold'),
+        hovertemplate="%{customdata}<extra></extra>",
+        customdata=hover_texts,
         showlegend=False
     ))
 
     fig.update_layout(
         title=dict(
-            text="Ethnic Clustering Network (Population-Adjusted)",
+            text="Intermarriage Affinities Between Ethnic Groups",
             font=dict(family='Neuton', size=22, color=COLORS['dark_teal']),
             x=0
         ),
@@ -2352,11 +2385,11 @@ def create_heatmap_chart(year):
         height=550,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=40, t=80, b=60),
+        margin=dict(l=40, r=40, t=80, b=50),
         annotations=[
             dict(
-                text="Connected groups married more than random chance would predict · Line thickness = affinity strength",
-                xref='paper', yref='paper', x=0.5, y=-0.05,
+                text="Lines connect groups with above-average intermarriage rates · Thicker lines = stronger affinity",
+                xref='paper', yref='paper', x=0.5, y=-0.04,
                 showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
                 xanchor='center'
             )
