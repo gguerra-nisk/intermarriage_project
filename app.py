@@ -2646,9 +2646,12 @@ def create_heatmap_chart(year):
         showlegend=False
     ))
 
-    # Add labels as separate annotations for better positioning control
+    # Build all annotations - node labels + footer note
+    all_annotations = []
+
+    # Add labels for each node
     for i, n in enumerate(nodes):
-        fig.add_annotation(
+        all_annotations.append(dict(
             x=node_x[i],
             y=node_y[i],
             text=node_labels[i],
@@ -2657,7 +2660,15 @@ def create_heatmap_chart(year):
             font=dict(family='Hanken Grotesk', size=10, color=COLORS['dark_teal']),
             bgcolor='rgba(255,255,255,0.8)',
             borderpad=2
-        )
+        ))
+
+    # Add footer note
+    all_annotations.append(dict(
+        text="Lines connect groups with above-average intermarriage rates · Thicker lines = stronger affinity",
+        xref='paper', yref='paper', x=0.5, y=-0.04,
+        showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
+        xanchor='center'
+    ))
 
     fig.update_layout(
         title=dict(
@@ -2673,14 +2684,7 @@ def create_heatmap_chart(year):
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=40, r=40, t=80, b=50),
-        annotations=[
-            dict(
-                text="Lines connect groups with above-average intermarriage rates · Thicker lines = stronger affinity",
-                xref='paper', yref='paper', x=0.5, y=-0.04,
-                showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
-                xanchor='center'
-            )
-        ]
+        annotations=all_annotations
     )
     return fig
 
