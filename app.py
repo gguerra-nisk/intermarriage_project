@@ -722,7 +722,7 @@ def get_single_origin_overview(origin, year='All'):
     df = df[~df['FATHER_ORIGIN'].isin(NON_COUNTRIES)]
 
     results = []
-    MIN_SAMPLE = 20000
+    MIN_SAMPLE = 10000  # Lowered to show more combinations for comparison
 
     # Get unique combinations
     combinations = df.groupby(['MOTHER_ORIGIN', 'FATHER_ORIGIN']).agg({
@@ -780,31 +780,44 @@ def get_single_origin_overview(origin, year='All'):
 
 
 def get_available_origins_for_overview():
-    """Get list of origins with enough data for single-origin overview."""
+    """Get list of origins with enough data for single-origin overview.
+
+    Only includes origins that have at least 2 parent combinations with
+    sufficient sample size, so users can make meaningful comparisons.
+    """
     df = DATA['marriage_agg'].copy()
 
     # Get origins that appear as either mother or father with substantial data
     mother_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
     father_totals = df.groupby('FATHER_ORIGIN')['WEIGHTED_COUNT'].sum()
 
-    MIN_SAMPLE = 100000
+    MIN_TOTAL_SAMPLE = 100000  # Minimum total population for origin
+    MIN_COMBO_SAMPLE = 10000   # Must match threshold in get_single_origin_overview
 
-    valid_origins = set()
-    for origin in mother_totals[mother_totals >= MIN_SAMPLE].index:
+    candidate_origins = set()
+    for origin in mother_totals[mother_totals >= MIN_TOTAL_SAMPLE].index:
         if origin not in NON_COUNTRIES:
-            valid_origins.add(origin)
-    for origin in father_totals[father_totals >= MIN_SAMPLE].index:
+            candidate_origins.add(origin)
+    for origin in father_totals[father_totals >= MIN_TOTAL_SAMPLE].index:
         if origin not in NON_COUNTRIES:
-            valid_origins.add(origin)
+            candidate_origins.add(origin)
+
+    # Filter to origins that have at least 2 combinations above threshold
+    valid_origins = []
+    for origin in candidate_origins:
+        origin_df = df[(df['MOTHER_ORIGIN'] == origin) | (df['FATHER_ORIGIN'] == origin)]
+        origin_df = origin_df[~origin_df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
+        origin_df = origin_df[~origin_df['FATHER_ORIGIN'].isin(NON_COUNTRIES)]
+        combos = origin_df.groupby(['MOTHER_ORIGIN', 'FATHER_ORIGIN'])['WEIGHTED_COUNT'].sum()
+        num_combos = len(combos[combos >= MIN_COMBO_SAMPLE])
+
+        if num_combos >= 2:  # Must have at least 2 combinations for comparison
+            total = mother_totals.get(origin, 0) + father_totals.get(origin, 0)
+            valid_origins.append((origin, total))
 
     # Sort by total population
-    origin_list = []
-    for origin in valid_origins:
-        total = mother_totals.get(origin, 0) + father_totals.get(origin, 0)
-        origin_list.append((origin, total))
-
-    origin_list.sort(key=lambda x: x[1], reverse=True)
-    return [o[0] for o in origin_list]
+    valid_origins.sort(key=lambda x: x[1], reverse=True)
+    return [o[0] for o in valid_origins]
 
 
 def get_top_spouse_backgrounds(mother, father, year, exclude_heritage=None, top_n=5):
