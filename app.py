@@ -1387,18 +1387,39 @@ body {
 .filter-section {
     background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
     border-radius: 16px;
-    padding: 1.5rem;
+    padding: 1.25rem 1.5rem 1rem 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(12, 42, 48, 0.25);
+    position: relative;
+}
+
+.filter-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7dceda 0%, #bca45e 50%, #7dceda 100%);
+    border-radius: 16px 16px 0 0;
 }
 
 .filter-label {
     color: #7dceda;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+/* Dropdown Styling */
+.Select-control {
+    transition: all 0.2s ease !important;
+}
+
+.Select-control:hover {
+    border-color: #7dceda !important;
 }
 
 /* Cards */
@@ -1407,6 +1428,11 @@ body {
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(12, 42, 48, 0.1);
     overflow: hidden;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.brand-card:hover {
+    box-shadow: 0 8px 30px rgba(12, 42, 48, 0.15);
 }
 
 .brand-card-header {
@@ -1448,7 +1474,7 @@ body {
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .brand-btn-secondary {
@@ -1458,27 +1484,66 @@ body {
 }
 
 .brand-btn-secondary:hover {
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.brand-btn-secondary:active {
+    transform: translateY(0);
+}
+
+/* Current Selection Display */
+.current-selection {
+    background: rgba(125, 206, 218, 0.15);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    display: inline-block;
+    border-left: 3px solid #7dceda;
+}
+
+.current-selection-label {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.5rem;
+}
+
+.current-selection-value {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
 /* Stats */
 .stat-display {
     text-align: left;
-    padding: 0.5rem 0;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, rgba(25, 72, 82, 0.03) 0%, rgba(52, 131, 151, 0.06) 100%);
+    border-radius: 12px;
+    border-left: 3px solid #348397;
+    transition: all 0.2s ease;
+}
+
+.stat-display:hover {
+    background: linear-gradient(135deg, rgba(25, 72, 82, 0.05) 0%, rgba(52, 131, 151, 0.08) 100%);
 }
 
 .stat-value {
     font-family: 'Neuton', serif;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #194852;
+    line-height: 1.2;
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #78a0a3;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-top: 0.2rem;
 }
 
 /* Tabs */
@@ -1496,11 +1561,30 @@ body {
     padding: 0.75rem 1.5rem;
     font-weight: 600;
     margin-right: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: rgba(255,255,255,0.95);
+    background: rgba(255,255,255,0.1);
 }
 
 .nav-tabs .nav-link.active {
     background: #ffffff;
     color: #194852;
+}
+
+/* Collapsible Summary */
+.summary-collapsed {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 1.5rem !important;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.summary-expanded {
+    max-height: 3000px;
+    transition: max-height 0.5s ease;
 }
 
 /* Summary */
@@ -1543,15 +1627,27 @@ body {
     color: white;
     padding: 0.75rem 1rem;
     font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
 }
 
 .brand-table td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid #edf1f2;
+    transition: background 0.15s ease;
 }
 
-.brand-table tr:hover {
-    background: rgba(125, 206, 218, 0.08);
+.brand-table tr:hover td {
+    background: rgba(125, 206, 218, 0.1);
+}
+
+.brand-table tr:nth-child(even) td {
+    background: rgba(237, 241, 242, 0.5);
+}
+
+.brand-table tr:nth-child(even):hover td {
+    background: rgba(125, 206, 218, 0.12);
 }
 
 /* Footer */
@@ -1573,9 +1669,47 @@ body {
     text-decoration: none;
 }
 
+/* Section Headers */
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(25, 72, 82, 0.1);
+}
+
+.section-title {
+    font-family: 'Neuton', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #194852;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.section-subtitle {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.85rem;
+    color: #78a0a3;
+    margin-left: 0.5rem;
+}
+
+/* Loading Animation Enhancement */
+.dash-spinner {
+    margin: 2rem auto;
+}
+
+/* Smooth content transitions */
+.brand-card-body {
+    transition: all 0.3s ease;
+}
+
 @media (max-width: 768px) {
     .main-title { font-size: 1.5rem; }
     .subtitle { font-size: 1rem; }
+    .stat-display { padding: 0.5rem 0.75rem; }
+    .stat-value { font-size: 1.3rem; }
+    .current-selection { font-size: 0.85rem; }
 }
 """
 
@@ -1632,87 +1766,108 @@ app.layout = html.Div([
             html.Div([
                 html.H1("Marriage and the Melting Pot, 1880-1930", className='main-title text-center'),
                 html.P("Whom did the US-born children of immigrants marry?", className='subtitle text-center'),
+                html.Div([
+                    html.P([
+                        "This dashboard explores the marriage patterns of second-generation Americans—U.S.-born individuals with at least one immigrant parent—using census data from 1880 to 1930."
+                    ], style={'marginBottom': '0.75rem'}),
+                    html.P([
+                        html.Strong("To begin:"),
+                        " Select the parental origins you want to explore using the filters below. Choose \"Quick Presets\" to see common combinations, or build your own selection. The dashboard will show marriage patterns for your chosen group across all available census years."
+                    ], style={'marginBottom': '0'})
+                ], style={
+                    'maxWidth': '800px',
+                    'margin': '1rem auto 0 auto',
+                    'color': COLORS['dark_teal'],
+                    'fontSize': '0.95rem',
+                    'lineHeight': '1.6',
+                    'textAlign': 'center'
+                }),
             ], className='header-section'),
 
             # Filters
             html.Div([
+                # Current Selection Display
+                html.Div(id='current-selection-display', style={'marginBottom': '1rem'}),
                 dbc.Row([
                     dbc.Col([
-                        html.Label("Mother's Birthplace", className='filter-label'),
+                        html.Label("Mother's Birth Country", className='filter-label'),
+                        html.Div("Where was the subject's mother born?",
+                                style={'fontSize': '0.75rem', 'color': 'rgba(255,255,255,0.6)', 'marginBottom': '0.25rem'}),
                         dcc.Dropdown(id='mother-dropdown', options=mother_dropdown_options,
                                     value='Any', clearable=False)
                     ], lg=3, md=6, xs=12, className='mb-3'),
                     dbc.Col([
-                        html.Label("Father's Birthplace", className='filter-label'),
+                        html.Label("Father's Birth Country", className='filter-label'),
+                        html.Div("Where was the subject's father born?",
+                                style={'fontSize': '0.75rem', 'color': 'rgba(255,255,255,0.6)', 'marginBottom': '0.25rem'}),
                         dcc.Dropdown(id='father-dropdown', options=father_dropdown_options,
                                     value='Any', clearable=False)
                     ], lg=3, md=6, xs=12, className='mb-3'),
                     dbc.Col([
                         html.Label("Census Year", className='filter-label'),
+                        html.Div("Filter by census",
+                                style={'fontSize': '0.75rem', 'color': 'rgba(255,255,255,0.6)', 'marginBottom': '0.25rem'}),
                         dcc.Dropdown(id='year-dropdown',
-                                    options=[{'label': 'All Years', 'value': 'All'}] +
+                                    options=[{'label': 'All Years (1880-1930)', 'value': 'All'}] +
                                             [{'label': str(y), 'value': y} for y in years],
                                     value='All', clearable=False)
                     ], lg=2, md=4, xs=6, className='mb-3'),
                     dbc.Col([
                         html.Label("Quick Presets", className='filter-label'),
+                        html.Div("Common combinations",
+                                style={'fontSize': '0.75rem', 'color': 'rgba(255,255,255,0.6)', 'marginBottom': '0.25rem'}),
                         dcc.Dropdown(id='preset-dropdown', options=DYNAMIC_PRESETS,
-                                    value='', clearable=False, optionHeight=45, maxHeight=400)
+                                    value='', clearable=False, optionHeight=45, maxHeight=400,
+                                    placeholder="Try a preset...")
                     ], lg=2, md=4, xs=6, className='mb-3'),
                     dbc.Col([
                         html.Label("Actions", className='filter-label'),
+                        html.Div(" ", style={'fontSize': '0.75rem', 'marginBottom': '0.25rem'}),
                         html.Div([
-                            html.Button("Reset", id='reset-btn', className='brand-btn brand-btn-secondary'),
+                            html.Button("Reset All", id='reset-btn', className='brand-btn brand-btn-secondary'),
                         ], className='d-flex gap-3')
                     ], lg=2, md=4, xs=12, className='mb-3'),
                 ]),
             ], className='filter-section'),
 
-            # Sample Size & Actions
+            # Key Stats Row
             dbc.Row([
                 dbc.Col([
                     html.Div([
                         html.Div(id='sample-size', className='stat-value'),
-                        html.Div("Weighted Sample Size", className='stat-label'),
-                    ], className='stat-display')
-                ], md=3, xs=6),
+                        html.Div("Sample Size", className='stat-label'),
+                    ], className='stat-display', title='Weighted population estimate based on census sampling')
+                ], md=2, sm=4, xs=6),
                 dbc.Col([
                     html.Div([
-                        html.Button("Download CSV", id='download-csv-btn', className='brand-btn brand-btn-secondary me-2'),
+                        html.Div(id='key-stat-heritage', className='stat-value'),
+                        html.Div("Within Heritage", className='stat-label'),
+                    ], className='stat-display', title='Married someone connected to their immigrant heritage (same, mother\'s, father\'s, or both parents\' origins)')
+                ], md=2, sm=4, xs=6),
+                dbc.Col([
+                    html.Div([
+                        html.Div(id='key-stat-american', className='stat-value'),
+                        html.Div("3rd+ Gen American", className='stat-label'),
+                    ], className='stat-display', title='Married someone whose parents were both US-born (established American family)')
+                ], md=2, sm=4, xs=6),
+                dbc.Col([
+                    html.Div([
+                        html.Button("Download CSV", id='download-csv-btn', className='brand-btn brand-btn-secondary me-2',
+                                   style={'padding': '0.5rem 0.8rem', 'fontSize': '0.85rem'}),
                         dcc.Download(id='download-csv'),
-                        html.Button("Share Link", id='copy-link-btn', className='brand-btn brand-btn-secondary'),
-                        html.Span(id='link-copied-msg', style={'marginLeft': '10px', 'color': COLORS['green'], 'fontWeight': '600'}),
-                    ], className='text-end pt-3')
-                ], md=9, xs=6),
+                        html.Button("Share Link", id='copy-link-btn', className='brand-btn brand-btn-secondary',
+                                   style={'padding': '0.5rem 0.8rem', 'fontSize': '0.85rem'}),
+                        html.Span(id='link-copied-msg', style={'marginLeft': '8px', 'color': COLORS['green'], 'fontWeight': '600', 'fontSize': '0.85rem'}),
+                    ], className='text-end pt-2')
+                ], md=6, sm=12, xs=12),
             ], className='mb-4 align-items-center'),
 
-            # Summary Card
-            html.Div([
-                html.Div("Analysis Summary", className='brand-card-header-gold'),
-                html.Div([
-                    dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                               children=[dcc.Markdown(id='auto-summary', className='summary-markdown')])
-                ], className='brand-card-body')
-            ], className='brand-card summary-card mb-4'),
-
-            # Selection-Based Visualization Tabs (respond to heritage dropdowns)
+            # Selection-Based Visualization Tabs (respond to heritage dropdowns) - MOVED BEFORE SUMMARY
             html.Div([
                 html.Div([
-                    html.Span("Your Selection", style={
-                        'fontFamily': 'Neuton, serif',
-                        'fontSize': '1.1rem',
-                        'fontWeight': '600',
-                        'color': COLORS['dark_teal'],
-                        'textTransform': 'uppercase',
-                        'letterSpacing': '0.05em'
-                    }),
-                    html.Span(" — responds to heritage selections above", style={
-                        'fontFamily': 'Hanken Grotesk, sans-serif',
-                        'fontSize': '0.85rem',
-                        'color': COLORS['muted_teal'],
-                        'marginLeft': '0.5rem'
-                    })
-                ], style={'marginBottom': '0.75rem'}),
+                    html.Span("Your Selection", className='section-title'),
+                    html.Span("— updates with filter changes", className='section-subtitle')
+                ], className='section-header'),
                 dbc.Tabs([
                     dbc.Tab(label="Main Chart", tab_id="tab-main"),
                     dbc.Tab(label="Trends Over Time", tab_id="tab-trends"),
@@ -1721,6 +1876,20 @@ app.layout = html.Div([
                 html.Div([html.Div(id='tab-content')], className='brand-card',
                         style={'borderRadius': '0 0 16px 16px'})
             ], className='mb-4'),
+
+            # Summary Card - Now collapsible and after the chart
+            html.Div([
+                html.Div([
+                    html.Span("Detailed Analysis", style={'flex': '1'}),
+                    html.Button("Show/Hide", id='toggle-summary-btn', className='brand-btn',
+                               style={'background': 'transparent', 'color': '#fff', 'border': '1px solid rgba(255,255,255,0.3)',
+                                      'padding': '0.25rem 0.75rem', 'fontSize': '0.8rem'})
+                ], className='brand-card-header-gold', style={'display': 'flex', 'alignItems': 'center', 'justifyContent': 'space-between'}),
+                html.Div([
+                    dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                               children=[dcc.Markdown(id='auto-summary', className='summary-markdown')])
+                ], id='summary-body', className='brand-card-body')
+            ], className='brand-card summary-card mb-4'),
 
             # Spouse Backgrounds Table
             html.Div([
@@ -1734,21 +1903,9 @@ app.layout = html.Div([
             # Compare All Groups Section
             html.Div([
                 html.Div([
-                    html.Span("Compare All Groups", style={
-                        'fontFamily': 'Neuton, serif',
-                        'fontSize': '1.1rem',
-                        'fontWeight': '600',
-                        'color': COLORS['dark_teal'],
-                        'textTransform': 'uppercase',
-                        'letterSpacing': '0.05em'
-                    }),
-                    html.Span(" — cross-group comparisons", style={
-                        'fontFamily': 'Hanken Grotesk, sans-serif',
-                        'fontSize': '0.85rem',
-                        'color': COLORS['muted_teal'],
-                        'marginLeft': '0.5rem'
-                    })
-                ], style={'marginBottom': '0.75rem'}),
+                    html.Span("Compare All Groups", className='section-title'),
+                    html.Span("— cross-group patterns (independent of filter selections)", className='section-subtitle')
+                ], className='section-header'),
                 dbc.Tabs([
                     dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
                     dbc.Tab(label="Clustering Network", tab_id="tab-heatmap"),
@@ -1950,6 +2107,21 @@ def copy_link(n_clicks, href):
     return (href, "Copied!") if n_clicks else (no_update, "")
 
 
+@callback(
+    [Output('summary-body', 'className'), Output('toggle-summary-btn', 'children')],
+    [Input('toggle-summary-btn', 'n_clicks')],
+    [State('summary-body', 'className')],
+    prevent_initial_call=True
+)
+def toggle_summary(n_clicks, current_class):
+    if n_clicks:
+        if current_class and 'summary-collapsed' in current_class:
+            return 'brand-card-body summary-expanded', 'Hide'
+        else:
+            return 'brand-card-body summary-collapsed', 'Show'
+    return no_update, no_update
+
+
 @callback(Output('download-csv', 'data'),
           [Input('download-csv-btn', 'n_clicks')],
           [State('mother-dropdown', 'value'), State('father-dropdown', 'value'), State('year-dropdown', 'value')],
@@ -1964,19 +2136,60 @@ def download_csv(n_clicks, mother, father, year):
     return no_update
 
 
-@callback([Output('sample-size', 'children'), Output('auto-summary', 'children')],
+@callback([Output('sample-size', 'children'), Output('auto-summary', 'children'),
+           Output('key-stat-heritage', 'children'), Output('key-stat-american', 'children'),
+           Output('current-selection-display', 'children')],
           [Input('mother-dropdown', 'value'), Input('father-dropdown', 'value'), Input('year-dropdown', 'value')])
 def update_summary(mother, father, year):
     stats, weighted, unweighted = get_marriage_stats(mother, father, year)
+
+    # Build current selection display
+    mother_dem = get_demonym(mother) if mother != 'Any' else 'Any'
+    father_dem = get_demonym(father) if father != 'Any' else 'Any'
+    year_display = f"{year}" if year != 'All' else "All Years"
+
+    if mother != 'Any' and father != 'Any':
+        if mother == father:
+            selection_text = f"{mother_dem} × {father_dem}"
+        else:
+            selection_text = f"{mother_dem} mom × {father_dem} dad"
+    elif mother != 'Any':
+        selection_text = f"{mother_dem} mother × Any father"
+    elif father != 'Any':
+        selection_text = f"Any mother × {father_dem} father"
+    else:
+        selection_text = "All Second-Generation Americans"
+
+    current_selection = html.Div([
+        html.Span("Currently viewing: ", className='current-selection-label'),
+        html.Span(f"{selection_text} | {year_display}", className='current-selection-value')
+    ], className='current-selection')
+
     if stats is None:
-        return "0", "No data available"
+        return "0", "No data available", "—", "—", current_selection
+
+    # Sample size
     if unweighted < 30:
         size_text = html.Span([f"{weighted:,.0f}", html.Br(),
                                html.Span(f"Small sample ({unweighted})", style={'fontSize': '0.7rem', 'color': COLORS['orange']})])
     else:
         size_text = f"{weighted:,.0f}"
+
+    # Calculate key percentages
+    total = stats['WEIGHTED_COUNT'].sum()
+    pcts = dict(zip(stats['MARRIAGE_TYPE'], stats['WEIGHTED_COUNT'] / total * 100))
+
+    # Heritage-based marriages (same origin + mother's + father's + both heritages)
+    heritage_pct = sum(v for k, v in pcts.items()
+                      if any(x in k for x in ['same origin', "mother's origin", "father's origin", 'both heritages']))
+    heritage_text = f"{heritage_pct:.0f}%"
+
+    # 3rd+ gen American marriages
+    american_pct = sum(v for k, v in pcts.items() if '3rd+ gen' in k)
+    american_text = f"{american_pct:.0f}%"
+
     summary = generate_summary(mother, father, year)
-    return size_text, summary
+    return size_text, summary, heritage_text, american_text, current_selection
 
 
 @callback(Output('tab-content', 'children'),
