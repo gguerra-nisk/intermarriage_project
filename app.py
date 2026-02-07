@@ -1380,37 +1380,93 @@ body {
 
 /* Header */
 .header-section {
-    padding: 2rem 0 1.5rem 0;
-    text-align: center;
+    background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
+    border-radius: 16px;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(12, 42, 48, 0.25);
+    overflow: hidden;
+    position: relative;
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    gap: 2rem;
+}
+
+.header-logo {
+    flex-shrink: 0;
+}
+
+.header-logo img {
+    height: 60px;
+    filter: brightness(0) invert(1);
+}
+
+.header-divider {
+    width: 1px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    flex-shrink: 0;
+}
+
+.header-text {
+    flex: 1;
+}
+
+.header-section::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7dceda 0%, #bca45e 50%, #7dceda 100%);
+}
+
+.header-intro {
+    padding: 1.25rem 2rem;
+    background: rgba(255,255,255,0.05);
+}
+
+.header-intro p {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.4rem;
+}
+
+.header-intro p:last-child {
+    margin-bottom: 0;
 }
 
 .main-title {
     font-family: 'Neuton', Georgia, serif;
-    font-size: 2.5rem;
+    font-size: 2.2rem;
     font-weight: 700;
-    color: #194852;
-    margin-bottom: 0.5rem;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
     letter-spacing: -0.02em;
+    line-height: 1.2;
 }
 
 .subtitle {
     font-family: 'Hanken Grotesk', sans-serif;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 400;
-    color: #348397;
+    color: #7dceda;
     margin: 0;
 }
 
-/* Filter Section - Sticky */
+/* Filter Section */
 .filter-section {
     background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
     border-radius: 16px;
     padding: 1.25rem 1.5rem 1rem 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(12, 42, 48, 0.25);
-    position: sticky;
-    top: 10px;
-    z-index: 100;
     overflow: hidden;
 }
 
@@ -1431,10 +1487,47 @@ body {
     gap: 0;
     padding: 0;
     background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 4px 16px rgba(12, 42, 48, 0.15);
+    border-radius: 12px 12px 0 0;
+    margin-bottom: 0;
+    box-shadow: 0 -2px 16px rgba(12, 42, 48, 0.15);
     overflow: hidden;
+}
+
+/* Integrated summary panel below anchor nav */
+.summary-panel {
+    background: #ffffff;
+    padding: 1.25rem 1.5rem;
+    border-left: 1px solid rgba(12, 42, 48, 0.08);
+    border-right: 1px solid rgba(12, 42, 48, 0.08);
+    border-bottom: 1px solid rgba(12, 42, 48, 0.08);
+    border-radius: 0 0 12px 12px;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 4px 16px rgba(12, 42, 48, 0.08);
+}
+
+.narrative-snapshot {
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #194852;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(12, 42, 48, 0.08);
+}
+
+.summary-panel-stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.summary-panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    flex-shrink: 0;
 }
 
 .anchor-link {
@@ -1519,7 +1612,7 @@ html {
 
 /* Scroll margin for anchored sections */
 [id] {
-    scroll-margin-top: 180px;
+    scroll-margin-top: 20px;
 }
 
 .filter-label {
@@ -1538,6 +1631,40 @@ html {
 
 .Select-control:hover {
     border-color: #7dceda !important;
+}
+
+/* Dropdown option highlights - light teal */
+.VirtualizedSelectOption {
+    transition: background 0.1s ease;
+}
+
+.VirtualizedSelectFocusedOption {
+    background-color: rgba(125, 206, 218, 0.2) !important;
+}
+
+.VirtualizedSelectSelectedOption {
+    background-color: rgba(125, 206, 218, 0.35) !important;
+}
+
+/* Dash dropdown menu option hover */
+.Select-option.is-focused {
+    background-color: rgba(125, 206, 218, 0.2) !important;
+}
+
+.Select-option.is-selected {
+    background-color: rgba(125, 206, 218, 0.35) !important;
+    color: #194852 !important;
+}
+
+/* Text selection highlight */
+::selection {
+    background: #7dceda;
+    color: #194852;
+}
+
+::-moz-selection {
+    background: #7dceda;
+    color: #194852;
 }
 
 /* Cards */
@@ -1642,10 +1769,6 @@ html {
     border-radius: 12px;
     border-left: 3px solid #348397;
     transition: all 0.2s ease;
-}
-
-.stat-display:hover {
-    background: linear-gradient(135deg, rgba(25, 72, 82, 0.05) 0%, rgba(52, 131, 151, 0.08) 100%);
 }
 
 .stat-value {
@@ -1799,7 +1922,7 @@ html {
 .section-title {
     font-family: 'Neuton', serif;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #194852;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1823,11 +1946,23 @@ html {
 }
 
 @media (max-width: 768px) {
+    .header-bar {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.25rem 1.25rem;
+        text-align: center;
+    }
+    .header-divider { display: none; }
+    .header-logo img { height: 45px; }
+    .header-intro { padding: 1rem 1.25rem; }
     .main-title { font-size: 1.5rem; }
     .subtitle { font-size: 1rem; }
     .stat-display { padding: 0.5rem 0.75rem; }
     .stat-value { font-size: 1.3rem; }
     .current-selection { font-size: 0.85rem; }
+    .narrative-snapshot { font-size: 0.85rem; }
+    .summary-panel { padding: 1rem !important; }
+    .anchor-link { font-size: 0.7rem; padding: 0.6rem 0.5rem; }
 }
 """
 
@@ -1882,31 +2017,26 @@ app.layout = html.Div([
         dbc.Container([
             # Header with Logo
             html.Div([
-                # Logo placeholder - replace src with actual Niskanen logo URL
                 html.Div([
-                    html.Img(src='/assets/niskanen-logo.png', alt='Niskanen Center',
-                            style={'height': '50px', 'marginBottom': '0.75rem'},
-                            id='niskanen-logo'),
-                ], style={'textAlign': 'center'}),
-                html.H1("Marriage and the Melting Pot, 1880-1930", className='main-title text-center'),
-                html.P("Whom did the US-born children of immigrants marry?", className='subtitle text-center'),
+                    html.Div([
+                        html.Img(src='/assets/niskanen-logo.png', alt='Niskanen Center',
+                                id='niskanen-logo'),
+                    ], className='header-logo'),
+                    html.Div(className='header-divider'),
+                    html.Div([
+                        html.H1("Marriage and the Melting Pot, 1880-1930", className='main-title'),
+                        html.P("Whom did the US-born children of immigrants marry?", className='subtitle'),
+                    ], className='header-text'),
+                ], className='header-bar'),
                 html.Div([
                     html.P([
                         "This dashboard explores the marriage patterns of second-generation Americans—U.S.-born individuals with at least one immigrant parent—using census data from 1880 to 1930."
-                    ], style={'marginBottom': '0.5rem'}),
+                    ]),
                     html.P([
-                        html.Strong("To begin:"),
+                        html.Strong("To begin:", style={'color': '#7dceda'}),
                         " Select the parental origins you want to explore using the filters below. Choose \"Quick Presets\" to see common combinations, or build your own selection."
-                    ], style={'marginBottom': '0'})
-                ], style={
-                    'maxWidth': '900px',
-                    'margin': '1rem auto 0 auto',
-                    'padding': '0 1rem',
-                    'color': COLORS['dark_teal'],
-                    'fontSize': '0.95rem',
-                    'lineHeight': '1.6',
-                    'textAlign': 'left'
-                }),
+                    ])
+                ], className='header-intro'),
             ], className='header-section'),
 
             # Filters
@@ -1955,7 +2085,7 @@ app.layout = html.Div([
                 ]),
             ], className='filter-section'),
 
-            # Anchor Navigation
+            # Anchor Navigation + Integrated Summary Panel
             html.Div([
                 html.A("Charts", href='#charts', className='anchor-link'),
                 html.A("Analysis", href='#analysis', className='anchor-link'),
@@ -1963,51 +2093,40 @@ app.layout = html.Div([
                 html.A("Compare Groups", href='#compare', className='anchor-link'),
                 html.A("Methodology", href='#methodology', className='anchor-link'),
             ], className='anchor-nav'),
-
-            # Key Stats Row
-            dbc.Row([
-                dbc.Col([
+            html.Div([
+                # Narrative snapshot
+                html.Div(id='narrative-snapshot', className='narrative-snapshot'),
+                # Stats + actions row
+                html.Div([
                     html.Div([
                         html.Div(id='sample-size', className='stat-value'),
                         html.Div("Sample Size", className='stat-label'),
-                    ], className='stat-display', title='Weighted population estimate based on census sampling')
-                ], md=2, sm=4, xs=6),
-                dbc.Col([
+                    ], className='stat-display', title='Weighted population estimate based on census sampling'),
                     html.Div([
                         html.Div(id='key-stat-heritage', className='stat-value'),
                         html.Div("Within Heritage", className='stat-label'),
-                    ], className='stat-display', title='Married someone connected to their immigrant heritage (same, mother\'s, father\'s, or both parents\' origins)')
-                ], md=2, sm=4, xs=6),
-                dbc.Col([
+                    ], className='stat-display', title='Married someone connected to their immigrant heritage (same, mother\'s, father\'s, or both parents\' origins)'),
                     html.Div([
                         html.Div(id='key-stat-american', className='stat-value'),
                         html.Div("3rd+ Gen American", className='stat-label'),
-                    ], className='stat-display', title='Married someone whose parents were both US-born (established American family)')
-                ], md=2, sm=4, xs=6),
-                dbc.Col([
+                    ], className='stat-display', title='Married someone whose parents were both US-born (established American family)'),
                     html.Div([
-                        # Action buttons
                         html.Button("Download CSV", id='download-csv-btn', className='action-btn me-2'),
                         dcc.Download(id='download-csv'),
-                        html.Button("Copy Link", id='copy-link-btn', className='action-btn me-3'),
-                        html.Span(id='link-copied-msg', style={'marginRight': '1rem', 'color': COLORS['green'], 'fontWeight': '600', 'fontSize': '0.85rem'}),
-                        # Social share buttons
+                        html.Button("Copy Link", id='copy-link-btn', className='action-btn me-2'),
+                        html.Span(id='link-copied-msg', style={'marginRight': '0.5rem', 'color': COLORS['green'], 'fontWeight': '600', 'fontSize': '0.85rem'}),
                         html.Span([
                             html.A("X", href='#', id='share-twitter', className='social-btn social-btn-twitter', title='Share on X/Twitter', target='_blank'),
                             html.A("in", href='#', id='share-linkedin', className='social-btn social-btn-linkedin', title='Share on LinkedIn', target='_blank'),
                             html.A("f", href='#', id='share-facebook', className='social-btn social-btn-facebook', title='Share on Facebook', target='_blank'),
                             html.A("✉", href='#', id='share-email', className='social-btn social-btn-email', title='Share via Email'),
                         ], className='social-share'),
-                    ], className='d-flex align-items-center justify-content-end pt-2')
-                ], md=6, sm=12, xs=12),
-            ], className='mb-4 align-items-center'),
+                    ], className='summary-panel-actions'),
+                ], className='summary-panel-stats'),
+            ], className='summary-panel'),
 
-            # Selection-Based Visualization Tabs (respond to heritage dropdowns) - MOVED BEFORE SUMMARY
+            # Selection-Based Visualization Tabs (respond to heritage dropdowns)
             html.Div([
-                html.Div([
-                    html.Span("Your Selection", className='section-title'),
-                    html.Span("— updates with filter changes", className='section-subtitle')
-                ], className='section-header'),
                 dbc.Tabs([
                     dbc.Tab(label="Main Chart", tab_id="tab-main"),
                     dbc.Tab(label="Trends Over Time", tab_id="tab-trends"),
@@ -2178,6 +2297,65 @@ app.layout = html.Div([
 ])
 
 # =============================================================================
+# NARRATIVE SNAPSHOT HELPER
+# =============================================================================
+
+def _build_narrative_snapshot(mother, father, year, mother_dem, father_dem,
+                              heritage_pct, american_pct, diff_pct, weighted, unweighted):
+    """Build a 2-3 sentence narrative summary for the control panel."""
+    # Build subject phrase
+    if mother != 'Any' and father != 'Any':
+        if mother == father:
+            subject = f"second-generation {mother_dem}-Americans"
+        elif mother == 'US-born':
+            subject = f"children of {father_dem} fathers and American mothers"
+        elif father == 'US-born':
+            subject = f"children of {mother_dem} mothers and American fathers"
+        else:
+            subject = f"children of {mother_dem} mothers and {father_dem} fathers"
+    elif mother != 'Any':
+        subject = f"children of {mother_dem} mothers"
+    elif father != 'Any':
+        subject = f"children of {father_dem} fathers"
+    else:
+        subject = "second-generation Americans"
+
+    time_phrase = f"in {year}" if year != 'All' else "across 1880\u20131930"
+
+    if unweighted < 30:
+        return f"Very small sample for {subject} {time_phrase} ({unweighted} records). Results may not be reliable."
+
+    # Sentence 1: Main finding
+    if heritage_pct >= american_pct:
+        sentence1 = (f"Among {subject} {time_phrase}, {heritage_pct:.1f}% married within "
+                     f"their ethnic heritage community, while {american_pct:.1f}% married a "
+                     f"3rd+ generation American.")
+    else:
+        sentence1 = (f"Among {subject} {time_phrase}, {american_pct:.1f}% married a "
+                     f"3rd+ generation American\u2014the most common outcome\u2014while "
+                     f"{heritage_pct:.1f}% married within their ethnic heritage.")
+
+    # Sentence 2: Cross-ethnic or interpretive color
+    if diff_pct >= 5:
+        sentence2 = (f"Another {diff_pct:.1f}% married someone from a different immigrant "
+                     f"background entirely.")
+    elif heritage_pct >= 60:
+        sentence2 = "This group showed strong ethnic retention in marriage patterns."
+    elif american_pct >= 50:
+        sentence2 = "This group was notably assimilated into the broader American population."
+    else:
+        sentence2 = "Marriage patterns were relatively mixed across categories."
+
+    # Sentence 3: Sample context
+    if weighted >= 100000:
+        sentence3 = f"Based on a robust sample of {weighted:,.0f} individuals."
+    else:
+        sentence3 = f"Based on {weighted:,.0f} individuals ({unweighted:,} census records)."
+
+    return f"{sentence1} {sentence2} {sentence3}"
+
+
+# =============================================================================
 # CALLBACKS
 # =============================================================================
 
@@ -2304,7 +2482,8 @@ def download_csv(n_clicks, mother, father, year):
 
 @callback([Output('sample-size', 'children'), Output('auto-summary', 'children'),
            Output('key-stat-heritage', 'children'), Output('key-stat-american', 'children'),
-           Output('current-selection-display', 'children')],
+           Output('current-selection-display', 'children'),
+           Output('narrative-snapshot', 'children')],
           [Input('mother-dropdown', 'value'), Input('father-dropdown', 'value'), Input('year-dropdown', 'value')])
 def update_summary(mother, father, year):
     stats, weighted, unweighted = get_marriage_stats(mother, father, year)
@@ -2332,7 +2511,7 @@ def update_summary(mother, father, year):
     ], className='current-selection')
 
     if stats is None:
-        return "0", "No data available", "—", "—", current_selection
+        return "0", "No data available", "—", "—", current_selection, "No data available for this selection."
 
     # Sample size
     if unweighted < 30:
@@ -2354,8 +2533,17 @@ def update_summary(mother, father, year):
     american_pct = sum(v for k, v in pcts.items() if '3rd+ gen' in k)
     american_text = f"{american_pct:.0f}%"
 
+    # Different origin marriages
+    diff_pct = sum(v for k, v in pcts.items() if 'different origin' in k)
+
+    # Generate narrative snapshot (2-3 sentences)
+    narrative = _build_narrative_snapshot(
+        mother, father, year, mother_dem, father_dem,
+        heritage_pct, american_pct, diff_pct, weighted, unweighted
+    )
+
     summary = generate_summary(mother, father, year)
-    return size_text, summary, heritage_text, american_text, current_selection
+    return size_text, summary, heritage_text, american_text, current_selection, narrative
 
 
 @callback(Output('tab-content', 'children'),
