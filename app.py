@@ -1962,7 +1962,44 @@ html {
     .current-selection { font-size: 0.85rem; }
     .narrative-snapshot { font-size: 0.85rem; }
     .summary-panel { padding: 1rem !important; }
-    .anchor-link { font-size: 0.7rem; padding: 0.6rem 0.5rem; }
+
+    /* Anchor nav: allow horizontal scroll on small screens */
+    .anchor-nav {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .anchor-link {
+        font-size: 0.7rem;
+        padding: 0.6rem 0.75rem;
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    /* Summary panel: stack actions below stats */
+    .summary-panel-stats {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    .summary-panel-actions {
+        margin-left: 0;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    /* Tabs: scrollable on mobile to prevent text clipping */
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0.4rem 0.4rem 0 0.4rem;
+    }
+    .nav-tabs .nav-link {
+        font-size: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
 }
 """
 
