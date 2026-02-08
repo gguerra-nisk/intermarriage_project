@@ -1935,6 +1935,20 @@ html {
     margin-left: 0.5rem;
 }
 
+/* Scrollable chart containers for mobile */
+.chart-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.chart-scroll-wide > .js-plotly-plot {
+    min-width: 700px;
+}
+
+.chart-scroll-medium > .js-plotly-plot {
+    min-width: 550px;
+}
+
 /* Loading Animation Enhancement */
 .dash-spinner {
     margin: 2rem auto;
@@ -2591,14 +2605,14 @@ def render_tab_content(active_tab, mother, father, year):
     if active_tab == 'tab-main':
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[dcc.Graph(id='main-chart', figure=create_main_chart(mother, father, year),
-                                          config={'displayModeBar': True})])
+                       children=[html.Div(dcc.Graph(id='main-chart', figure=create_main_chart(mother, father, year),
+                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-wide')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-trends':
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[dcc.Graph(id='time-chart', figure=create_time_chart(mother, father),
-                                          config={'displayModeBar': True})])
+                       children=[html.Div(dcc.Graph(id='time-chart', figure=create_time_chart(mother, father),
+                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-spouse-gen':
         return html.Div([
@@ -2606,8 +2620,8 @@ def render_tab_content(active_tab, mother, father, year):
                    "married recent immigrants (1st gen), fellow second-generation Americans (2nd gen), or established Americans (3rd+ gen).",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[dcc.Graph(id='spouse-gen-chart', figure=create_spouse_gen_chart(mother, father, year),
-                                          config={'displayModeBar': True})])
+                       children=[html.Div(dcc.Graph(id='spouse-gen-chart', figure=create_spouse_gen_chart(mother, father, year),
+                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')])
         ], style={'padding': '1rem'})
     return html.Div()
 
@@ -2643,8 +2657,8 @@ def render_overview_tab_content(active_tab, year):
                    "(children of same-origin immigrant parents) who intermarried at higher rates than population sizes alone would predict.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
-                                          config={'displayModeBar': True})])
+                       children=[html.Div(dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
+                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-single-origin':
         available_origins = get_available_origins_for_overview()
@@ -2672,8 +2686,8 @@ def render_overview_tab_content(active_tab, year):
           [Input('outmarriage-sort-dropdown', 'value'), Input('year-dropdown', 'value')])
 def update_outmarriage_chart(sort_by, year):
     """Update the outmarriage rates chart based on sorting selection."""
-    return dcc.Graph(id='outmarriage-chart', figure=create_outmarriage_chart(year, sort_by),
-                     config={'displayModeBar': True})
+    return html.Div(dcc.Graph(id='outmarriage-chart', figure=create_outmarriage_chart(year, sort_by),
+                     config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')
 
 
 @callback(Output('single-origin-chart-container', 'children'),
@@ -2682,8 +2696,8 @@ def update_single_origin_chart(origin, year):
     """Update the single origin overview chart."""
     if not origin:
         return html.P("Please select an origin", style={'color': COLORS['muted_teal']})
-    return dcc.Graph(id='single-origin-chart', figure=create_single_origin_chart(origin, year),
-                     config={'displayModeBar': True})
+    return html.Div(dcc.Graph(id='single-origin-chart', figure=create_single_origin_chart(origin, year),
+                     config={'displayModeBar': True}), className='chart-scroll chart-scroll-wide')
 
 
 def create_main_chart(mother, father, year):
