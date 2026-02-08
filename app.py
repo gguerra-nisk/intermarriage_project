@@ -139,6 +139,22 @@ def load_data():
         with open(PROCESSED_DIR / "metadata.json", 'r') as f:
             data['metadata'] = json.load(f)
 
+        # Geographic aggregation (optional - only if preprocessing included STATEFIP)
+        geo_path = PROCESSED_DIR / "geographic_agg.csv"
+        if geo_path.exists():
+            data['geographic'] = pd.read_csv(geo_path, low_memory=False)
+            print(f"  Loaded geographic data: {len(data['geographic'])} rows")
+        else:
+            data['geographic'] = None
+
+        # Geography-adjusted affinity matrix (optional)
+        adj_path = PROCESSED_DIR / "geo_adjusted_affinity.csv"
+        if adj_path.exists():
+            data['geo_adjusted_affinity'] = pd.read_csv(adj_path)
+            print(f"  Loaded adjusted affinities: {len(data['geo_adjusted_affinity'])} pairs")
+        else:
+            data['geo_adjusted_affinity'] = None
+
         return data
     except FileNotFoundError as e:
         print(f"Error loading data: {e}")
@@ -631,6 +647,61 @@ def _compute_force_layout(nodes, edges, iterations=500):
     return pos
 
 
+def get_adjusted_network_data():
+    """Build network data using geography-adjusted affinities.
+
+    Uses pre-computed within-state affinities so that co-location in the
+    same states doesn't masquerade as cultural affinity.
+    """
+    adj_df = DATA.get('geo_adjusted_affinity')
+    if adj_df is None or len(adj_df) == 0:
+        return [], [], {}
+
+    # Get population data for node sizing (reuse spouse_bg like raw network)
+    df = DATA['spouse_bg'].copy()
+    df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
+    df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
+    parent_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
+
+    # Build edges from adjusted affinities (only keep affinity >= 1.0)
+    edges = []
+    for _, row in adj_df.iterrows():
+        if row['GEO_ADJUSTED_AFFINITY'] >= 1.0:
+            edges.append({
+                'source': row['SOURCE'],
+                'target': row['TARGET'],
+                'weight': row['GEO_ADJUSTED_AFFINITY']
+            })
+
+    # Connected groups only
+    connected_groups = set()
+    for edge in edges:
+        connected_groups.add(edge['source'])
+        connected_groups.add(edge['target'])
+
+    # Build connection info for tooltips
+    node_connections = {g: [] for g in connected_groups}
+    for edge in edges:
+        src, tgt, wt = edge['source'], edge['target'], edge['weight']
+        node_connections[src].append((tgt, wt))
+        node_connections[tgt].append((src, wt))
+
+    nodes = []
+    for group in connected_groups:
+        pop = parent_totals.get(group, 0)
+        conns = sorted(node_connections[group], key=lambda x: x[1], reverse=True)
+        conn_text = [f"{get_demonym(c)}: {w:.1f}x" for c, w in conns[:5]]
+        nodes.append({
+            'id': group,
+            'label': get_demonym(group),
+            'population': pop,
+            'connections': conn_text
+        })
+
+    positions = _compute_force_layout(nodes, edges, iterations=150)
+    return nodes, edges, positions
+
+
 def get_scatter_data(year='All'):
     """Get population size vs ethnic retention for scatter plot."""
     df = DATA['marriage_agg'].copy()
@@ -851,6 +922,19 @@ def get_available_origins_for_overview():
     # Sort by total population
     valid_origins.sort(key=lambda x: x[1], reverse=True)
     return [o[0] for o in valid_origins]
+
+
+def get_geographic_data():
+    """Return the full geographic aggregation dataframe, or None if unavailable."""
+    return DATA.get('geographic')
+
+
+def get_group_geographic_data(origin):
+    """Get state-level data for a specific ethnic group."""
+    df = get_geographic_data()
+    if df is None:
+        return None
+    return df[df['ORIGIN_GROUP'] == origin]
 
 
 def get_top_spouse_backgrounds(mother, father, year, exclude_heritage=None, top_n=5):
@@ -2030,6 +2114,125 @@ html {
         flex: 0 0 auto;
     }
 }
+
+/* Welcome / Landing Section */
+.welcome-section {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem 2rem 1.5rem 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(12, 42, 48, 0.1);
+}
+
+.welcome-intro {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: #194852;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 0.25rem auto;
+}
+
+.welcome-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 1.25rem 0;
+    margin: 1rem 0 1.5rem 0;
+    border-top: 1px solid rgba(12, 42, 48, 0.08);
+    border-bottom: 1px solid rgba(12, 42, 48, 0.08);
+}
+
+.welcome-stat-item {
+    text-align: center;
+    flex: 1;
+    padding: 0 0.75rem;
+}
+
+.welcome-stat-value {
+    font-family: 'Neuton', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #194852;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.welcome-stat-label {
+    font-size: 0.78rem;
+    color: #78a0a3;
+    line-height: 1.3;
+}
+
+.nav-cards-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #78a0a3;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.nav-cards {
+    display: flex;
+    gap: 1rem;
+}
+
+.nav-card {
+    flex: 1;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(12, 42, 48, 0.08);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #ffffff;
+}
+
+.nav-card:hover {
+    box-shadow: 0 6px 20px rgba(12, 42, 48, 0.12);
+    transform: translateY(-2px);
+    border-color: rgba(12, 42, 48, 0.15);
+}
+
+.nav-card-compare { border-left: 4px solid #348397; }
+.nav-card-geo { border-left: 4px solid #bca45e; }
+.nav-card-explore { border-left: 4px solid #da5831; }
+
+.nav-card-title {
+    font-family: 'Neuton', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #194852;
+    margin-bottom: 0.4rem;
+}
+
+.nav-card-desc {
+    font-size: 0.85rem;
+    color: #78a0a3;
+    margin: 0;
+    line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 1.5rem 1.25rem 1.25rem 1.25rem;
+    }
+    .welcome-intro {
+        font-size: 0.95rem;
+    }
+    .welcome-stats {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .welcome-stat-item {
+        flex: 0 0 45%;
+    }
+    .welcome-stat-value {
+        font-size: 1.5rem;
+    }
+    .nav-cards {
+        flex-direction: column;
+    }
+}
 """
 
 # =============================================================================
@@ -2094,19 +2297,68 @@ app.layout = html.Div([
                         html.P("Whom did the US-born children of immigrants marry?", className='subtitle'),
                     ], className='header-text'),
                 ], className='header-bar'),
-                html.Div([
-                    html.P([
-                        "This dashboard explores the marriage patterns of second-generation Americans—U.S.-born individuals with at least one immigrant parent—using census data from 1880 to 1930."
-                    ]),
-                    html.P([
-                        html.Strong("To begin:", style={'color': '#7dceda'}),
-                        " Select the parental origins you want to explore using the filters below. Choose \"Quick Presets\" to see common combinations, or build your own selection."
-                    ])
-                ], className='header-intro'),
             ], className='header-section'),
+
+            # Welcome / Landing Section
+            html.Div([
+                html.P(
+                    "This dashboard explores the marriage patterns of second-generation Americans"
+                    "\u2014U.S.-born individuals with at least one immigrant parent\u2014using "
+                    "census data from 1880 to 1930.",
+                    className='welcome-intro'
+                ),
+                # Topline stats
+                html.Div([
+                    html.Div([
+                        html.Div("48.9%", className='welcome-stat-value'),
+                        html.Div("married within their ethnic heritage", className='welcome-stat-label'),
+                    ], className='welcome-stat-item'),
+                    html.Div([
+                        html.Div("28.7%", className='welcome-stat-value'),
+                        html.Div("married a 3rd+ gen American", className='welcome-stat-label'),
+                    ], className='welcome-stat-item'),
+                    html.Div([
+                        html.Div("22.3%", className='welcome-stat-value'),
+                        html.Div("married a different immigrant group", className='welcome-stat-label'),
+                    ], className='welcome-stat-item'),
+                    html.Div([
+                        html.Div("19.1M", className='welcome-stat-value'),
+                        html.Div("individuals in sample", className='welcome-stat-label'),
+                    ], className='welcome-stat-item'),
+                ], className='welcome-stats'),
+                # Navigation cards
+                html.Div("Explore the data:", className='nav-cards-label'),
+                html.Div([
+                    html.Div([
+                        html.Div("How did groups compare?", className='nav-card-title'),
+                        html.P("Compare outmarriage rates across 26 ethnic origins, "
+                               "with and without geographic adjustment",
+                               className='nav-card-desc'),
+                    ], id='nav-card-compare', n_clicks=0,
+                       className='nav-card nav-card-compare'),
+                    html.Div([
+                        html.Div("Did geography explain it?", className='nav-card-title'),
+                        html.P("See whether local ethnic concentration drove "
+                               "intermarriage patterns",
+                               className='nav-card-desc'),
+                    ], id='nav-card-geo', n_clicks=0,
+                       className='nav-card nav-card-geo'),
+                    html.Div([
+                        html.Div("Explore a specific group", className='nav-card-title'),
+                        html.P("Select parental origins to see detailed marriage patterns, "
+                               "trends, and spouse backgrounds",
+                               className='nav-card-desc'),
+                    ], id='nav-card-explore', n_clicks=0,
+                       className='nav-card nav-card-explore'),
+                ], className='nav-cards'),
+            ], className='welcome-section'),
 
             # Filters
             html.Div([
+                html.Div("Select parental origins below to explore specific groups, "
+                         "or use \"Quick Presets\" for common combinations.",
+                         style={'color': 'rgba(255,255,255,0.7)', 'fontSize': '0.85rem',
+                                'marginBottom': '0.75rem'}),
                 # Current Selection Display
                 html.Div(id='current-selection-display', style={'marginBottom': '1rem'}),
                 dbc.Row([
@@ -2149,7 +2401,7 @@ app.layout = html.Div([
                         ], className='d-flex gap-3')
                     ], lg=2, md=4, xs=12, className='mb-3'),
                 ]),
-            ], className='filter-section'),
+            ], id='filters', className='filter-section'),
 
             # Anchor Navigation + Integrated Summary Panel
             html.Div([
@@ -2235,6 +2487,8 @@ app.layout = html.Div([
                     dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
                     dbc.Tab(label="Clustering Network", tab_id="tab-heatmap"),
                     dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
+                    dbc.Tab(label="Geographic Patterns", tab_id="tab-geographic",
+                            disabled=DATA.get('geographic') is None),
                 ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
                 html.Div([html.Div(id='overview-tab-content')], className='brand-card',
                         style={'borderRadius': '0 0 16px 16px'})
@@ -2361,6 +2615,39 @@ app.layout = html.Div([
         ], fluid=True, style={'maxWidth': '1400px'})
     ], style={'minHeight': '100vh', 'padding': '1rem'})
 ])
+
+# =============================================================================
+# WELCOME CARD NAVIGATION (clientside)
+# =============================================================================
+
+app.clientside_callback(
+    """
+    function(n1, n2, n3) {
+        var triggered = dash_clientside.callback_context.triggered;
+        if (!triggered || triggered.length === 0) return dash_clientside.no_update;
+        var id = triggered[0].prop_id.split('.')[0];
+        if (id === 'nav-card-compare') {
+            var el = document.getElementById('compare');
+            if (el) el.scrollIntoView({behavior: 'smooth'});
+            return 'tab-outmarriage';
+        } else if (id === 'nav-card-geo') {
+            var el = document.getElementById('compare');
+            if (el) el.scrollIntoView({behavior: 'smooth'});
+            return 'tab-geographic';
+        } else if (id === 'nav-card-explore') {
+            var el = document.getElementById('filters');
+            if (el) el.scrollIntoView({behavior: 'smooth'});
+            return dash_clientside.no_update;
+        }
+        return dash_clientside.no_update;
+    }
+    """,
+    Output('overview-tabs', 'active_tab', allow_duplicate=True),
+    [Input('nav-card-compare', 'n_clicks'),
+     Input('nav-card-geo', 'n_clicks'),
+     Input('nav-card-explore', 'n_clicks')],
+    prevent_initial_call=True
+)
 
 # =============================================================================
 # NARRATIVE SNAPSHOT HELPER
@@ -2657,6 +2944,8 @@ def render_overview_tab_content(active_tab, year):
                         {'label': 'Total Outmarriage Rate', 'value': 'total'},
                         {'label': 'Outmarriage to 3rd+ Gen Americans', 'value': 'american'},
                         {'label': 'Outmarriage to Different Immigrant Groups', 'value': 'other_immigrant'},
+                        {'label': 'Geography-Adjusted Rate', 'value': 'geo_adjusted',
+                         'disabled': DATA.get('geographic') is None},
                     ],
                     value='total',
                     style={'width': '300px', 'display': 'inline-block', 'verticalAlign': 'middle'},
@@ -2667,13 +2956,28 @@ def render_overview_tab_content(active_tab, year):
                        children=[html.Div(id='outmarriage-chart-container')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
+        has_adjusted = DATA.get('geo_adjusted_affinity') is not None
         return html.Div([
             html.P("Which ethnic groups had marriage affinities with each other? This network shows connections between second-generation Americans "
                    "(children of same-origin immigrant parents) who intermarried at higher rates than population sizes alone would predict.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
+            html.Div([
+                html.Label("View:", style={'fontWeight': '500', 'marginRight': '10px',
+                                           'color': COLORS['dark_teal']}),
+                dcc.Dropdown(
+                    id='network-view-dropdown',
+                    options=[
+                        {'label': 'National Affinities', 'value': 'raw'},
+                        {'label': 'Geography-Adjusted', 'value': 'adjusted',
+                         'disabled': not has_adjusted},
+                    ],
+                    value='raw',
+                    style={'width': '250px', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    clearable=False
+                ),
+            ], style={'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[html.Div(dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')])
+                       children=[html.Div(id='network-chart-container')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-single-origin':
         available_origins = get_available_origins_for_overview()
@@ -2694,7 +2998,79 @@ def render_overview_tab_content(active_tab, year):
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(id='single-origin-chart-container')])
         ], style={'padding': '1rem'})
+    elif active_tab == 'tab-geographic':
+        geo_df = get_geographic_data()
+        if geo_df is None:
+            return html.Div([
+                html.P("Geographic data not available. Re-run preprocessing with a STATEFIP-enabled IPUMS extract.",
+                       style={'color': COLORS['muted_teal'], 'padding': '2rem'})
+            ])
+        geo_origins = sorted(geo_df['ORIGIN_GROUP'].unique().tolist())
+        default_geo = 'Italy' if 'Italy' in geo_origins else geo_origins[0]
+        return html.Div([
+            html.P("Does local ethnic concentration explain outmarriage rates? Groups that were geographically concentrated "
+                   "(like Italians in New York) had lower outmarriage — possibly reflecting marriage market opportunity rather "
+                   "than cultural preferences alone.",
+                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
+            # Chart 1: Scatter plot
+            dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                       children=[html.Div(
+                           dcc.Graph(id='geo-scatter', figure=create_geo_scatter_chart(),
+                                     config={'displayModeBar': True, 'scrollZoom': False}),
+                           className='chart-scroll chart-scroll-medium')]),
+            # Chart 2: Single group across states
+            html.Div([
+                html.Label("Select group:", style={'fontWeight': '500', 'marginRight': '10px',
+                                                    'color': COLORS['dark_teal']}),
+                dcc.Dropdown(
+                    id='geo-group-dropdown',
+                    options=[{'label': get_demonym(o) + '-Americans', 'value': o} for o in geo_origins],
+                    value=default_geo,
+                    style={'width': '250px', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    clearable=False
+                ),
+            ], style={'marginBottom': '1rem', 'marginTop': '1.5rem'}),
+            dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                       children=[html.Div(id='geo-group-chart-container')]),
+            # Chart 3: Residuals
+            html.Div(style={'marginTop': '1.5rem'}),
+            dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                       children=[html.Div(
+                           dcc.Graph(id='geo-residuals', figure=create_geo_residuals_chart(),
+                                     config={'displayModeBar': True, 'scrollZoom': False}),
+                           className='chart-scroll chart-scroll-medium')]),
+        ], style={'padding': '1rem'})
     return html.Div()
+
+
+@callback(Output('network-chart-container', 'children'),
+          [Input('network-view-dropdown', 'value'), Input('year-dropdown', 'value')])
+def update_network_chart(view_mode, year):
+    """Update the clustering network based on view mode selection."""
+    if view_mode == 'adjusted':
+        network_fig = create_adjusted_network_chart()
+        attraction_fig = create_attraction_chart()
+        avoidance_fig = create_avoidance_chart()
+        return html.Div([
+            html.Div(dcc.Graph(id='heatmap-chart', figure=network_fig,
+                     config={'displayModeBar': True, 'scrollZoom': False}),
+                     className='chart-scroll chart-scroll-medium'),
+            dbc.Row([
+                dbc.Col(html.Div(dcc.Graph(id='attraction-chart', figure=attraction_fig,
+                         config={'displayModeBar': True, 'scrollZoom': False}),
+                         className='chart-scroll chart-scroll-medium'),
+                         md=6),
+                dbc.Col(html.Div(dcc.Graph(id='avoidance-chart', figure=avoidance_fig,
+                         config={'displayModeBar': True, 'scrollZoom': False}),
+                         className='chart-scroll chart-scroll-medium'),
+                         md=6),
+            ], style={'marginTop': '1.5rem'}),
+        ])
+    else:
+        fig = create_heatmap_chart(year)
+        return html.Div(dcc.Graph(id='heatmap-chart', figure=fig,
+                         config={'displayModeBar': True, 'scrollZoom': False}),
+                         className='chart-scroll chart-scroll-medium')
 
 
 @callback(Output('outmarriage-chart-container', 'children'),
@@ -2702,6 +3078,16 @@ def render_overview_tab_content(active_tab, year):
 def update_outmarriage_chart(sort_by, year):
     """Update the outmarriage rates chart based on sorting selection."""
     return html.Div(dcc.Graph(id='outmarriage-chart', figure=create_outmarriage_chart(year, sort_by),
+                     config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')
+
+
+@callback(Output('geo-group-chart-container', 'children'),
+          [Input('geo-group-dropdown', 'value')])
+def update_geo_group_chart(origin):
+    """Update the single-group geographic chart."""
+    if not origin:
+        return html.P("Please select a group", style={'color': COLORS['muted_teal']})
+    return html.Div(dcc.Graph(id='geo-group-chart', figure=create_geo_group_chart(origin),
                      config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')
 
 
@@ -2829,8 +3215,102 @@ def create_time_chart(mother, father):
     return fig
 
 
+def _compute_geo_adjusted_rates():
+    """Compute geography-adjusted outmarriage rates using residuals from concentration regression."""
+    geo_df = get_geographic_data()
+    if geo_df is None or len(geo_df) == 0:
+        return None
+
+    x_all = geo_df['GROUP_SHARE_PCT'].values
+    y_all = geo_df['OUTMARRIAGE_RATE'].values
+    mask = np.isfinite(x_all) & np.isfinite(y_all) & (x_all > 0)
+
+    if mask.sum() < 3:
+        return None
+
+    log_x = np.log10(x_all[mask])
+    y_fit = y_all[mask]
+    coeffs = np.polyfit(log_x, y_fit, 1)
+    overall_mean = np.mean(y_fit)
+
+    # Compute per-group adjusted rates
+    geo_df = geo_df.copy()
+    geo_df['PREDICTED'] = np.polyval(coeffs, np.log10(geo_df['GROUP_SHARE_PCT'].clip(lower=0.001)))
+    geo_df['RESIDUAL'] = geo_df['OUTMARRIAGE_RATE'] - geo_df['PREDICTED']
+
+    results = {}
+    for origin, grp in geo_df.groupby('ORIGIN_GROUP'):
+        avg_residual = np.average(grp['RESIDUAL'], weights=grp['WEIGHTED_N'])
+        raw_rate = np.average(grp['OUTMARRIAGE_RATE'], weights=grp['WEIGHTED_N'])
+        adjusted_rate = overall_mean + avg_residual
+        results[origin] = {
+            'adjusted_rate': adjusted_rate,
+            'raw_rate': raw_rate,
+            'residual': avg_residual,
+        }
+    return results
+
+
 def create_outmarriage_chart(year, sort_by='total'):
     """Create horizontal bar chart showing outmarriage rates with different sorting options."""
+
+    # Geography-adjusted view uses different data path
+    if sort_by == 'geo_adjusted':
+        adjusted = _compute_geo_adjusted_rates()
+        if adjusted is None:
+            fig = go.Figure()
+            fig.add_annotation(text="Geographic data not available for adjustment",
+                               x=0.5, y=0.5, showarrow=False)
+            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+            return fig
+
+        items = [{'origin': k, 'demonym': get_demonym(k), **v} for k, v in adjusted.items()]
+        items.sort(key=lambda x: x['adjusted_rate'])  # ascending for horizontal bar
+
+        demonyms = [r['demonym'] + '-Americans' for r in items]
+        values = [r['adjusted_rate'] for r in items]
+
+        hover_texts = []
+        for r in items:
+            hover_texts.append(
+                f"<b>{r['demonym']}-Americans</b><br>"
+                f"Adjusted rate: {r['adjusted_rate']:.1f}%<br>"
+                f"Raw rate: {r['raw_rate']:.1f}%<br>"
+                f"Residual: {r['residual']:+.1f}pp"
+            )
+
+        fig = go.Figure(go.Bar(
+            x=values, y=demonyms, orientation='h',
+            marker_color=[COLORS['medium_teal'] if r['residual'] >= 0 else COLORS['gold']
+                          for r in items],
+            text=[f"{v:.0f}%" for v in values],
+            textposition='outside',
+            hovertemplate="%{customdata}<extra></extra>",
+            customdata=hover_texts
+        ))
+
+        fig.update_layout(
+            title=dict(text="Outmarriage Rates: Geography-Adjusted",
+                       font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+            xaxis_title="Adjusted Outmarriage Rate (%)",
+            xaxis=dict(gridcolor=COLORS['light_gray'],
+                       range=[0, max(values) * 1.15 if values else 100], fixedrange=True),
+            yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
+            dragmode=False,
+            height=max(400, len(items) * 28 + 100),
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+            margin=dict(r=60, t=100, b=70),
+            annotations=[
+                dict(text="Removes effect of geographic concentration · "
+                          "<b>Teal</b> = outmarried more than concentration predicts · "
+                          "<b>Gold</b> = less",
+                     xref='paper', yref='paper', x=0.5, y=-0.06, showarrow=False,
+                     font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
+            ]
+        )
+        return fig
+
+    # Standard (non-adjusted) views
     ranking = get_integration_ranking(year)
 
     if not ranking:
@@ -2938,25 +3418,11 @@ def create_spouse_gen_chart(mother, father, year):
     return fig
 
 
-def create_heatmap_chart(year):
-    """Create network graph showing ethnic clustering patterns."""
-    try:
-        nodes, edges, positions = get_network_data(year)
-    except Exception as e:
-        fig = go.Figure()
-        fig.add_annotation(text="Insufficient data for clustering analysis", x=0.5, y=0.5, showarrow=False)
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
-        return fig
-
-    if not nodes or not edges:
-        fig = go.Figure()
-        fig.add_annotation(text="Insufficient data for network visualization", x=0.5, y=0.5, showarrow=False)
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
-        return fig
-
+def _draw_network_fig(nodes, edges, positions, title, footer_lines=None):
+    """Shared drawing logic for network visualizations."""
     fig = go.Figure()
 
-    # Draw edges with curved paths for cleaner look
+    # Draw edges with curved paths
     max_weight = max(e['weight'] for e in edges) if edges else 1
     min_weight = min(e['weight'] for e in edges) if edges else 1
 
@@ -2964,15 +3430,12 @@ def create_heatmap_chart(year):
         x0, y0 = positions[edge['source']]
         x1, y1 = positions[edge['target']]
 
-        # Normalize weight for visual scaling
         norm_weight = (edge['weight'] - min_weight) / (max_weight - min_weight) if max_weight > min_weight else 0.5
         width = 1 + norm_weight * 5
         opacity = 0.3 + norm_weight * 0.5
 
-        # Create slight curve using bezier-like path
         mid_x = (x0 + x1) / 2
         mid_y = (y0 + y1) / 2
-        # Offset midpoint perpendicular to line
         dx, dy = x1 - x0, y1 - y0
         length = np.sqrt(dx*dx + dy*dy)
         if length > 0:
@@ -2989,15 +3452,13 @@ def create_heatmap_chart(year):
             showlegend=False
         ))
 
-    # Draw nodes - uniform small size for cleaner look
+    # Draw nodes
     max_pop = max(n['population'] for n in nodes) if nodes else 1
     node_x = [positions[n['id']][0] for n in nodes]
     node_y = [positions[n['id']][1] for n in nodes]
-    # Smaller, more uniform nodes (size based on population but constrained)
     node_sizes = [10 + 12 * np.sqrt(n['population'] / max_pop) for n in nodes]
     node_labels = [n['label'] for n in nodes]
 
-    # Build rich hover text with connections
     hover_texts = []
     for n in nodes:
         conn_list = n.get('connections', [])
@@ -3008,7 +3469,6 @@ def create_heatmap_chart(year):
             f"<br><b>Affinities:</b><br>{conn_str}"
         )
 
-    # Draw nodes (markers only)
     fig.add_trace(go.Scatter(
         x=node_x, y=node_y,
         mode='markers',
@@ -3023,81 +3483,256 @@ def create_heatmap_chart(year):
         showlegend=False
     ))
 
-    # Calculate smart label positions - place labels away from graph center
-    # to avoid overlapping with other nodes
+    # Smart label placement
     center_x = np.mean(node_x)
     center_y = np.mean(node_y)
 
     all_annotations = []
-
     for i, n in enumerate(nodes):
         x, y = node_x[i], node_y[i]
-
-        # Calculate direction away from center
         dx = x - center_x
         dy = y - center_y
         dist_from_center = np.sqrt(dx*dx + dy*dy)
 
         if dist_from_center > 0.01:
-            # Normalize and extend outward
             dx_norm = dx / dist_from_center
             dy_norm = dy / dist_from_center
         else:
             dx_norm, dy_norm = 0, 1
 
-        # Place label outside the node, away from center
-        label_offset = 0.12  # Distance from node in data coordinates
-
-        # Determine text anchor based on position relative to center
+        label_offset = 0.12
         if abs(dx_norm) > abs(dy_norm):
-            # More horizontal - anchor left or right
             xanchor = 'left' if dx_norm > 0 else 'right'
             yanchor = 'middle'
             label_x = x + dx_norm * label_offset
             label_y = y
         else:
-            # More vertical - anchor top or bottom
             xanchor = 'center'
             yanchor = 'bottom' if dy_norm > 0 else 'top'
             label_x = x
             label_y = y + dy_norm * label_offset
 
         all_annotations.append(dict(
-            x=label_x,
-            y=label_y,
-            text=node_labels[i],
-            showarrow=False,
-            xanchor=xanchor,
-            yanchor=yanchor,
+            x=label_x, y=label_y, text=node_labels[i],
+            showarrow=False, xanchor=xanchor, yanchor=yanchor,
             font=dict(family='Hanken Grotesk', size=9, color=COLORS['dark_teal']),
-            bgcolor='rgba(255,255,255,0.85)',
-            borderpad=3
+            bgcolor='rgba(255,255,255,0.85)', borderpad=3
         ))
 
-    # Add footer note
-    all_annotations.append(dict(
-        text="Lines connect groups with above-average intermarriage rates · Thicker lines = stronger affinity",
-        xref='paper', yref='paper', x=0.5, y=-0.04,
-        showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
-        xanchor='center'
+    # Footer lines
+    if footer_lines:
+        for idx, line in enumerate(footer_lines):
+            all_annotations.append(dict(
+                text=line, xref='paper', yref='paper',
+                x=0.5, y=-0.04 - idx * 0.04,
+                showarrow=False, font=dict(size=10, color=COLORS['muted_teal']),
+                xanchor='center'
+            ))
+
+    fig.update_layout(
+        title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        showlegend=False, hovermode='closest',
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
+        dragmode=False, height=550,
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=40, r=40, t=100, b=60 + (len(footer_lines or []) * 18)),
+        annotations=all_annotations
+    )
+    return fig
+
+
+def create_heatmap_chart(year):
+    """Create network graph showing ethnic clustering patterns (national affinities)."""
+    try:
+        nodes, edges, positions = get_network_data(year)
+    except Exception:
+        fig = go.Figure()
+        fig.add_annotation(text="Insufficient data for clustering analysis", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    if not nodes or not edges:
+        fig = go.Figure()
+        fig.add_annotation(text="Insufficient data for network visualization", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    footer = [
+        "Lines connect groups with above-average intermarriage rates · Thicker lines = stronger affinity",
+        "Note: Affinities partly reflect geographic co-location (groups in the same states marry more)"
+    ]
+    return _draw_network_fig(nodes, edges, positions,
+                             "Intermarriage Affinities Between Ethnic Groups (National)",
+                             footer_lines=footer)
+
+
+def create_adjusted_network_chart():
+    """Create network using geography-adjusted affinities (within-state expected rates)."""
+    try:
+        nodes, edges, positions = get_adjusted_network_data()
+    except Exception:
+        fig = go.Figure()
+        fig.add_annotation(text="Insufficient data for adjusted network", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    if not nodes or not edges:
+        fig = go.Figure()
+        fig.add_annotation(text="Insufficient data for adjusted network", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    footer = [
+        "Geography-adjusted: expected rates computed within each state, then averaged",
+        "Removes the effect of groups sharing the same states · Shows genuine cultural affinity"
+    ]
+    return _draw_network_fig(nodes, edges, positions,
+                             "Intermarriage Affinities (Geography-Adjusted)",
+                             footer_lines=footer)
+
+
+def create_avoidance_chart():
+    """Bar chart showing pairs that intermarried LESS than geographic proximity predicts."""
+    adj_df = DATA.get('geo_adjusted_affinity')
+    if adj_df is None or len(adj_df) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No adjusted affinity data available", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    # Pairs below 1.0 = married less than expected
+    avoided = adj_df[adj_df['GEO_ADJUSTED_AFFINITY'] < 1.0].copy()
+    avoided = avoided.sort_values('GEO_ADJUSTED_AFFINITY', ascending=True).head(20)
+
+    if len(avoided) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No avoided pairs found", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    # Invert: show how far below expected (1 - affinity), so most avoided = longest bar
+    # Sort so most avoided is at top (highest inverted value at top = last in list for horizontal bars)
+    avoided = avoided.sort_values('GEO_ADJUSTED_AFFINITY', ascending=False)
+
+    pair_labels = [
+        f"{get_demonym(row['SOURCE'])} — {get_demonym(row['TARGET'])}"
+        for _, row in avoided.iterrows()
+    ]
+    raw_values = avoided['GEO_ADJUSTED_AFFINITY'].values
+    display_values = 1.0 - raw_values  # e.g. 0.026x -> 0.974 "shortfall"
+
+    # Color gradient: deeper red/orange for stronger avoidance
+    colors = [COLORS['medium_orange'] if rv < 0.2 else COLORS['orange'] if rv < 0.5 else COLORS['light_orange']
+              for rv in raw_values]
+
+    fig = go.Figure(go.Bar(
+        x=display_values,
+        y=pair_labels,
+        orientation='h',
+        marker_color=colors,
+        text=[f"{rv:.2f}x" for rv in raw_values],
+        textposition='outside',
+        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Adjusted affinity: %{customdata:.3f}x expected rate<br>'
+            '<i>Below 1.0 = married less than proximity predicts</i><extra></extra>'
+        ),
+        customdata=raw_values
     ))
 
     fig.update_layout(
-        title=dict(
-            text="Intermarriage Affinities Between Ethnic Groups",
-            font=dict(family='Neuton', size=22, color=COLORS['dark_teal']),
-            x=0
-        ),
-        showlegend=False,
-        hovermode='closest',
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
+        title=dict(text="Most Avoided Pairs (Despite Geographic Proximity)",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Shortfall below expected (longer bar = stronger avoidance)",
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
+                   range=[0, 1.1],
+                   title_font=dict(family='Hanken Grotesk', size=12),
+                   tickvals=[0, 0.25, 0.5, 0.75, 1.0],
+                   ticktext=['1.0x<br>(expected)', '0.75x', '0.50x', '0.25x', '0.0x']),
+        yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
-        height=550,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=40, t=100, b=50),
-        annotations=all_annotations
+        height=max(400, len(avoided) * 28 + 120),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(r=60, t=100, b=60),
+        annotations=[
+            dict(text="Groups that shared the same states but rarely intermarried — suggesting cultural boundaries",
+                 xref='paper', yref='paper', x=0.5, y=-0.06, showarrow=False,
+                 font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
+        ]
+    )
+    return fig
+
+
+def create_attraction_chart():
+    """Bar chart showing pairs that intermarried MORE than geographic proximity predicts."""
+    adj_df = DATA.get('geo_adjusted_affinity')
+    if adj_df is None or len(adj_df) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No adjusted affinity data available", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    # Match the count used by avoidance chart
+    n_avoided = len(adj_df[adj_df['GEO_ADJUSTED_AFFINITY'] < 1.0].head(20))
+    attracted = adj_df[adj_df['GEO_ADJUSTED_AFFINITY'] >= 1.0].copy()
+    attracted = attracted.sort_values('GEO_ADJUSTED_AFFINITY', ascending=False).head(n_avoided)
+
+    if len(attracted) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No attracted pairs found", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    # Reverse so highest is at top
+    attracted = attracted.iloc[::-1]
+
+    pair_labels = [
+        f"{get_demonym(row['SOURCE'])} — {get_demonym(row['TARGET'])}"
+        for _, row in attracted.iterrows()
+    ]
+    values = attracted['GEO_ADJUSTED_AFFINITY'].values
+
+    colors = [COLORS['dark_teal'] if v >= 3.0 else COLORS['medium_teal'] if v >= 2.0 else COLORS['light_teal']
+              for v in values]
+
+    fig = go.Figure(go.Bar(
+        x=values,
+        y=pair_labels,
+        orientation='h',
+        marker_color=colors,
+        text=[f"{v:.1f}x" for v in values],
+        textposition='outside',
+        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Adjusted affinity: %{x:.2f}x expected rate<br>'
+            '<i>Above 1.0 = married more than proximity predicts</i><extra></extra>'
+        )
+    ))
+
+    fig.add_vline(x=1.0, line_width=1, line_dash='dash',
+                  line_color=COLORS['muted_teal'], opacity=0.6,
+                  annotation_text="expected", annotation_position="top left",
+                  annotation_font=dict(size=10, color=COLORS['muted_teal']))
+
+    fig.update_layout(
+        title=dict(text="Strongest Affinities (Beyond Geographic Proximity)",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Adjusted Affinity (1.0 = expected from local market share)",
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
+                   title_font=dict(family='Hanken Grotesk', size=12)),
+        yaxis=dict(fixedrange=True, automargin=True),
+        dragmode=False,
+        height=max(400, len(attracted) * 28 + 120),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(r=60, t=100, b=60),
+        annotations=[
+            dict(text="Groups that married each other more than local population shares predict — genuine cultural affinity",
+                 xref='paper', yref='paper', x=0.5, y=-0.06, showarrow=False,
+                 font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
+        ]
     )
     return fig
 
@@ -3261,6 +3896,234 @@ def update_table(mother, father, year):
             ]) for _, row in agg.iterrows()
         ])
     ], className='brand-table', style={'width': '100%'})
+
+
+# =============================================================================
+# GEOGRAPHIC CHART FUNCTIONS
+# =============================================================================
+
+# Color palette for ethnic groups in scatter plot
+GEO_GROUP_COLORS = [
+    COLORS['dark_teal'], COLORS['medium_teal'], COLORS['orange'],
+    COLORS['purple'], COLORS['green'], COLORS['gold'],
+    COLORS['light_orange'], COLORS['light_purple'], COLORS['light_teal'],
+    COLORS['dark_green'], COLORS['medium_orange'], COLORS['dark_purple'],
+    COLORS['dark_gold'], COLORS['light_green'], COLORS['muted_teal'],
+]
+
+
+def create_geo_scatter_chart():
+    """Scatter plot: group concentration (%) vs outmarriage rate, colored by group."""
+    geo_df = get_geographic_data()
+    if geo_df is None or len(geo_df) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No geographic data available", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    origins = sorted(geo_df['ORIGIN_GROUP'].unique())
+    color_map = {o: GEO_GROUP_COLORS[i % len(GEO_GROUP_COLORS)] for i, o in enumerate(origins)}
+
+    fig = go.Figure()
+    for origin in origins:
+        odf = geo_df[geo_df['ORIGIN_GROUP'] == origin]
+        fig.add_trace(go.Scatter(
+            x=odf['GROUP_SHARE_PCT'],
+            y=odf['OUTMARRIAGE_RATE'],
+            mode='markers',
+            name=get_demonym(origin),
+            marker=dict(
+                color=color_map[origin],
+                size=np.clip(np.sqrt(odf['WEIGHTED_N'] / 1000) * 2, 6, 30),
+                opacity=0.75,
+                line=dict(width=1, color='white')
+            ),
+            hovertemplate=(
+                '<b>%{customdata[0]}</b> in %{customdata[1]}<br>'
+                'Local concentration: %{x:.1f}%<br>'
+                'Outmarriage rate: %{y:.1f}%<br>'
+                'Sample size: %{customdata[2]:,.0f}<extra></extra>'
+            ),
+            customdata=list(zip(
+                [get_demonym(origin) + '-Americans'] * len(odf),
+                odf['STATE_NAME'],
+                odf['WEIGHTED_N']
+            ))
+        ))
+
+    # OLS trend line across all data points
+    x_all = geo_df['GROUP_SHARE_PCT'].values
+    y_all = geo_df['OUTMARRIAGE_RATE'].values
+    mask = np.isfinite(x_all) & np.isfinite(y_all) & (x_all > 0)
+    if mask.sum() > 2:
+        log_x = np.log10(x_all[mask])
+        y_fit = y_all[mask]
+        coeffs = np.polyfit(log_x, y_fit, 1)
+        # R-squared
+        y_pred = np.polyval(coeffs, log_x)
+        ss_res = np.sum((y_fit - y_pred) ** 2)
+        ss_tot = np.sum((y_fit - np.mean(y_fit)) ** 2)
+        r_squared = 1 - ss_res / ss_tot if ss_tot > 0 else 0
+
+        # Draw trend line
+        x_line = np.linspace(log_x.min(), log_x.max(), 50)
+        y_line = np.polyval(coeffs, x_line)
+        fig.add_trace(go.Scatter(
+            x=10 ** x_line, y=y_line,
+            mode='lines', name=f'Trend (R²={r_squared:.2f})',
+            line=dict(color=COLORS['dark_teal'], width=2, dash='dash'),
+            hoverinfo='skip'
+        ))
+
+        fig.add_annotation(
+            text=f"R² = {r_squared:.2f}",
+            xref='paper', yref='paper', x=0.98, y=0.98,
+            showarrow=False, font=dict(size=14, color=COLORS['dark_teal'], family='Hanken Grotesk'),
+            bgcolor='rgba(255,255,255,0.8)', bordercolor=COLORS['light_gray'], borderwidth=1
+        )
+
+    fig.update_layout(
+        title=dict(text="Ethnic Concentration vs. Outmarriage Rate",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Group's Share of State's 2nd-Gen Population (%)",
+        yaxis_title="Outmarriage Rate (%)",
+        xaxis=dict(type='log', gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
+                   title_font=dict(family='Hanken Grotesk', size=12)),
+        yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
+                   title_font=dict(family='Hanken Grotesk', size=12)),
+        dragmode=False,
+        height=550,
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        legend=dict(font=dict(size=10), itemsizing='constant'),
+        margin=dict(t=80, r=20)
+    )
+    return fig
+
+
+def create_geo_group_chart(origin):
+    """Horizontal bar chart showing one group's outmarriage rate across states."""
+    odf = get_group_geographic_data(origin)
+    if odf is None or len(odf) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No data for this group", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    odf = odf.sort_values('OUTMARRIAGE_RATE', ascending=True)
+    demonym = get_demonym(origin)
+
+    fig = go.Figure(go.Bar(
+        x=odf['OUTMARRIAGE_RATE'],
+        y=odf['STATE_NAME'],
+        orientation='h',
+        marker_color=COLORS['medium_teal'],
+        text=[f"{r:.0f}%  (conc: {c:.1f}%)" for r, c in
+              zip(odf['OUTMARRIAGE_RATE'], odf['GROUP_SHARE_PCT'])],
+        textposition='outside',
+        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Outmarriage rate: %{x:.1f}%<br>'
+            'Local concentration: %{customdata[0]:.1f}%<br>'
+            'Sample size: %{customdata[1]:,.0f}<extra></extra>'
+        ),
+        customdata=list(zip(odf['GROUP_SHARE_PCT'], odf['WEIGHTED_N']))
+    ))
+
+    fig.update_layout(
+        title=dict(text=f"{demonym}-Americans: Outmarriage by State",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Outmarriage Rate (%)",
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True,
+                   range=[0, min(odf['OUTMARRIAGE_RATE'].max() * 1.25, 105)],
+                   title_font=dict(family='Hanken Grotesk', size=12)),
+        yaxis=dict(fixedrange=True, automargin=True),
+        dragmode=False,
+        height=max(400, len(odf) * 28 + 120),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(r=120, t=80)
+    )
+    return fig
+
+
+def create_geo_residuals_chart():
+    """Bar chart showing average residuals: actual outmarriage - predicted by concentration."""
+    geo_df = get_geographic_data()
+    if geo_df is None or len(geo_df) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No geographic data available", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    # Fit OLS: outmarriage ~ log(concentration) across all group-state pairs
+    x_all = geo_df['GROUP_SHARE_PCT'].values
+    y_all = geo_df['OUTMARRIAGE_RATE'].values
+    mask = np.isfinite(x_all) & np.isfinite(y_all) & (x_all > 0)
+
+    if mask.sum() < 3:
+        fig = go.Figure()
+        fig.add_annotation(text="Insufficient data for regression", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
+        return fig
+
+    log_x = np.log10(x_all[mask])
+    y_fit = y_all[mask]
+    coeffs = np.polyfit(log_x, y_fit, 1)
+
+    # Compute residuals for each row
+    geo_df = geo_df.copy()
+    geo_df['PREDICTED'] = np.polyval(coeffs, np.log10(geo_df['GROUP_SHARE_PCT'].clip(lower=0.001)))
+    geo_df['RESIDUAL'] = geo_df['OUTMARRIAGE_RATE'] - geo_df['PREDICTED']
+
+    # Average residual per group (weighted by sample size)
+    group_resid = geo_df.groupby('ORIGIN_GROUP').apply(
+        lambda g: np.average(g['RESIDUAL'], weights=g['WEIGHTED_N'])
+    ).reset_index()
+    group_resid.columns = ['ORIGIN_GROUP', 'AVG_RESIDUAL']
+    group_resid = group_resid.sort_values('AVG_RESIDUAL', ascending=True)
+
+    colors = [COLORS['medium_teal'] if r >= 0 else COLORS['gold']
+              for r in group_resid['AVG_RESIDUAL']]
+    demonyms = [get_demonym(o) + '-Americans' for o in group_resid['ORIGIN_GROUP']]
+
+    fig = go.Figure(go.Bar(
+        x=group_resid['AVG_RESIDUAL'],
+        y=demonyms,
+        orientation='h',
+        marker_color=colors,
+        text=[f"{r:+.1f}pp" for r in group_resid['AVG_RESIDUAL']],
+        textposition='outside',
+        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Avg residual: %{x:+.1f} percentage points<extra></extra>'
+        )
+    ))
+
+    # Add a vertical line at 0
+    fig.add_vline(x=0, line_width=1, line_color=COLORS['dark_teal'], opacity=0.5)
+
+    fig.update_layout(
+        title=dict(text="Cultural vs. Geographic Effects on Outmarriage",
+                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Avg. Residual (pp above/below concentration-predicted rate)",
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
+                   title_font=dict(family='Hanken Grotesk', size=12)),
+        yaxis=dict(fixedrange=True, automargin=True),
+        dragmode=False,
+        height=max(400, len(group_resid) * 28 + 120),
+        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(r=80, t=100),
+        annotations=[
+            dict(text="<b>Teal</b> = more outmarriage than concentration predicts (cultural openness)",
+                 xref='paper', yref='paper', x=0.5, y=-0.08, showarrow=False,
+                 font=dict(size=11, color=COLORS['medium_teal'], family='Hanken Grotesk')),
+            dict(text="<b>Gold</b> = less outmarriage than concentration predicts (cultural retention)",
+                 xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
+                 font=dict(size=11, color=COLORS['gold'], family='Hanken Grotesk')),
+        ]
+    )
+    return fig
 
 
 # =============================================================================

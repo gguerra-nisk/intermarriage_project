@@ -2,12 +2,13 @@
 Preprocessing Script for Deployment
 ====================================
 Creates optimized aggregated data files for the dashboard.
-The raw data (usa_00004.csv.gz) is too large for free hosting,
+The raw data is too large for free hosting,
 so we pre-compute all aggregations needed by the dashboard.
 
 Output files (in data/processed/):
 - marriage_agg.csv: Main aggregation by year/origins/marriage type
 - spouse_backgrounds.csv: Spouse background details for the table
+- geographic_agg.csv: State-level concentration vs outmarriage rates
 - metadata.json: Valid origins, years, and presets info
 
 Usage: python preprocess_for_deploy.py
@@ -31,13 +32,32 @@ PROCESSED_DIR = Path("data/processed")
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 CHUNK_SIZE = 300000
-INPUT_FILE = "usa_00004.csv.gz"
+INPUT_FILE = "usa_00007.csv.gz"
 
 # Only process these census years
 VALID_YEARS = [1880, 1900, 1910, 1920, 1930]
 
 # Minimum sample size for origin to appear in dropdowns
 MIN_SAMPLE_SIZE = 20000
+
+# Minimum weighted count for a group-state cell in geographic analysis
+MIN_GEO_SAMPLE = 5000
+
+# FIPS state code to state name mapping
+STATEFIP_NAMES = {
+    1: 'Alabama', 2: 'Alaska', 4: 'Arizona', 5: 'Arkansas', 6: 'California',
+    8: 'Colorado', 9: 'Connecticut', 10: 'Delaware', 11: 'District of Columbia',
+    12: 'Florida', 13: 'Georgia', 15: 'Hawaii', 16: 'Idaho', 17: 'Illinois',
+    18: 'Indiana', 19: 'Iowa', 20: 'Kansas', 21: 'Kentucky', 22: 'Louisiana',
+    23: 'Maine', 24: 'Maryland', 25: 'Massachusetts', 26: 'Michigan',
+    27: 'Minnesota', 28: 'Mississippi', 29: 'Missouri', 30: 'Montana',
+    31: 'Nebraska', 32: 'Nevada', 33: 'New Hampshire', 34: 'New Jersey',
+    35: 'New Mexico', 36: 'New York', 37: 'North Carolina', 38: 'North Dakota',
+    39: 'Ohio', 40: 'Oklahoma', 41: 'Oregon', 42: 'Pennsylvania',
+    44: 'Rhode Island', 45: 'South Carolina', 46: 'South Dakota',
+    47: 'Tennessee', 48: 'Texas', 49: 'Utah', 50: 'Vermont', 51: 'Virginia',
+    53: 'Washington', 54: 'West Virginia', 55: 'Wisconsin', 56: 'Wyoming',
+}
 
 # Origins to exclude from dropdowns
 EXCLUDED_ORIGINS = {
@@ -205,7 +225,7 @@ def process_chunk(chunk):
 
         marriage_type = classify_marriage(mother_origin, father_origin, spouse_gen, spouse_origins)
 
-        results.append({
+        record = {
             'YEAR': int(row['YEAR']),
             'PERWT': row['PERWT'],
             'MOTHER_ORIGIN': mother_origin,
@@ -215,7 +235,10 @@ def process_chunk(chunk):
             'SPOUSE_MOTHER_ORIGIN': spouse_mom,
             'SPOUSE_FATHER_ORIGIN': spouse_dad,
             'MARRIAGE_TYPE': marriage_type,
-        })
+        }
+        if 'STATEFIP' in row.index:
+            record['STATEFIP'] = int(row['STATEFIP'])
+        results.append(record)
 
     return pd.DataFrame(results)
 
@@ -228,7 +251,7 @@ def main():
     input_path = RAW_DATA_DIR / INPUT_FILE
     if not input_path.exists():
         print(f"\nERROR: File not found: {input_path}")
-        print("Please ensure usa_00004.csv.gz is in data/raw/")
+        print(f"Please ensure {INPUT_FILE} is in data/raw/")
         return False
 
     print(f"\nInput: {input_path}")
@@ -291,11 +314,196 @@ def main():
     spouse_bg.to_csv(PROCESSED_DIR / "spouse_backgrounds.csv", index=False)
     print(f"     Saved: spouse_backgrounds.csv ({len(spouse_bg):,} rows)")
 
+    # 3. Geographic aggregation (state-level concentration vs outmarriage)
+    has_statefip = 'STATEFIP' in df.columns
+    if has_statefip:
+        print("  3. Geographic aggregation by state/origin...")
+
+        # Filter to same-origin parents only (cleaner analysis)
+        geo_df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']].copy()
+        geo_df = geo_df[~geo_df['MOTHER_ORIGIN'].isin(
+            {'US-born', 'Unknown', 'N/A', 'Abroad/At Sea', 'Missing', 'Illegible'}
+        )]
+        geo_df = geo_df[geo_df['STATEFIP'].isin(STATEFIP_NAMES.keys())]
+        geo_df['STATE_NAME'] = geo_df['STATEFIP'].map(STATEFIP_NAMES)
+
+        # Pool all years for statistical power
+        # Total 2nd-gen population per state
+        state_totals = geo_df.groupby('STATEFIP')['PERWT'].sum().reset_index()
+        state_totals.columns = ['STATEFIP', 'TOTAL_2NDGEN_IN_STATE']
+
+        geo_results = []
+        for (statefip, origin), grp in geo_df.groupby(['STATEFIP', 'MOTHER_ORIGIN']):
+            weighted_n = grp['PERWT'].sum()
+            unweighted_n = len(grp)
+
+            if weighted_n < MIN_GEO_SAMPLE:
+                continue
+
+            state_total = state_totals.loc[
+                state_totals['STATEFIP'] == statefip, 'TOTAL_2NDGEN_IN_STATE'
+            ].values[0]
+            group_share = weighted_n / state_total * 100 if state_total > 0 else 0
+
+            # Marriage type breakdown
+            type_counts = grp.groupby('MARRIAGE_TYPE')['PERWT'].sum()
+            total = type_counts.sum()
+            pcts = (type_counts / total * 100).to_dict() if total > 0 else {}
+
+            heritage_rate = sum(v for k, v in pcts.items() if 'same origin' in k)
+            third_gen_rate = sum(v for k, v in pcts.items() if '3rd+ gen' in k)
+            outmarriage_rate = 100 - heritage_rate
+
+            geo_results.append({
+                'STATEFIP': int(statefip),
+                'STATE_NAME': STATEFIP_NAMES.get(int(statefip), 'Unknown'),
+                'ORIGIN_GROUP': origin,
+                'TOTAL_2NDGEN_IN_STATE': state_total,
+                'GROUP_COUNT_IN_STATE': weighted_n,
+                'GROUP_SHARE_PCT': round(group_share, 2),
+                'OUTMARRIAGE_RATE': round(outmarriage_rate, 2),
+                'THIRD_GEN_RATE': round(third_gen_rate, 2),
+                'HERITAGE_RATE': round(heritage_rate, 2),
+                'WEIGHTED_N': weighted_n,
+                'UNWEIGHTED_N': unweighted_n,
+            })
+
+        if geo_results:
+            geo_agg = pd.DataFrame(geo_results)
+            geo_agg.to_csv(PROCESSED_DIR / "geographic_agg.csv", index=False)
+            print(f"     Saved: geographic_agg.csv ({len(geo_agg):,} rows)")
+            print(f"     Origins with state data: {geo_agg['ORIGIN_GROUP'].nunique()}")
+            print(f"     States with data: {geo_agg['STATE_NAME'].nunique()}")
+        else:
+            print("     WARNING: No geographic data met the minimum sample threshold")
+            has_statefip = False
+        # 3b. Geography-adjusted affinity matrix
+        print("  3b. Computing geography-adjusted intermarriage affinities...")
+
+        # Start from full df (has spouse details + STATEFIP)
+        net_df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']].copy()
+        net_df = net_df[~net_df['MOTHER_ORIGIN'].isin(
+            {'US-born', 'Unknown', 'N/A', 'Abroad/At Sea', 'Missing', 'Illegible'}
+        )]
+        net_df = net_df[net_df['STATEFIP'].isin(STATEFIP_NAMES.keys())]
+
+        EXCLUDED_FROM_NETWORK = {'Mexico', 'Cuba', 'West Indies', 'China', 'Japan'}
+        net_df = net_df[~net_df['MOTHER_ORIGIN'].isin(EXCLUDED_FROM_NETWORK)]
+
+        # Determine spouse heritage (same logic as app.py network)
+        def get_spouse_heritage(row):
+            if row['SPOUSE_GENERATION'] == '3rd+ gen American':
+                return None
+            elif row['SPOUSE_GENERATION'] == '1st gen immigrant':
+                return row['SPOUSE_COUNTRY']
+            else:
+                dad = str(row['SPOUSE_FATHER_ORIGIN'])
+                mom = str(row['SPOUSE_MOTHER_ORIGIN'])
+                if dad not in ['US-born', 'Unknown', 'N/A', 'nan']:
+                    return dad
+                elif mom not in ['US-born', 'Unknown', 'N/A', 'nan']:
+                    return mom
+                return None
+
+        net_df['SPOUSE_HERITAGE'] = net_df.apply(get_spouse_heritage, axis=1)
+        net_df = net_df[net_df['SPOUSE_HERITAGE'].notna()]
+        net_df = net_df[~net_df['SPOUSE_HERITAGE'].isin(
+            ['Unknown', 'N/A', 'US-born'] + list(EXCLUDED_FROM_NETWORK)
+        )]
+
+        # Major groups (enough data nationally)
+        MIN_NET_SAMPLE = 50000
+        parent_totals_net = net_df.groupby('MOTHER_ORIGIN')['PERWT'].sum()
+        major_groups = parent_totals_net[parent_totals_net >= MIN_NET_SAMPLE].index.tolist()
+
+        net_df = net_df[net_df['MOTHER_ORIGIN'].isin(major_groups)]
+        net_df = net_df[net_df['SPOUSE_HERITAGE'].isin(major_groups)]
+
+        if len(net_df) > 0 and len(major_groups) > 1:
+            # Pairwise counts per state
+            state_pairs = net_df.groupby(
+                ['STATEFIP', 'MOTHER_ORIGIN', 'SPOUSE_HERITAGE']
+            )['PERWT'].sum().reset_index()
+            state_pairs.columns = ['STATEFIP', 'PARENT', 'SPOUSE', 'COUNT']
+
+            # Parent totals per state (denominator for observed rate)
+            state_parent_tot = net_df.groupby(
+                ['STATEFIP', 'MOTHER_ORIGIN']
+            )['PERWT'].sum().reset_index()
+            state_parent_tot.columns = ['STATEFIP', 'PARENT', 'PARENT_TOTAL']
+
+            # Local spouse market shares per state
+            state_spouse_tot = net_df.groupby(
+                ['STATEFIP', 'SPOUSE_HERITAGE']
+            )['PERWT'].sum().reset_index()
+            state_spouse_tot.columns = ['STATEFIP', 'SPOUSE', 'SPOUSE_TOTAL']
+            state_market = state_spouse_tot.groupby('STATEFIP')['SPOUSE_TOTAL'].sum().reset_index()
+            state_market.columns = ['STATEFIP', 'MARKET_TOTAL']
+            state_spouse_tot = state_spouse_tot.merge(state_market, on='STATEFIP')
+            state_spouse_tot['MARKET_SHARE'] = (
+                state_spouse_tot['SPOUSE_TOTAL'] / state_spouse_tot['MARKET_TOTAL']
+            )
+
+            # Merge and compute within-state affinities
+            merged = state_pairs.merge(state_parent_tot, on=['STATEFIP', 'PARENT'])
+            merged = merged.merge(
+                state_spouse_tot[['STATEFIP', 'SPOUSE', 'MARKET_SHARE']],
+                on=['STATEFIP', 'SPOUSE']
+            )
+
+            # Drop state-pair cells with tiny counts (prevents extreme ratios)
+            MIN_PAIR_COUNT = 500
+            merged = merged[merged['COUNT'] >= MIN_PAIR_COUNT]
+
+            merged['OBSERVED_RATE'] = merged['COUNT'] / merged['PARENT_TOTAL']
+            merged['AFFINITY'] = merged['OBSERVED_RATE'] / merged['MARKET_SHARE'].clip(lower=0.0001)
+
+            # Weighted average affinity across states
+            cross_group = merged[merged['PARENT'] != merged['SPOUSE']]
+            adjusted = cross_group.groupby(['PARENT', 'SPOUSE']).apply(
+                lambda g: np.average(g['AFFINITY'], weights=g['PARENT_TOTAL'])
+            ).reset_index()
+            adjusted.columns = ['SOURCE', 'TARGET', 'GEO_ADJUSTED_AFFINITY']
+
+            # Symmetrize — require BOTH directions to exist (prevents one-sided artifacts)
+            sym_results = []
+            seen = set()
+            for _, row in adjusted.iterrows():
+                pair = tuple(sorted([row['SOURCE'], row['TARGET']]))
+                if pair in seen:
+                    continue
+                seen.add(pair)
+                ab = adjusted[
+                    (adjusted['SOURCE'] == pair[0]) & (adjusted['TARGET'] == pair[1])
+                ]['GEO_ADJUSTED_AFFINITY'].values
+                ba = adjusted[
+                    (adjusted['SOURCE'] == pair[1]) & (adjusted['TARGET'] == pair[0])
+                ]['GEO_ADJUSTED_AFFINITY'].values
+                if len(ab) == 0 or len(ba) == 0:
+                    continue  # Skip one-directional pairs
+                avg = (ab[0] + ba[0]) / 2
+                sym_results.append({
+                    'SOURCE': pair[0], 'TARGET': pair[1],
+                    'GEO_ADJUSTED_AFFINITY': round(avg, 3)
+                })
+
+            if sym_results:
+                adj_aff_df = pd.DataFrame(sym_results)
+                adj_aff_df.to_csv(PROCESSED_DIR / "geo_adjusted_affinity.csv", index=False)
+                print(f"     Saved: geo_adjusted_affinity.csv ({len(adj_aff_df)} pairs)")
+            else:
+                print("     WARNING: No adjusted affinity pairs computed")
+        else:
+            print("     WARNING: Insufficient data for adjusted affinity computation")
+
+    else:
+        print("  3. Skipping geographic aggregation (no STATEFIP column in data)")
+
     # ==========================================================================
     # COMPUTE METADATA
     # ==========================================================================
 
-    print("  3. Computing metadata...")
+    print("  4. Computing metadata...")
 
     # Get valid origins (those with sufficient sample size)
     mother_counts = df.groupby('MOTHER_ORIGIN')['PERWT'].sum()
@@ -334,6 +542,10 @@ def main():
         'min_sample_size': MIN_SAMPLE_SIZE,
     }
 
+    if has_statefip and geo_results:
+        geographic_origins = sorted(geo_agg['ORIGIN_GROUP'].unique().tolist())
+        metadata['geographic_origins'] = geographic_origins
+
     with open(PROCESSED_DIR / "metadata.json", 'w') as f:
         json.dump(metadata, f, indent=2)
     print(f"     Saved: metadata.json")
@@ -355,6 +567,10 @@ def main():
     print(f"\nOutput files:")
     print(f"  marriage_agg.csv:       {marriage_size:,.0f} KB")
     print(f"  spouse_backgrounds.csv: {spouse_size:,.0f} KB")
+    if has_statefip and (PROCESSED_DIR / "geographic_agg.csv").exists():
+        geo_size = (PROCESSED_DIR / "geographic_agg.csv").stat().st_size / 1024
+        total_size += geo_size
+        print(f"  geographic_agg.csv:     {geo_size:,.0f} KB")
     print(f"  metadata.json:          {meta_size:,.1f} KB")
     print(f"  TOTAL:                  {total_size:,.0f} KB ({total_size/1024:.1f} MB)")
 

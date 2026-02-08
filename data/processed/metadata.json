@@ -52,5 +52,33 @@
     "Canada|Ireland",
     "Ireland|Scotland"
   ],
-  "min_sample_size": 20000
+  "min_sample_size": 20000,
+  "geographic_origins": [
+    "Austria",
+    "Belgium",
+    "Canada",
+    "Cuba",
+    "Czechoslovakia",
+    "Denmark",
+    "England",
+    "Finland",
+    "France",
+    "Germany",
+    "Hungary",
+    "Ireland",
+    "Italy",
+    "Japan",
+    "Lithuania",
+    "Mexico",
+    "Netherlands",
+    "Norway",
+    "Poland",
+    "Portugal",
+    "Romania",
+    "Russia/USSR",
+    "Scotland",
+    "Sweden",
+    "Switzerland",
+    "Wales"
+  ]
 }
