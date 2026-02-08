@@ -1567,19 +1567,9 @@ body {
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(12, 42, 48, 0.25);
     overflow: visible;
-    position: relative;
 }
 
-.filter-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #7dceda 0%, #bca45e 50%, #7dceda 100%);
-    border-radius: 16px 16px 0 0;
-}
+/* Accent stripe removed to avoid rectangular edge on rounded container */
 
 /* Anchor link navigation - full width bar */
 .anchor-nav {
@@ -2036,6 +2026,23 @@ html {
     margin-left: 0.5rem;
 }
 
+.section-header-prominent {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: linear-gradient(135deg, #194852 0%, #0c2a30 100%);
+    border-radius: 12px;
+}
+
+.section-header-prominent .section-title {
+    color: #ffffff;
+}
+
+.section-header-prominent .section-subtitle {
+    color: rgba(255,255,255,0.6);
+}
+
 /* Scrollable chart containers for mobile */
 .chart-scroll {
     overflow-x: auto;
@@ -2159,6 +2166,24 @@ html {
     margin-bottom: 0.3rem;
 }
 
+.welcome-stat-value-alt {
+    font-family: 'Neuton', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #bca45e;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
+.welcome-stat-value-neutral {
+    font-family: 'Neuton', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #7dceda;
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+
 .welcome-stat-label {
     font-size: 0.78rem;
     color: #78a0a3;
@@ -2228,7 +2253,9 @@ html {
     .welcome-stat-item {
         flex: 0 0 45%;
     }
-    .welcome-stat-value {
+    .welcome-stat-value,
+    .welcome-stat-value-alt,
+    .welcome-stat-value-neutral {
         font-size: 1.5rem;
     }
     .nav-cards {
@@ -2343,6 +2370,9 @@ app.layout = html.Div([
                     html.Div([
                         html.H1("Marriage and the Melting Pot, 1880-1930", className='main-title'),
                         html.P("Whom did the US-born children of immigrants marry?", className='subtitle'),
+                        html.P("Gil Guerra | Niskanen Center",
+                               style={'color': 'rgba(255,255,255,0.5)', 'fontSize': '0.8rem',
+                                      'margin': '0.3rem 0 0 0', 'fontWeight': '400'}),
                     ], className='header-text'),
                 ], className='header-bar'),
             ], className='header-section'),
@@ -2370,11 +2400,11 @@ app.layout = html.Div([
                         html.Div("married into a different recent-immigrant community", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                     html.Div([
-                        html.Div("48.9%", className='welcome-stat-value'),
+                        html.Div("48.9%", className='welcome-stat-value-alt'),
                         html.Div("married within their ethnic heritage", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                     html.Div([
-                        html.Div("19.1M", className='welcome-stat-value'),
+                        html.Div("19.1M", className='welcome-stat-value-neutral'),
                         html.Div("individuals in sample", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                 ], className='welcome-stats'),
@@ -2389,9 +2419,10 @@ app.layout = html.Div([
                     ], id='nav-card-compare', n_clicks=0,
                        className='nav-card nav-card-compare'),
                     html.Div([
-                        html.Div("How did geography impact immigrant assimilation?", className='nav-card-title'),
+                        html.Div("How did geography affect immigrant assimilation?", className='nav-card-title'),
                         html.P("See how local ethnic composition affected "
                                "intermarriage patterns.",
+
                                className='nav-card-desc'),
                     ], id='nav-card-geo', n_clicks=0,
                        className='nav-card nav-card-geo'),
@@ -2534,7 +2565,7 @@ app.layout = html.Div([
                 html.Div([
                     html.Span("Compare All Groups", className='section-title'),
                     html.Span("— cross-group patterns (independent of filter selections)", className='section-subtitle')
-                ], className='section-header'),
+                ], className='section-header-prominent'),
                 dbc.Tabs([
                     dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
                     dbc.Tab(label="Clustering Network", tab_id="tab-heatmap"),
@@ -3141,12 +3172,13 @@ def render_overview_tab_content(active_tab, year):
         geo_origins = sorted(geo_df['ORIGIN_GROUP'].unique().tolist())
         default_geo = 'Italy' if 'Italy' in geo_origins else geo_origins[0]
         return html.Div([
-            html.P("See how geography impacted marriage trends for various groups.",
+            html.P("See how geography affected marriage trends for various groups.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
-            # Chart 1: Scatter plot
+            # Chart 1: Scatter plot (static, all groups)
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(
-                           dcc.Graph(id='geo-scatter', figure=create_geo_scatter_chart(),
+                           dcc.Graph(id='geo-scatter',
+                                     figure=create_geo_scatter_chart(),
                                      config={'displayModeBar': True, 'scrollZoom': False}),
                            className='chart-scroll chart-scroll-medium')]),
             # Chart 2: Single group across states
@@ -4120,10 +4152,11 @@ def create_geo_scatter_chart():
         ))
 
         fig.add_annotation(
-            text=f"R² = {r_squared:.2f}",
+            text=f"R² = {r_squared:.2f} (all groups)",
             xref='paper', yref='paper', x=0.98, y=0.98,
-            showarrow=False, font=dict(size=14, color=COLORS['dark_teal'], family='Hanken Grotesk'),
-            bgcolor='rgba(255,255,255,0.8)', bordercolor=COLORS['light_gray'], borderwidth=1
+            showarrow=False, font=dict(size=12, color=COLORS['dark_teal'], family='Hanken Grotesk'),
+            bgcolor='rgba(255,255,255,0.9)', bordercolor=COLORS['light_gray'], borderwidth=1,
+            align='right'
         )
 
     fig.update_layout(
@@ -4248,23 +4281,24 @@ def create_geo_residuals_chart():
     fig.add_vline(x=0, line_width=1, line_color=COLORS['dark_teal'], opacity=0.5)
 
     fig.update_layout(
-        title=dict(text="Cultural vs. Geographic Effects on Outmarriage",
+        title=dict(text="Cultural vs. Geographic Effects on Outmarriage (All Groups)",
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Avg. Residual (pp above/below concentration-predicted rate)",
-        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
-                   title_font=dict(family='Hanken Grotesk', size=12)),
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
         height=max(400, len(group_resid) * 28 + 120),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=80, t=100),
+        margin=dict(r=80, t=100, b=100),
         annotations=[
-            dict(text="<b>Teal</b> = more outmarriage than concentration predicts (cultural openness)",
-                 xref='paper', yref='paper', x=0.5, y=-0.08, showarrow=False,
+            dict(text="<b>Teal</b> = more outmarriage than predicted by concentration \u00a0\u00a0\u00a0 ",
+                 xref='paper', yref='paper', x=0.35, y=-0.06, showarrow=False, xanchor='right',
                  font=dict(size=11, color=COLORS['medium_teal'], family='Hanken Grotesk')),
-            dict(text="<b>Gold</b> = less outmarriage than concentration predicts (cultural retention)",
-                 xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
+            dict(text="\u00a0\u00a0\u00a0 <b>Gold</b> = less outmarriage than predicted by concentration",
+                 xref='paper', yref='paper', x=0.35, y=-0.06, showarrow=False, xanchor='left',
                  font=dict(size=11, color=COLORS['gold'], family='Hanken Grotesk')),
+            dict(text="Independent of filter selections above \u2014 shows all groups pooled across census years.",
+                 xref='paper', yref='paper', x=0.5, y=-0.11, showarrow=False,
+                 font=dict(size=10, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
     )
     return fig
