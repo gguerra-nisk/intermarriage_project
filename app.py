@@ -2315,7 +2315,7 @@ app.layout = html.Div([
                     html.Blockquote([
                         "Guerra, Gil. ",
                         html.Em("Marriage and the Melting Pot, 1880-1930"),
-                        " [interactive dashboard]. Washington, DC: Niskanen Center, 2025. ",
+                        " [interactive dashboard]. Washington, DC: Niskanen Center, 2026. ",
                         html.A("https://www.niskanencenter.org/intermarriage-dashboard/", href="https://www.niskanencenter.org/intermarriage-dashboard/", target="_blank", style={'color': COLORS['medium_teal']})
                     ], style={
                         'borderLeft': f'3px solid {COLORS["gold"]}',
