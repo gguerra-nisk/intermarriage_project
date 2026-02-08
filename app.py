@@ -2310,8 +2310,8 @@ app.layout = html.Div([
                 # Topline stats
                 html.Div([
                     html.Div([
-                        html.Div("48.9%", className='welcome-stat-value'),
-                        html.Div("married within their ethnic heritage", className='welcome-stat-label'),
+                        html.Div("51.0%", className='welcome-stat-value'),
+                        html.Div("married outside their heritage", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                     html.Div([
                         html.Div("28.7%", className='welcome-stat-value'),
@@ -2319,7 +2319,11 @@ app.layout = html.Div([
                     ], className='welcome-stat-item'),
                     html.Div([
                         html.Div("22.3%", className='welcome-stat-value'),
-                        html.Div("married a different immigrant group", className='welcome-stat-label'),
+                        html.Div("married into a different recent-immigrant community", className='welcome-stat-label'),
+                    ], className='welcome-stat-item'),
+                    html.Div([
+                        html.Div("48.9%", className='welcome-stat-value'),
+                        html.Div("married within their ethnic heritage", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                     html.Div([
                         html.Div("19.1M", className='welcome-stat-value'),
@@ -2332,21 +2336,21 @@ app.layout = html.Div([
                     html.Div([
                         html.Div("How did groups compare?", className='nav-card-title'),
                         html.P("Compare outmarriage rates across 26 ethnic origins, "
-                               "with and without geographic adjustment",
+                               "with and without geographic adjustment.",
                                className='nav-card-desc'),
                     ], id='nav-card-compare', n_clicks=0,
                        className='nav-card nav-card-compare'),
                     html.Div([
-                        html.Div("Did geography explain it?", className='nav-card-title'),
-                        html.P("See whether local ethnic concentration drove "
-                               "intermarriage patterns",
+                        html.Div("How did geography impact immigrant assimilation?", className='nav-card-title'),
+                        html.P("See how local ethnic composition affected "
+                               "intermarriage patterns.",
                                className='nav-card-desc'),
                     ], id='nav-card-geo', n_clicks=0,
                        className='nav-card nav-card-geo'),
                     html.Div([
                         html.Div("Explore a specific group", className='nav-card-title'),
                         html.P("Select parental origins to see detailed marriage patterns, "
-                               "trends, and spouse backgrounds",
+                               "trends, and spouse backgrounds.",
                                className='nav-card-desc'),
                     ], id='nav-card-explore', n_clicks=0,
                        className='nav-card nav-card-explore'),
@@ -2943,7 +2947,7 @@ def render_overview_tab_content(active_tab, year):
                     options=[
                         {'label': 'Total Outmarriage Rate', 'value': 'total'},
                         {'label': 'Outmarriage to 3rd+ Gen Americans', 'value': 'american'},
-                        {'label': 'Outmarriage to Different Immigrant Groups', 'value': 'other_immigrant'},
+                        {'label': 'Outmarriage into Different Recent-Immigrant Communities', 'value': 'other_immigrant'},
                         {'label': 'Geography-Adjusted Rate', 'value': 'geo_adjusted',
                          'disabled': DATA.get('geographic') is None},
                     ],
@@ -3008,9 +3012,7 @@ def render_overview_tab_content(active_tab, year):
         geo_origins = sorted(geo_df['ORIGIN_GROUP'].unique().tolist())
         default_geo = 'Italy' if 'Italy' in geo_origins else geo_origins[0]
         return html.Div([
-            html.P("Does local ethnic concentration explain outmarriage rates? Groups that were geographically concentrated "
-                   "(like Italians in New York) had lower outmarriage — possibly reflecting marriage market opportunity rather "
-                   "than cultural preferences alone.",
+            html.P("See how geography impacted marriage trends for various groups.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             # Chart 1: Scatter plot
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
@@ -3297,14 +3299,14 @@ def create_outmarriage_chart(year, sort_by='total'):
                        range=[0, max(values) * 1.15 if values else 100], fixedrange=True),
             yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
             dragmode=False,
-            height=max(400, len(items) * 28 + 100),
+            height=max(400, len(items) * 28 + 140),
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            margin=dict(r=60, t=100, b=70),
+            margin=dict(r=60, t=100, b=100),
             annotations=[
                 dict(text="Removes effect of geographic concentration · "
                           "<b>Teal</b> = outmarried more than concentration predicts · "
                           "<b>Gold</b> = less",
-                     xref='paper', yref='paper', x=0.5, y=-0.06, showarrow=False,
+                     xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
                      font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
             ]
         )
@@ -3327,8 +3329,8 @@ def create_outmarriage_chart(year, sort_by='total'):
         value_key = 'third_gen_rate'
     elif sort_by == 'other_immigrant':
         ranking.sort(key=lambda x: x['diff_origin_rate'], reverse=True)
-        title = "Outmarriage Rates: Into Other Immigrant Groups"
-        xaxis_title = "Outmarriage to Different Immigrant Groups (%)"
+        title = "Outmarriage Rates: Into Different Recent-Immigrant Communities"
+        xaxis_title = "Outmarriage into Different Recent-Immigrant Communities (%)"
         value_key = 'diff_origin_rate'
     else:  # total
         ranking.sort(key=lambda x: x['integration_rate'], reverse=True)
@@ -3350,7 +3352,7 @@ def create_outmarriage_chart(year, sort_by='total'):
             f"<b>{r['demonym']}-Americans</b><br>"
             f"Total outmarriage: {r['integration_rate']:.1f}%<br>"
             f"  To 3rd+ gen Americans: {r['third_gen_rate']:.1f}%<br>"
-            f"  To other immigrant groups: {r['diff_origin_rate']:.1f}%<br>"
+            f"  Into different recent-immigrant communities: {r['diff_origin_rate']:.1f}%<br>"
             f"Population: {r['population']:,.0f}"
         )
 
@@ -3653,12 +3655,12 @@ def create_avoidance_chart():
                    ticktext=['1.0x<br>(expected)', '0.75x', '0.50x', '0.25x', '0.0x']),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
-        height=max(400, len(avoided) * 28 + 120),
+        height=max(400, len(avoided) * 28 + 160),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100, b=60),
+        margin=dict(r=60, t=100, b=100),
         annotations=[
             dict(text="Groups that shared the same states but rarely intermarried — suggesting cultural boundaries",
-                 xref='paper', yref='paper', x=0.5, y=-0.06, showarrow=False,
+                 xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
                  font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
     )
@@ -3725,12 +3727,12 @@ def create_attraction_chart():
                    title_font=dict(family='Hanken Grotesk', size=12)),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
-        height=max(400, len(attracted) * 28 + 120),
+        height=max(400, len(attracted) * 28 + 160),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100, b=60),
+        margin=dict(r=60, t=100, b=100),
         annotations=[
             dict(text="Groups that married each other more than local population shares predict — genuine cultural affinity",
-                 xref='paper', yref='paper', x=0.5, y=-0.06, showarrow=False,
+                 xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
                  font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
     )
