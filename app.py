@@ -1941,11 +1941,11 @@ html {
     -webkit-overflow-scrolling: touch;
 }
 
-.chart-scroll-wide > .js-plotly-plot {
+.chart-scroll-wide .js-plotly-plot {
     min-width: 800px;
 }
 
-.chart-scroll-medium > .js-plotly-plot {
+.chart-scroll-medium .js-plotly-plot {
     min-width: 600px;
 }
 
