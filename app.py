@@ -2606,13 +2606,13 @@ def render_tab_content(active_tab, mother, father, year):
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='main-chart', figure=create_main_chart(mother, father, year),
-                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-wide')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-wide')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-trends':
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='time-chart', figure=create_time_chart(mother, father),
-                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-spouse-gen':
         return html.Div([
@@ -2621,7 +2621,7 @@ def render_tab_content(active_tab, mother, father, year):
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='spouse-gen-chart', figure=create_spouse_gen_chart(mother, father, year),
-                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')])
         ], style={'padding': '1rem'})
     return html.Div()
 
@@ -2658,7 +2658,7 @@ def render_overview_tab_content(active_tab, year):
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='heatmap-chart', figure=create_heatmap_chart(year),
-                                          config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')])
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-single-origin':
         available_origins = get_available_origins_for_overview()
@@ -2687,7 +2687,7 @@ def render_overview_tab_content(active_tab, year):
 def update_outmarriage_chart(sort_by, year):
     """Update the outmarriage rates chart based on sorting selection."""
     return html.Div(dcc.Graph(id='outmarriage-chart', figure=create_outmarriage_chart(year, sort_by),
-                     config={'displayModeBar': True}), className='chart-scroll chart-scroll-medium')
+                     config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')
 
 
 @callback(Output('single-origin-chart-container', 'children'),
@@ -2697,7 +2697,7 @@ def update_single_origin_chart(origin, year):
     if not origin:
         return html.P("Please select an origin", style={'color': COLORS['muted_teal']})
     return html.Div(dcc.Graph(id='single-origin-chart', figure=create_single_origin_chart(origin, year),
-                     config={'displayModeBar': True}), className='chart-scroll chart-scroll-wide')
+                     config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-wide')
 
 
 def create_main_chart(mother, father, year):
@@ -2743,8 +2743,9 @@ def create_main_chart(mother, father, year):
     fig.update_layout(
         title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0, xanchor='left'),
         xaxis_title="Weighted Count",
-        xaxis=dict(title_font=dict(family='Hanken Grotesk', size=12), gridcolor=COLORS['light_gray']),
-        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11)),
+        xaxis=dict(title_font=dict(family='Hanken Grotesk', size=12), gridcolor=COLORS['light_gray'], fixedrange=True),
+        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True),
+        dragmode=False,
         height=max(400, len(agg) * 45 + 120),
         margin=dict(l=320, r=80, t=100, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
@@ -2802,8 +2803,9 @@ def create_time_chart(mother, father):
     fig.update_layout(
         title=dict(text="Trends Over Time", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Census Year", yaxis_title="% of Marriages",
-        xaxis=dict(gridcolor=COLORS['light_gray'], dtick=10),
-        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(yearly_agg['Percent'].max() * 1.15, 50)]),
+        xaxis=dict(gridcolor=COLORS['light_gray'], dtick=10, fixedrange=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(yearly_agg['Percent'].max() * 1.15, 50)], fixedrange=True),
+        dragmode=False,
         height=480, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(t=120),
         legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
@@ -2870,8 +2872,9 @@ def create_outmarriage_chart(year, sort_by='total'):
     fig.update_layout(
         title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title=xaxis_title,
-        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(values) * 1.15 if values else 100]),
-        yaxis=dict(gridcolor=COLORS['light_gray']),
+        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(values) * 1.15 if values else 100], fixedrange=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True),
+        dragmode=False,
         height=max(400, len(ranking) * 28 + 100),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=150, r=60, t=100)
@@ -2912,8 +2915,9 @@ def create_spouse_gen_chart(mother, father, year):
     fig.update_layout(
         title=dict(text="Spouse Generation Distribution", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         yaxis_title="% of Spouses",
-        xaxis=dict(gridcolor=COLORS['light_gray']),
-        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(percentages) * 1.2 if percentages else 100]),
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(percentages) * 1.2 if percentages else 100], fixedrange=True),
+        dragmode=False,
         height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
@@ -3070,8 +3074,9 @@ def create_heatmap_chart(year):
         ),
         showlegend=False,
         hovermode='closest',
-        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False),
-        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False),
+        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
+        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
+        dragmode=False,
         height=550,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
@@ -3120,8 +3125,9 @@ def create_scatter_chart(year):
         title=dict(text="Population Size vs Ethnic Retention", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Population (Same-Origin Parents)",
         yaxis_title="Same-Origin Marriage Rate (%)",
-        xaxis=dict(type='log', gridcolor=COLORS['light_gray']),
-        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 100]),
+        xaxis=dict(type='log', gridcolor=COLORS['light_gray'], fixedrange=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 100], fixedrange=True),
+        dragmode=False,
         height=500, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         showlegend=False
     )
@@ -3178,9 +3184,9 @@ def create_single_origin_chart(origin, year):
         title=dict(text=f"Marriage Patterns: Most Common {dem} Parent Combinations",
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Percentage (categories sum to 100%)",
-        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 105], ticksuffix='%'),
-        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11)),
-        barmode='stack',
+        xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 105], ticksuffix='%', fixedrange=True),
+        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True),
+        barmode='stack', dragmode=False,
         height=max(400, len(df) * 45 + 120),
         margin=dict(l=220, r=60, t=120, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
