@@ -1942,11 +1942,11 @@ html {
 }
 
 .chart-scroll-wide > .js-plotly-plot {
-    min-width: 700px;
+    min-width: 800px;
 }
 
 .chart-scroll-medium > .js-plotly-plot {
-    min-width: 550px;
+    min-width: 600px;
 }
 
 /* Loading Animation Enhancement */
@@ -2746,7 +2746,7 @@ def create_main_chart(mother, father, year):
         xaxis=dict(title_font=dict(family='Hanken Grotesk', size=12), gridcolor=COLORS['light_gray']),
         yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11)),
         height=max(400, len(agg) * 45 + 120),
-        margin=dict(l=320, r=80, t=80, b=60),
+        margin=dict(l=320, r=80, t=100, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         annotations=[dict(text=sample_note, xref='paper', yref='paper', x=1, y=-0.08, showarrow=False,
                          font=dict(family='Hanken Grotesk', size=11, color=COLORS['muted_teal']))]
@@ -2805,7 +2805,8 @@ def create_time_chart(mother, father):
         xaxis=dict(gridcolor=COLORS['light_gray'], dtick=10),
         yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(yearly_agg['Percent'].max() * 1.15, 50)]),
         height=480, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='center', x=0.5)
+        margin=dict(t=120),
+        legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
     )
     return fig
 
@@ -2873,7 +2874,7 @@ def create_outmarriage_chart(year, sort_by='total'):
         yaxis=dict(gridcolor=COLORS['light_gray']),
         height=max(400, len(ranking) * 28 + 100),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=150, r=60)
+        margin=dict(l=150, r=60, t=100)
     )
     return fig
 
@@ -3074,7 +3075,7 @@ def create_heatmap_chart(year):
         height=550,
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=40, t=80, b=50),
+        margin=dict(l=40, r=40, t=100, b=50),
         annotations=all_annotations
     )
     return fig
@@ -3181,9 +3182,9 @@ def create_single_origin_chart(origin, year):
         yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11)),
         barmode='stack',
         height=max(400, len(df) * 45 + 120),
-        margin=dict(l=220, r=60, t=80, b=60),
+        margin=dict(l=220, r=60, t=120, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='center', x=0.5)
+        legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
     )
     return fig
 
