@@ -16,7 +16,7 @@ import os
 from scipy.spatial.distance import pdist, squareform
 
 import dash
-from dash import dcc, html, callback, Input, Output, State, ctx, no_update
+from dash import dcc, html, callback, Input, Output, State, ctx, no_update, ALL
 import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
@@ -1566,7 +1566,8 @@ body {
     padding: 1.25rem 1.5rem 1rem 1.5rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 8px 32px rgba(12, 42, 48, 0.25);
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
 }
 
 .filter-section::before {
@@ -1577,6 +1578,7 @@ body {
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, #7dceda 0%, #bca45e 50%, #7dceda 100%);
+    border-radius: 16px 16px 0 0;
 }
 
 /* Anchor link navigation - full width bar */
@@ -2233,6 +2235,52 @@ html {
         flex-direction: column;
     }
 }
+
+/* Methodology collapsible blocks */
+.methodology-toggle {
+    background: none;
+    border: 1px solid rgba(12, 42, 48, 0.15);
+    color: #78a0a3;
+    font-family: 'Hanken Grotesk', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 0.75rem;
+}
+
+.methodology-toggle:hover {
+    background: rgba(125, 206, 218, 0.1);
+    border-color: #7dceda;
+    color: #348397;
+}
+
+.methodology-content {
+    background: linear-gradient(135deg, rgba(25, 72, 82, 0.03) 0%, rgba(52, 131, 151, 0.05) 100%);
+    border-left: 3px solid #7dceda;
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: #194852;
+}
+
+.methodology-content p {
+    margin-bottom: 0.5rem;
+}
+
+.methodology-content p:last-child {
+    margin-bottom: 0;
+}
+
+.methodology-content strong {
+    color: #194852;
+}
 """
 
 # =============================================================================
@@ -2654,6 +2702,58 @@ app.clientside_callback(
 )
 
 # =============================================================================
+# METHODOLOGY BLOCK HELPER
+# =============================================================================
+
+def _methodology_block(chart_id, paragraphs):
+    """Return a collapsible 'Detailed Methodology' block for a chart.
+
+    Parameters
+    ----------
+    chart_id : str
+        Unique identifier for this chart's methodology toggle.
+    paragraphs : list[str]
+        List of paragraph strings to display when expanded.
+    """
+    return html.Div([
+        html.Button(
+            "Detailed Methodology",
+            id={'type': 'methodology-btn', 'index': chart_id},
+            n_clicks=0,
+            className='methodology-toggle',
+        ),
+        dbc.Collapse(
+            html.Div(
+                [html.P(p) for p in paragraphs],
+                className='methodology-content',
+            ),
+            id={'type': 'methodology-collapse', 'index': chart_id},
+            is_open=False,
+        ),
+    ])
+
+
+@callback(
+    Output({'type': 'methodology-collapse', 'index': ALL}, 'is_open'),
+    Input({'type': 'methodology-btn', 'index': ALL}, 'n_clicks'),
+    State({'type': 'methodology-collapse', 'index': ALL}, 'is_open'),
+    prevent_initial_call=True,
+)
+def toggle_methodology(n_clicks_list, is_open_list):
+    """Toggle whichever methodology block was clicked."""
+    triggered = ctx.triggered_id
+    if triggered is None:
+        return [no_update] * len(is_open_list)
+    results = []
+    for i, btn_id in enumerate(ctx.inputs_list[0]):
+        if btn_id['id']['index'] == triggered['index']:
+            results.append(not is_open_list[i])
+        else:
+            results.append(no_update)
+    return results
+
+
+# =============================================================================
 # NARRATIVE SNAPSHOT HELPER
 # =============================================================================
 
@@ -2912,13 +3012,23 @@ def render_tab_content(active_tab, mother, father, year):
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='main-chart', figure=create_main_chart(mother, father, year),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-wide')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-wide')]),
+            _methodology_block('main-chart', [
+                "This chart shows the marriage patterns of second-generation Americans (U.S.-born individuals with at least one immigrant parent) based on the selected parental origins and census year.",
+                "Each bar represents a marriage outcome category. \"Same origin\" means the spouse shares the subject's parental heritage (e.g., a child of Irish parents married to an Irish immigrant or another child of Irish parents). \"3rd+ gen American\" means the spouse's parents were both U.S.-born. \"Different origin\" means the spouse has a different immigrant background.",
+                "Percentages are computed from weighted census microdata (IPUMS USA). Person weights (PERWT) are applied to produce population-representative estimates. Spouse information comes from IPUMS's \"Attach Characteristics\" feature, which links married individuals to their co-resident spouse's birthplace and parental birthplace data.",
+            ]),
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-trends':
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='time-chart', figure=create_time_chart(mother, father),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')]),
+            _methodology_block('trends-chart', [
+                "This chart tracks how marriage patterns changed across census years (1880, 1900, 1910, 1920, 1930) for the selected parental origins.",
+                "Each line shows the percentage of second-generation Americans who married a particular category of spouse. The data is cross-sectional: each census year captures everyone currently married at that time, not new marriages formed that year.",
+                "Caution: individuals who remained married across multiple census years may appear in more than one cross-section. Historical census microdata lacks longitudinal identifiers, so individual-level deduplication is not possible. Trends should be interpreted as shifts in the stock of existing marriages, not strictly as changes in marriage formation behavior.",
+            ]),
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-spouse-gen':
         return html.Div([
@@ -2927,7 +3037,12 @@ def render_tab_content(active_tab, mother, father, year):
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='spouse-gen-chart', figure=create_spouse_gen_chart(mother, father, year),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')])
+                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')]),
+            _methodology_block('spouse-gen-chart', [
+                "This chart breaks down spouses by their immigrant generation. \"1st generation\" spouses were themselves born outside the U.S. \"2nd generation\" spouses were U.S.-born with at least one foreign-born parent. \"3rd+ generation\" spouses had both parents born in the U.S.",
+                "Generation is determined from the spouse's birthplace (BPL_SP) and the spouse's parents' birthplaces (FBPL_SP, MBPL_SP) as recorded in the census. A spouse is classified as 2nd generation if either parent was foreign-born, and 3rd+ generation only if both parents were U.S.-born.",
+                "This classification means \"3rd+ generation\" is a residual category\u2014it includes anyone whose immigrant ancestry cannot be traced through parental birthplace, regardless of how many generations their family has been in the U.S.",
+            ]),
         ], style={'padding': '1rem'})
     return html.Div()
 
@@ -2957,7 +3072,12 @@ def render_overview_tab_content(active_tab, year):
                 ),
             ], style={'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[html.Div(id='outmarriage-chart-container')])
+                       children=[html.Div(id='outmarriage-chart-container')]),
+            _methodology_block('outmarriage', [
+                "Outmarriage rate measures the percentage of second-generation Americans (with same-origin parents) who married someone outside their own ethnic group. Only groups with at least 20,000 weighted individuals are included.",
+                "\"Total outmarriage\" combines marriages to 3rd+ generation Americans and marriages into different recent-immigrant communities. \"3rd+ gen American\" counts spouses whose parents were both U.S.-born. \"Different recent-immigrant communities\" counts spouses from a different immigrant heritage.",
+                "The \"Geography-Adjusted Rate\" removes the effect of geographic concentration. It fits a regression of outmarriage rate on local ethnic concentration across states, computes each group's average residual, and adds it to the overall mean. This shows which groups outmarried more or less than their geographic circumstances would predict. Groups colored teal outmarried more than concentration predicts; gold outmarried less.",
+            ]),
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-heatmap':
         has_adjusted = DATA.get('geo_adjusted_affinity') is not None
@@ -2981,7 +3101,12 @@ def render_overview_tab_content(active_tab, year):
                 ),
             ], style={'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[html.Div(id='network-chart-container')])
+                       children=[html.Div(id='network-chart-container')]),
+            _methodology_block('clustering', [
+                "This network diagram shows which ethnic groups intermarried at rates higher than random chance would predict. Each node is an ethnic group (sized by population). An edge connects two groups whose intermarriage rate exceeds what population shares alone would predict (affinity > 1.0x). Thicker edges indicate stronger affinities.",
+                "Affinity is calculated as: (observed intermarriage rate) / (expected rate based on population shares). An affinity of 2.0x means two groups intermarried at twice the rate you'd expect given their relative population sizes. The layout uses a force-directed algorithm where groups with stronger affinities are pulled closer together.",
+                "The \"Geography-Adjusted\" view removes the effect of geographic co-location. Instead of using national population shares, it computes expected intermarriage rates using each group's share within each state, then averages across states. This reveals affinities that persist even after accounting for the fact that some groups lived in the same places. The attraction and avoidance bar charts show the strongest and weakest adjusted pairings. Pairs require at least 500 weighted observations per state-level cell and must appear in both directions to be included.",
+            ]),
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-single-origin':
         available_origins = get_available_origins_for_overview()
@@ -3000,7 +3125,11 @@ def render_overview_tab_content(active_tab, year):
                 ),
             ], style={'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
-                       children=[html.Div(id='single-origin-chart-container')])
+                       children=[html.Div(id='single-origin-chart-container')]),
+            _methodology_block('single-origin', [
+                "This chart compares marriage patterns for different parental origin combinations involving the selected heritage. For example, selecting \"Ireland\" shows children of Irish-Irish parents alongside children of Irish-German parents, Irish-English parents, etc.",
+                "Each row shows the marriage outcome breakdown for that parental combination: what percentage married within heritage, married a 3rd+ generation American, or married into a different immigrant community. Only the most common parental combinations are shown (those with sufficient sample sizes). US-born parents are excluded to focus on immigrant-origin combinations.",
+            ]),
         ], style={'padding': '1rem'})
     elif active_tab == 'tab-geographic':
         geo_df = get_geographic_data()
@@ -3041,6 +3170,11 @@ def render_overview_tab_content(active_tab, year):
                            dcc.Graph(id='geo-residuals', figure=create_geo_residuals_chart(),
                                      config={'displayModeBar': True, 'scrollZoom': False}),
                            className='chart-scroll chart-scroll-medium')]),
+            _methodology_block('geographic', [
+                "Scatter plot: Each dot represents one ethnic group in one state. The x-axis shows the group's share of that state's second-generation immigrant population (log scale); the y-axis shows their outmarriage rate. The trend line is an OLS regression of outmarriage rate on log\u2081\u2080(concentration). R\u00b2 indicates how much of the variation in outmarriage is explained by concentration alone. All census years are pooled for statistical power.",
+                "State breakdown: For the selected ethnic group, shows their outmarriage rate in each state where at least 5,000 weighted individuals are present. The annotation on each bar shows the group's local concentration (share of the state's second-generation population).",
+                "Residuals chart: For each ethnic group, computes the difference between their actual average outmarriage rate and what the concentration regression predicts. Positive residuals (teal) indicate groups that outmarried more than their geographic circumstances would predict\u2014suggesting cultural openness. Negative residuals (gold) indicate groups that outmarried less\u2014suggesting cultural insularity beyond what geography explains. Residuals are weighted by state-level sample size.",
+            ]),
         ], style={'padding': '1rem'})
     return html.Div()
 
@@ -3222,6 +3356,14 @@ def _compute_geo_adjusted_rates():
     geo_df = get_geographic_data()
     if geo_df is None or len(geo_df) == 0:
         return None
+
+    # Only include groups that appear in the main dashboard (valid_origins),
+    # excluding US-born. This prevents groups like Cuba/Japan (which pass the
+    # lower geographic threshold but not the main 20k threshold) from appearing.
+    valid = set(DATA.get('metadata', {}).get('valid_origins', []))
+    valid.discard('US-born')
+    if valid:
+        geo_df = geo_df[geo_df['ORIGIN_GROUP'].isin(valid)]
 
     x_all = geo_df['GROUP_SHARE_PCT'].values
     y_all = geo_df['OUTMARRIAGE_RATE'].values
@@ -3655,12 +3797,12 @@ def create_avoidance_chart():
                    ticktext=['1.0x<br>(expected)', '0.75x', '0.50x', '0.25x', '0.0x']),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
-        height=max(400, len(avoided) * 28 + 160),
+        height=max(400, len(avoided) * 28 + 180),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100, b=100),
+        margin=dict(r=60, t=100, b=120),
         annotations=[
-            dict(text="Groups that shared the same states but rarely intermarried — suggesting cultural boundaries",
-                 xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
+            dict(text="Shared the same states but rarely intermarried — cultural boundaries.",
+                 xref='paper', yref='paper', x=0.5, y=-0.18, showarrow=False,
                  font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
     )
@@ -3727,12 +3869,12 @@ def create_attraction_chart():
                    title_font=dict(family='Hanken Grotesk', size=12)),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
-        height=max(400, len(attracted) * 28 + 160),
+        height=max(400, len(attracted) * 28 + 180),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100, b=100),
+        margin=dict(r=60, t=100, b=120),
         annotations=[
-            dict(text="Groups that married each other more than local population shares predict — genuine cultural affinity",
-                 xref='paper', yref='paper', x=0.5, y=-0.12, showarrow=False,
+            dict(text="Married more than local shares predict — genuine cultural affinity.",
+                 xref='paper', yref='paper', x=0.5, y=-0.18, showarrow=False,
                  font=dict(size=11, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
     )
