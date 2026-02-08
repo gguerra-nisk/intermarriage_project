@@ -67,6 +67,21 @@ MARRIAGE_COLORS = {
     'Married 3rd+ gen American': COLORS['light_teal'],
 }
 
+# Shorter display labels for chart y-axes
+MARRIAGE_DISPLAY_LABELS = {
+    'Married same origin (1st gen immigrant)': 'Same origin (1st gen)',
+    'Married same origin (2nd gen)': 'Same origin (2nd gen)',
+    "Married mother's origin (1st gen immigrant)": "Mother's origin (1st gen)",
+    "Married mother's origin (2nd gen)": "Mother's origin (2nd gen)",
+    "Married father's origin (1st gen immigrant)": "Father's origin (1st gen)",
+    "Married father's origin (2nd gen)": "Father's origin (2nd gen)",
+    'Married someone sharing both heritages (1st gen immigrant)': 'Both heritages (1st gen)',
+    'Married someone sharing both heritages (2nd gen)': 'Both heritages (2nd gen)',
+    'Married different origin (1st gen immigrant)': 'Different origin (1st gen)',
+    'Married different origin (2nd gen)': 'Different origin (2nd gen)',
+    'Married 3rd+ gen American': '3rd+ gen American',
+}
+
 CATEGORY_COLORS = {
     '3rd+ gen American': COLORS['light_teal'],
     'Same origin': COLORS['dark_teal'],
@@ -1942,11 +1957,11 @@ html {
 }
 
 .chart-scroll-wide .js-plotly-plot {
-    min-width: 800px;
+    min-width: 540px;
 }
 
 .chart-scroll-medium .js-plotly-plot {
-    min-width: 600px;
+    min-width: 480px;
 }
 
 /* Loading Animation Enhancement */
@@ -2715,9 +2730,10 @@ def create_main_chart(mother, father, year):
     agg['Percent'] = (agg['WEIGHTED_COUNT'] / total * 100).round(1)
     agg['Label'] = agg['Percent'].apply(lambda x: f"{x:.1f}%")
     agg['Color'] = agg['MARRIAGE_TYPE'].map(MARRIAGE_COLORS).fillna(COLORS['muted_teal'])
+    agg['DisplayLabel'] = agg['MARRIAGE_TYPE'].map(MARRIAGE_DISPLAY_LABELS).fillna(agg['MARRIAGE_TYPE'])
 
     fig = go.Figure(go.Bar(
-        x=agg['WEIGHTED_COUNT'], y=agg['MARRIAGE_TYPE'], orientation='h',
+        x=agg['WEIGHTED_COUNT'], y=agg['DisplayLabel'], orientation='h',
         marker_color=agg['Color'], text=agg['Label'], textposition='outside',
         textfont=dict(family='Hanken Grotesk', size=12, color=COLORS['dark_teal']),
         hovertemplate='<b>%{y}</b><br>Count: %{x:,.0f}<br>Percent: %{text}<extra></extra>'
@@ -2744,10 +2760,10 @@ def create_main_chart(mother, father, year):
         title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0, xanchor='left'),
         xaxis_title="Weighted Count",
         xaxis=dict(title_font=dict(family='Hanken Grotesk', size=12), gridcolor=COLORS['light_gray'], fixedrange=True),
-        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True),
+        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True, automargin=True),
         dragmode=False,
         height=max(400, len(agg) * 45 + 120),
-        margin=dict(l=320, r=80, t=100, b=60),
+        margin=dict(r=80, t=100, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         annotations=[dict(text=sample_note, xref='paper', yref='paper', x=1, y=-0.08, showarrow=False,
                          font=dict(family='Hanken Grotesk', size=11, color=COLORS['muted_teal']))]
@@ -2873,11 +2889,11 @@ def create_outmarriage_chart(year, sort_by='total'):
         title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title=xaxis_title,
         xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(values) * 1.15 if values else 100], fixedrange=True),
-        yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
         dragmode=False,
         height=max(400, len(ranking) * 28 + 100),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=150, r=60, t=100)
+        margin=dict(r=60, t=100)
     )
     return fig
 
@@ -3185,10 +3201,10 @@ def create_single_origin_chart(origin, year):
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Percentage (categories sum to 100%)",
         xaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 105], ticksuffix='%', fixedrange=True),
-        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True),
+        yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True, automargin=True),
         barmode='stack', dragmode=False,
         height=max(400, len(df) * 45 + 120),
-        margin=dict(l=220, r=60, t=120, b=60),
+        margin=dict(r=60, t=120, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
     )
