@@ -2823,8 +2823,8 @@ def create_time_chart(mother, father):
         yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(yearly_agg['Percent'].max() * 1.15, 50)], fixedrange=True),
         dragmode=False,
         height=480, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(t=120),
-        legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
+        margin=dict(t=80),
+        legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
     return fig
 
@@ -3204,9 +3204,9 @@ def create_single_origin_chart(origin, year):
         yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True, automargin=True),
         barmode='stack', dragmode=False,
         height=max(400, len(df) * 45 + 120),
-        margin=dict(r=60, t=120, b=60),
+        margin=dict(r=60, t=80, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
+        legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
     return fig
 
