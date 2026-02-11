@@ -4118,19 +4118,20 @@ def create_geo_scatter_chart():
         )
 
     fig.update_layout(
-        title=dict(text="Ethnic Concentration vs. Outmarriage Rate",
-                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
+        title=dict(text="Concentration vs. Outmarriage",
+                   font=dict(family='Neuton', size=20, color=COLORS['dark_teal']), x=0),
         xaxis_title="Group's Share of State's 2nd-Gen Population (%)",
         yaxis_title="Outmarriage Rate (%)",
         xaxis=dict(type='log', gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
-                   title_font=dict(family='Hanken Grotesk', size=12)),
+                   title_font=dict(family='Hanken Grotesk', size=11)),
         yaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
-                   title_font=dict(family='Hanken Grotesk', size=12)),
+                   title_font=dict(family='Hanken Grotesk', size=11)),
         dragmode=False,
         height=550,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        legend=dict(font=dict(size=10), itemsizing='constant'),
-        margin=dict(l=10, t=80, r=20)
+        legend=dict(font=dict(size=9), itemsizing='constant', orientation='h',
+                    yanchor='top', y=-0.15, xanchor='center', x=0.5),
+        margin=dict(l=10, t=70, r=10, b=80)
     )
     return fig
 
@@ -4194,7 +4195,7 @@ def create_geo_group_chart(origin):
         fig.add_annotation(
             x=row['OUTMARRIAGE_RATE'] + 1.5,
             y=row['STATE_NAME'],
-            text=f"{row['OUTMARRIAGE_RATE']:.0f}%  (conc: {row['GROUP_SHARE_PCT']:.1f}%)",
+            text=f"{row['OUTMARRIAGE_RATE']:.0f}% ({row['GROUP_SHARE_PCT']:.1f}%)",
             showarrow=False, xanchor='left',
             font=dict(family='Hanken Grotesk', size=10, color=COLORS['dark_teal'])
         )
@@ -4202,17 +4203,17 @@ def create_geo_group_chart(origin):
     fig.update_layout(
         barmode='stack',
         title=dict(text=f"{demonym}-Americans: Outmarriage by State",
-                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Outmarriage Rate (%)",
+                   font=dict(family='Neuton', size=20, color=COLORS['dark_teal']), x=0),
+        xaxis_title="Outmarriage Rate (%) — values outside bars: total (concentration)",
         xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True,
                    range=[0, min(odf['OUTMARRIAGE_RATE'].max() * 1.3, 110)],
                    ticksuffix='%',
-                   title_font=dict(family='Hanken Grotesk', size=12)),
+                   title_font=dict(family='Hanken Grotesk', size=10)),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
         height=max(400, len(odf) * 28 + 140),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=10, r=120, t=80, b=80),
+        margin=dict(l=10, r=90, t=70, b=80),
         legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
     return fig
@@ -4277,23 +4278,22 @@ def create_geo_residuals_chart():
     fig.add_vline(x=0, line_width=1, line_color=COLORS['dark_teal'], opacity=0.5)
 
     fig.update_layout(
-        title=dict(text="Beyond Geography: Outmarriage Above or Below Predicted (All Groups)",
-                   font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
+        title=dict(text="Beyond Geography: Above or Below Predicted",
+                   font=dict(family='Neuton', size=20, color=COLORS['dark_teal']), x=0),
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True,
+                   title=dict(text="Percentage points above/below predicted",
+                              font=dict(family='Hanken Grotesk', size=11))),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
         height=max(400, len(group_resid) * 28 + 120),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=10, r=80, t=80, b=100),
+        margin=dict(l=10, r=20, t=70, b=90),
         annotations=[
-            dict(text="<b>Teal</b> = more outmarriage than predicted by concentration \u00a0\u00a0\u00a0 ",
-                 xref='paper', yref='paper', x=0.35, y=-0.06, showarrow=False, xanchor='right',
-                 font=dict(size=11, color=COLORS['medium_teal'], family='Hanken Grotesk')),
-            dict(text="\u00a0\u00a0\u00a0 <b>Gold</b> = less outmarriage than predicted by concentration",
-                 xref='paper', yref='paper', x=0.35, y=-0.06, showarrow=False, xanchor='left',
-                 font=dict(size=11, color=COLORS['gold'], family='Hanken Grotesk')),
-            dict(text="Independent of filter selections above \u2014 shows all groups pooled across census years.",
-                 xref='paper', yref='paper', x=0.5, y=-0.11, showarrow=False,
+            dict(text="<b>Teal</b> = more than predicted \u00a0|\u00a0 <b>Gold</b> = less than predicted",
+                 xref='paper', yref='paper', x=0.5, y=-0.08, showarrow=False, xanchor='center',
+                 font=dict(size=10, color=COLORS['muted_teal'], family='Hanken Grotesk')),
+            dict(text="All groups pooled across census years \u2014 independent of filter selections.",
+                 xref='paper', yref='paper', x=0.5, y=-0.13, showarrow=False, xanchor='center',
                  font=dict(size=10, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
     )
