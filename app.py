@@ -2254,11 +2254,20 @@ app.index_string = f'''
             (function() {{
                 var lastHeight = 0;
                 var pending = null;
+                var isIframe = window !== window.parent;
+
+                // When embedded in an iframe, remove min-height: 100vh from body.
+                // Otherwise 100vh = iframe height, creating a circular dependency
+                // that prevents the iframe from shrinking on content collapse.
+                if (isIframe) {{
+                    document.documentElement.style.minHeight = '0';
+                    document.body.style.minHeight = '0';
+                }}
 
                 function measureHeight() {{
-                    // Get the actual bottom of rendered content by checking
-                    // the Dash app container's bounding rect
-                    var app = document.getElementById('react-entry-point');
+                    // Measure the actual Dash app content container
+                    var app = document.getElementById('_dash-app-content');
+                    if (!app) app = document.getElementById('react-entry-point');
                     if (app) {{
                         var rect = app.getBoundingClientRect();
                         return Math.ceil(rect.top + window.scrollY + rect.height);
