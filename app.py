@@ -4170,8 +4170,8 @@ def create_geo_scatter_chart():
         height=550,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         legend=dict(font=dict(size=9), itemsizing='constant', orientation='h',
-                    yanchor='top', y=-0.15, xanchor='center', x=0.5),
-        margin=dict(l=10, t=70, r=10, b=80)
+                    yanchor='top', y=-0.25, xanchor='center', x=0.5),
+        margin=dict(l=10, t=70, r=10, b=120)
     )
     return fig
 
