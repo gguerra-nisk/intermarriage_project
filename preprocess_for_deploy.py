@@ -9,6 +9,7 @@ Output files (in data/processed/):
 - marriage_agg.csv: Main aggregation by year/origins/marriage type
 - spouse_backgrounds.csv: Spouse background details for the table
 - geographic_agg.csv: State-level concentration vs outmarriage rates
+- language_agg.csv: Language-level marriage patterns (1910-1930, MTONGUE)
 - metadata.json: Valid origins, years, and presets info
 
 Usage: python preprocess_for_deploy.py
@@ -32,7 +33,7 @@ PROCESSED_DIR = Path("data/processed")
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 CHUNK_SIZE = 300000
-INPUT_FILE = "usa_00007.csv.gz"
+INPUT_FILE = "usa_00008.csv.gz"
 
 # Only process these census years
 VALID_YEARS = [1880, 1900, 1910, 1920, 1930]
@@ -57,6 +58,40 @@ STATEFIP_NAMES = {
     44: 'Rhode Island', 45: 'South Carolina', 46: 'South Dakota',
     47: 'Tennessee', 48: 'Texas', 49: 'Utah', 50: 'Vermont', 51: 'Virginia',
     53: 'Washington', 54: 'West Virginia', 55: 'Wisconsin', 56: 'Wyoming',
+}
+
+# IPUMS MTONGUE codes (mother tongue)
+MTONGUE_NAMES = {
+    0: 'English/Not Reported',
+    1: 'English',
+    2: 'German',
+    3: 'Yiddish/Hebrew',
+    4: 'Dutch/Flemish',
+    5: 'Swedish',
+    6: 'Danish',
+    7: 'Norwegian',
+    10: 'Italian',
+    11: 'French',
+    12: 'Spanish',
+    13: 'Portuguese',
+    14: 'Romanian',
+    15: 'Celtic/Gaelic',
+    16: 'Greek',
+    17: 'Albanian',
+    18: 'Russian',
+    19: 'Ruthenian',
+    20: 'Czech',
+    21: 'Polish',
+    22: 'Slovak',
+    23: 'Serbian/Croatian',
+    24: 'Slovenian',
+    25: 'Lithuanian',
+    26: 'Latvian',
+    28: 'Armenian',
+    33: 'Finnish',
+    34: 'Magyar',
+    43: 'Chinese',
+    48: 'Japanese',
 }
 
 # Origins to exclude from dropdowns
@@ -238,6 +273,12 @@ def process_chunk(chunk):
         }
         if 'STATEFIP' in row.index:
             record['STATEFIP'] = int(row['STATEFIP'])
+        if 'MTONGUE' in row.index:
+            record['MTONGUE'] = int(row['MTONGUE']) if pd.notna(row.get('MTONGUE')) else 0
+            record['MTONGUED'] = int(row['MTONGUED']) if pd.notna(row.get('MTONGUED')) else 0
+        if 'MTONGUE_SP' in row.index:
+            record['MTONGUE_SP'] = int(row['MTONGUE_SP']) if pd.notna(row.get('MTONGUE_SP')) else 0
+            record['MTONGUED_SP'] = int(row['MTONGUED_SP']) if pd.notna(row.get('MTONGUED_SP')) else 0
         results.append(record)
 
     return pd.DataFrame(results)
@@ -500,10 +541,112 @@ def main():
         print("  3. Skipping geographic aggregation (no STATEFIP column in data)")
 
     # ==========================================================================
+    # LANGUAGE AGGREGATION (MTONGUE, 1910-1930 only)
+    # ==========================================================================
+    # MTONGUE is only populated for foreign-born individuals, so we process
+    # first-generation immigrants separately from the raw data. We classify
+    # their marriages by: whether the spouse shares their birthplace origin
+    # (same heritage), is 3rd+ gen American, or is from a different origin.
+
+    lang_results_exist = False
+    print("  4. Language aggregation (MTONGUE, 1910-1930)...")
+    print("     Scanning raw data for first-gen immigrants with MTONGUE...")
+
+    lang_all = []
+    for chunk_num, chunk in enumerate(pd.read_csv(input_path, chunksize=CHUNK_SIZE, low_memory=False), 1):
+        if 'MTONGUE' not in chunk.columns or 'MTONGUE_SP' not in chunk.columns:
+            continue
+
+        # Filter: 1910-1930, foreign-born, married, has spouse
+        valid_year = chunk['YEAR'].isin([1910, 1920, 1930])
+        is_foreign = ~chunk['BPL'].isin(US_STATE_CODES) & (chunk['BPL'] > 99)
+        is_married = chunk['MARST'] == 1
+        has_spouse = chunk['SPLOC'] > 0
+        has_tongue = chunk['MTONGUE'].notna() & (chunk['MTONGUE'] > 0)
+
+        sub = chunk[valid_year & is_foreign & is_married & has_spouse & has_tongue].copy()
+        if len(sub) == 0:
+            continue
+
+        # Ensure spouse columns exist
+        if not all(c in sub.columns for c in ['BPL_SP', 'MTONGUE_SP']):
+            continue
+
+        # Map person's origin from BPL
+        sub['ORIGIN'] = sub['BPL'].apply(lambda x: COUNTRY_CODES.get(int(x), 'Unknown') if pd.notna(x) else 'Unknown')
+        sub = sub[~sub['ORIGIN'].isin({'Unknown', 'N/A', 'Abroad/At Sea', 'Missing', 'Illegible'})]
+
+        # Map languages
+        sub['LANGUAGE'] = sub['MTONGUE'].astype(int).map(MTONGUE_NAMES).fillna('Other')
+        sub['SPOUSE_LANGUAGE'] = sub['MTONGUE_SP'].apply(
+            lambda x: MTONGUE_NAMES.get(int(x), 'Other') if pd.notna(x) and int(x) > 0 else 'English/Not Reported'
+        )
+
+        # Classify marriage: does spouse share origin?
+        sub['SPOUSE_ORIGIN'] = sub['BPL_SP'].apply(
+            lambda x: COUNTRY_CODES.get(int(x), 'Unknown') if pd.notna(x) and int(x) > 99 and int(x) not in US_STATE_CODES else (
+                'US-born' if pd.notna(x) and int(x) in US_STATE_CODES else 'Unknown'
+            )
+        )
+
+        def classify_1stgen(row):
+            if row['SPOUSE_ORIGIN'] == row['ORIGIN']:
+                return 'Same heritage'
+            elif row['SPOUSE_ORIGIN'] == 'US-born':
+                return '3rd+ gen American'
+            elif row['SPOUSE_ORIGIN'] in NON_ORIGIN or row['SPOUSE_ORIGIN'].startswith('Unknown'):
+                return '3rd+ gen American'
+            else:
+                return 'Different origin'
+
+        sub['MARRIAGE_CATEGORY'] = sub.apply(classify_1stgen, axis=1)
+
+        lang_all.append(sub[['ORIGIN', 'LANGUAGE', 'MARRIAGE_CATEGORY', 'SPOUSE_LANGUAGE', 'PERWT']].copy())
+
+    if lang_all:
+        lang_df = pd.concat(lang_all, ignore_index=True)
+        print(f"     Found {len(lang_df):,} first-gen immigrants with MTONGUE data")
+
+        # Apply minimum threshold: origin-language groups with >= 500 weighted
+        origin_lang_totals = lang_df.groupby(['ORIGIN', 'LANGUAGE'])['PERWT'].sum()
+        valid_combos = origin_lang_totals[origin_lang_totals >= 500].index
+        lang_df = lang_df[lang_df.set_index(['ORIGIN', 'LANGUAGE']).index.isin(valid_combos)]
+
+        if len(lang_df) > 0:
+            # Aggregate: ORIGIN x LANGUAGE x MARRIAGE_CATEGORY x SPOUSE_LANGUAGE
+            lang_agg = lang_df.groupby([
+                'ORIGIN', 'LANGUAGE', 'MARRIAGE_CATEGORY', 'SPOUSE_LANGUAGE'
+            ]).agg(
+                WEIGHTED_COUNT=('PERWT', 'sum'),
+                UNWEIGHTED_N=('PERWT', 'count')
+            ).reset_index()
+
+            lang_agg.to_csv(PROCESSED_DIR / "language_agg.csv", index=False)
+            print(f"     Saved: language_agg.csv ({len(lang_agg):,} rows)")
+            print(f"     Origins with language data: {lang_agg['ORIGIN'].nunique()}")
+            print(f"     Languages found: {lang_agg['LANGUAGE'].nunique()}")
+            lang_results_exist = True
+
+            # Identify multilingual origins (>= 2 languages with >= 1000 weighted)
+            origin_lang_sums = lang_agg.groupby(['ORIGIN', 'LANGUAGE'])['WEIGHTED_COUNT'].sum()
+            multilingual_origins = []
+            for origin in lang_agg['ORIGIN'].unique():
+                origin_langs = origin_lang_sums.loc[origin]
+                big_langs = origin_langs[origin_langs >= 1000]
+                if len(big_langs) >= 2:
+                    multilingual_origins.append(origin)
+            multilingual_origins.sort()
+            print(f"     Multilingual origins: {multilingual_origins}")
+        else:
+            print("     WARNING: No origin-language groups met the minimum threshold")
+    else:
+        print("     WARNING: No MTONGUE data found in raw file")
+
+    # ==========================================================================
     # COMPUTE METADATA
     # ==========================================================================
 
-    print("  4. Computing metadata...")
+    print("  5. Computing metadata...")
 
     # Get valid origins (those with sufficient sample size)
     mother_counts = df.groupby('MOTHER_ORIGIN')['PERWT'].sum()
@@ -546,6 +689,10 @@ def main():
         geographic_origins = sorted(geo_agg['ORIGIN_GROUP'].unique().tolist())
         metadata['geographic_origins'] = geographic_origins
 
+    if lang_results_exist:
+        metadata['language_years'] = [1910, 1920, 1930]
+        metadata['multilingual_origins'] = multilingual_origins
+
     with open(PROCESSED_DIR / "metadata.json", 'w') as f:
         json.dump(metadata, f, indent=2)
     print(f"     Saved: metadata.json")
@@ -571,6 +718,10 @@ def main():
         geo_size = (PROCESSED_DIR / "geographic_agg.csv").stat().st_size / 1024
         total_size += geo_size
         print(f"  geographic_agg.csv:     {geo_size:,.0f} KB")
+    if (PROCESSED_DIR / "language_agg.csv").exists():
+        lang_size = (PROCESSED_DIR / "language_agg.csv").stat().st_size / 1024
+        total_size += lang_size
+        print(f"  language_agg.csv:       {lang_size:,.0f} KB")
     print(f"  metadata.json:          {meta_size:,.1f} KB")
     print(f"  TOTAL:                  {total_size:,.0f} KB ({total_size/1024:.1f} MB)")
 

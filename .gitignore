@@ -11,6 +11,27 @@ ENV/
 # Raw data (too large for GitHub)
 data/raw/
 
+# Processed data not used by the dashboard
+data/processed/second_gen_marriages.csv
+data/processed/agg_by_year_country.csv
+data/processed/agg_by_year_region.csv
+data/processed/immigrant_marriages_sample.csv
+data/processed/intermarriage_by_year.csv
+data/processed/intermarriage_by_year_country.csv
+data/processed/intermarriage_by_year_region.csv
+data/processed/origin_type_breakdown.csv
+data/processed/sankey_flows.csv
+data/processed/spouse_pairs.csv
+
+# Development-only scripts
+scripts/
+diagnose_duplicates.py
+process_ipums_v2.py
+run_second_gen_dashboard.py
+validate_data.py
+setup.bat
+setup_project.bat
+
 # IDE
 .idea/
 .vscode/
@@ -18,5 +39,4 @@ data/raw/
 
 # OS
 .DS_Store
-Thumbs.dbnul
-data/processed/second_gen_marriages.csv
+Thumbs.db

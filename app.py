@@ -13,8 +13,6 @@ from pathlib import Path
 from urllib.parse import urlencode, parse_qs
 import json
 import os
-from scipy.spatial.distance import pdist, squareform
-
 import dash
 from dash import dcc, html, callback, Input, Output, State, ctx, no_update, ALL
 import dash_bootstrap_components as dbc
@@ -154,6 +152,14 @@ def load_data():
             print(f"  Loaded adjusted affinities: {len(data['geo_adjusted_affinity'])} pairs")
         else:
             data['geo_adjusted_affinity'] = None
+
+        # Language aggregation (optional - MTONGUE data for 1910-1930)
+        lang_path = PROCESSED_DIR / "language_agg.csv"
+        if lang_path.exists():
+            data['language'] = pd.read_csv(lang_path, low_memory=False)
+            print(f"  Loaded language data: {len(data['language'])} rows")
+        else:
+            data['language'] = None
 
         return data
     except FileNotFoundError as e:
@@ -382,63 +388,6 @@ def get_spouse_generation_data(mother, father, year):
             result[gen] = {'count': 0, 'pct': 0}
 
     return result
-
-
-def get_clustering_data(year='All'):
-    """Get marriage clustering data: who did children of each group marry?
-
-    Returns a matrix showing what % of children from same-origin Group X
-    married someone from Group Y (including 3rd+ gen Americans).
-    """
-    df = DATA['spouse_bg'].copy()
-    if year != 'All':
-        df = df[df['YEAR'] == int(year)]
-
-    # Filter to same-origin parents for cleaner clustering view
-    df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
-    df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
-
-    # Determine spouse heritage
-    def get_spouse_heritage(row):
-        if row['SPOUSE_GEN'] == '3rd+ gen American':
-            return 'American'
-        elif row['SPOUSE_GEN'] == '1st gen immigrant':
-            return row['SPOUSE_COUNTRY']
-        else:  # 2nd gen - use primary parent origin
-            if str(row['SPOUSE_FATHER']) not in ['US-born', 'Unknown', 'N/A', 'nan']:
-                return row['SPOUSE_FATHER']
-            elif str(row['SPOUSE_MOTHER']) not in ['US-born', 'Unknown', 'N/A', 'nan']:
-                return row['SPOUSE_MOTHER']
-            return 'Unknown'
-
-    df['SPOUSE_HERITAGE'] = df.apply(get_spouse_heritage, axis=1)
-
-    # Filter out unknown spouse heritage
-    df = df[~df['SPOUSE_HERITAGE'].isin(['Unknown', 'N/A', 'US-born'])]
-
-    # Get major parent origins (those with substantial data)
-    MIN_SAMPLE = 100000
-    parent_totals = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
-    major_parents = parent_totals[parent_totals >= MIN_SAMPLE].index.tolist()
-
-    # Get major spouse heritages
-    spouse_totals = df.groupby('SPOUSE_HERITAGE')['WEIGHTED_COUNT'].sum()
-    major_spouses = spouse_totals[spouse_totals >= 50000].index.tolist()
-
-    # Ensure 'American' is included if present
-    if 'American' in spouse_totals.index and 'American' not in major_spouses:
-        major_spouses.append('American')
-
-    # Build clustering matrix
-    clustering = df[df['MOTHER_ORIGIN'].isin(major_parents) & df['SPOUSE_HERITAGE'].isin(major_spouses)]
-    clustering = clustering.groupby(['MOTHER_ORIGIN', 'SPOUSE_HERITAGE'])['WEIGHTED_COUNT'].sum().reset_index()
-
-    # Pivot and convert to percentages
-    pivot = clustering.pivot_table(index='MOTHER_ORIGIN', columns='SPOUSE_HERITAGE',
-                                   values='WEIGHTED_COUNT', fill_value=0)
-    pivot_pct = pivot.div(pivot.sum(axis=1), axis=0) * 100
-
-    return pivot_pct, major_parents, major_spouses
 
 
 def get_network_data(year='All'):
@@ -702,112 +651,6 @@ def get_adjusted_network_data():
     return nodes, edges, positions
 
 
-def get_scatter_data(year='All'):
-    """Get population size vs ethnic retention for scatter plot."""
-    df = DATA['marriage_agg'].copy()
-    if year != 'All':
-        df = df[df['YEAR'] == int(year)]
-
-    # Filter to same-origin parents
-    df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
-    df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
-
-    results = []
-    MIN_SAMPLE = 20000
-
-    for origin in df['MOTHER_ORIGIN'].unique():
-        origin_df = df[df['MOTHER_ORIGIN'] == origin]
-        total = origin_df['WEIGHTED_COUNT'].sum()
-
-        if total < MIN_SAMPLE:
-            continue
-
-        stats = origin_df.groupby('MARRIAGE_TYPE')['WEIGHTED_COUNT'].sum()
-        pcts = (stats / total * 100).to_dict()
-
-        same_origin_rate = sum(v for k, v in pcts.items() if 'same origin' in k)
-
-        results.append({
-            'origin': origin,
-            'demonym': get_demonym(origin),
-            'population': total,
-            'same_origin_rate': same_origin_rate
-        })
-
-    return results
-
-
-def detect_anomalies(year='All'):
-    """Detect groups with counter-intuitive trends (like Italy's high retention)."""
-    anomalies = []
-
-    # Get trend data for major same-origin groups
-    df = DATA['marriage_agg'].copy()
-    df = df[df['MOTHER_ORIGIN'] == df['FATHER_ORIGIN']]
-    df = df[~df['MOTHER_ORIGIN'].isin(NON_COUNTRIES)]
-
-    major_origins = df.groupby('MOTHER_ORIGIN')['WEIGHTED_COUNT'].sum()
-    major_origins = major_origins[major_origins >= 100000].index.tolist()
-
-    # First pass: collect all trend data to find the average
-    all_trends = {}
-    for origin in major_origins:
-        trends = get_trend_data(origin, origin)
-        if len(trends) >= 2:
-            years_list = sorted(trends.keys())
-            first_ethnic = trends[years_list[0]]['ethnic_total']
-            last_ethnic = trends[years_list[-1]]['ethnic_total']
-            all_trends[origin] = {
-                'trends': trends,
-                'first_year': years_list[0],
-                'last_year': years_list[-1],
-                'first_rate': first_ethnic,
-                'last_rate': last_ethnic,
-                'change': last_ethnic - first_ethnic
-            }
-
-    if not all_trends:
-        return anomalies
-
-    # Calculate average change across all groups
-    avg_change = np.mean([t['change'] for t in all_trends.values()])
-
-    # Detect anomalies
-    for origin, data in all_trends.items():
-        change = data['change']
-        first_ethnic = data['first_rate']
-        last_ethnic = data['last_rate']
-
-        # Counter-trend: Most groups decline, but this one increased or stayed stable
-        if avg_change < -5 and change > 0:
-            anomalies.append({
-                'origin': origin,
-                'demonym': get_demonym(origin),
-                'first_year': data['first_year'],
-                'last_year': data['last_year'],
-                'first_rate': first_ethnic,
-                'last_rate': last_ethnic,
-                'change': change,
-                'avg_change': avg_change,
-                'type': 'counter_trend'
-            })
-        # Consistently high retention (>70%) - notable for late-arriving groups
-        elif first_ethnic > 70 and last_ethnic > 70:
-            anomalies.append({
-                'origin': origin,
-                'demonym': get_demonym(origin),
-                'first_year': data['first_year'],
-                'last_year': data['last_year'],
-                'first_rate': first_ethnic,
-                'last_rate': last_ethnic,
-                'change': change,
-                'avg_change': avg_change,
-                'type': 'consistently_high'
-            })
-
-    return anomalies
-
-
 def get_single_origin_overview(origin, year='All'):
     """Get marriage outcomes for all parent combinations involving a single origin.
 
@@ -935,6 +778,11 @@ def get_group_geographic_data(origin):
     if df is None:
         return None
     return df[df['ORIGIN_GROUP'] == origin]
+
+
+def get_language_data():
+    """Return the language aggregation dataframe, or None if unavailable."""
+    return DATA.get('language')
 
 
 def get_top_spouse_backgrounds(mother, father, year, exclude_heritage=None, top_n=5):
@@ -1511,8 +1359,19 @@ body {
     flex-shrink: 0;
 }
 
+.poe-logo-wrap img {
+    filter: none;
+    height: 75px;
+    opacity: 0.95;
+}
+
 .header-text {
     flex: 1;
+    text-align: center !important;
+}
+.header-text h1,
+.header-text p {
+    text-align: center !important;
 }
 
 .header-section::after {
@@ -2076,6 +1935,7 @@ html {
     }
     .header-divider { display: none; }
     .header-logo img { height: 45px; }
+    .poe-logo-wrap img { height: 50px; }
     .header-intro { padding: 1rem 1.25rem; }
     .main-title { font-size: 1.5rem; }
     .subtitle { font-size: 1rem; }
@@ -2332,6 +2192,12 @@ app.index_string = f'''
         {{%metas%}}
         <title>{{%title%}}</title>
         {{%favicon%}}
+        <meta property="og:title" content="Marriage and the Melting Pot, 1880-1930">
+        <meta property="og:description" content="Explore marriage patterns of second-generation Americans using census data from 1880-1930.">
+        <meta property="og:type" content="website">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Marriage and the Melting Pot, 1880-1930 | Niskanen Center">
+        <meta name="twitter:description" content="Explore marriage patterns of second-generation Americans using census data from 1880-1930.">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Neuton:wght@400;700&family=Hanken+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
@@ -2363,8 +2229,11 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Div([
-                        html.Img(src='/assets/niskanen-logo.png', alt='Niskanen Center',
-                                id='niskanen-logo'),
+                        html.A(
+                            html.Img(src='/assets/niskanen-logo.png', alt='Niskanen Center',
+                                    id='niskanen-logo'),
+                            href='https://www.niskanencenter.org/', target='_blank',
+                        ),
                     ], className='header-logo'),
                     html.Div(className='header-divider'),
                     html.Div([
@@ -2373,7 +2242,15 @@ app.layout = html.Div([
                         html.P("Gil Guerra | Niskanen Center",
                                style={'color': 'rgba(255,255,255,0.5)', 'fontSize': '0.8rem',
                                       'margin': '0.3rem 0 0 0', 'fontWeight': '400'}),
-                    ], className='header-text'),
+                    ], className='header-text', style={'textAlign': 'center'}),
+                    html.Div(className='header-divider'),
+                    html.Div([
+                        html.A(
+                            html.Img(src='/assets/POE Logo Plain.png', alt='POE',
+                                    id='poe-logo'),
+                            href='https://www.points-of-entry.com/', target='_blank',
+                        ),
+                    ], className='header-logo poe-logo-wrap'),
                 ], className='header-bar'),
             ], className='header-section'),
 
@@ -2492,6 +2369,7 @@ app.layout = html.Div([
                 html.A("Analysis", href='#analysis', className='anchor-link'),
                 html.A("Spouse Backgrounds", href='#spouse-table', className='anchor-link'),
                 html.A("Compare Groups", href='#compare', className='anchor-link'),
+                html.A("Deeper Analysis", href='#deeper-analysis', className='anchor-link'),
                 html.A("Methodology", href='#methodology', className='anchor-link'),
             ], className='anchor-nav'),
             html.Div([
@@ -2541,14 +2419,14 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.Span("Detailed Analysis", style={'flex': '1'}),
-                    html.Button("Show/Hide", id='toggle-summary-btn', className='brand-btn',
+                    html.Button("Show", id='toggle-summary-btn', className='brand-btn',
                                style={'background': 'transparent', 'color': '#fff', 'border': '1px solid rgba(255,255,255,0.3)',
                                       'padding': '0.25rem 0.75rem', 'fontSize': '0.8rem'})
                 ], className='brand-card-header-gold', style={'display': 'flex', 'alignItems': 'center', 'justifyContent': 'space-between'}),
                 html.Div([
                     dcc.Loading(type='circle', color=COLORS['medium_teal'],
                                children=[dcc.Markdown(id='auto-summary', className='summary-markdown')])
-                ], id='summary-body', className='brand-card-body')
+                ], id='summary-body', className='brand-card-body summary-collapsed')
             ], id='analysis', className='brand-card summary-card mb-4'),
 
             # Spouse Backgrounds Table
@@ -2570,12 +2448,28 @@ app.layout = html.Div([
                     dbc.Tab(label="Outmarriage Rates", tab_id="tab-outmarriage"),
                     dbc.Tab(label="Clustering Network", tab_id="tab-heatmap"),
                     dbc.Tab(label="Single Origin Overview", tab_id="tab-single-origin"),
-                    dbc.Tab(label="Geographic Patterns", tab_id="tab-geographic",
-                            disabled=DATA.get('geographic') is None),
                 ], id='overview-tabs', active_tab='tab-outmarriage', className='mb-0'),
                 html.Div([html.Div(id='overview-tab-content')], className='brand-card',
                         style={'borderRadius': '0 0 16px 16px'})
             ], id='compare', className='mb-4'),
+
+            # What Explains These Patterns?
+            html.Div([
+                html.Div([
+                    html.Span("What Explains These Patterns?", className='section-title'),
+                    html.Span("— geography and culture beyond national origin", className='section-subtitle')
+                ], className='section-header-prominent'),
+                dbc.Tabs([
+                    dbc.Tab(label="Concentration vs. Outmarriage", tab_id="tab-geo-scatter",
+                            disabled=DATA.get('geographic') is None),
+                    dbc.Tab(label="By State", tab_id="tab-geo-state",
+                            disabled=DATA.get('geographic') is None),
+                    dbc.Tab(label="Beyond Geography", tab_id="tab-geo-residuals",
+                            disabled=DATA.get('geographic') is None),
+                ], id='explain-tabs', active_tab='tab-geo-scatter', className='mb-0'),
+                html.Div([html.Div(id='explain-tab-content')], className='brand-card',
+                        style={'borderRadius': '0 0 16px 16px'})
+            ], id='deeper-analysis', className='mb-4'),
 
             # Methodology
             html.Div([
@@ -2650,10 +2544,9 @@ app.layout = html.Div([
 
                     html.P("To cite this dashboard:", style={'marginTop': '1rem', 'marginBottom': '0.25rem'}),
                     html.Blockquote([
-                        "Guerra, Gil. ",
-                        html.Em("Marriage and the Melting Pot, 1880-1930"),
-                        " [interactive dashboard]. Washington, DC: Niskanen Center, 2026. ",
-                        html.A("https://www.niskanencenter.org/intermarriage-dashboard/", href="https://www.niskanencenter.org/intermarriage-dashboard/", target="_blank", style={'color': COLORS['medium_teal']})
+                        "Guerra, Gil. \u201cMarriage and the Melting Pot, 1880\u20131930.\u201d Interactive dashboard. Washington, DC: Niskanen Center, 2026. ",
+                        html.A("https://intermarriage-dashboard.onrender.com", href="https://intermarriage-dashboard.onrender.com", target="_blank", style={'color': COLORS['medium_teal']}),
+                        "."
                     ], style={
                         'borderLeft': f'3px solid {COLORS["gold"]}',
                         'paddingLeft': '1rem',
@@ -2673,17 +2566,23 @@ app.layout = html.Div([
                 ], className='brand-card-body', style={'fontSize': '0.95rem', 'lineHeight': '1.6'})
             ], id='methodology', className='brand-card mb-4'),
 
-            # Feedback
+            # Stay Connected
             html.Div([
-                html.Div("Feedback", className='brand-card-header'),
+                html.Div("Stay Connected", className='brand-card-header'),
                 html.Div([
+                    html.P([
+                        "For more analysis of these findings and other immigration research, follow ",
+                        html.A("Points of Entry", href="https://www.points-of-entry.com/", target="_blank",
+                               style={'color': COLORS['medium_teal'], 'fontWeight': '600'}),
+                        " on Substack."
+                    ], style={'marginBottom': '0.75rem'}),
                     html.P([
                         "Comments, inquiries, and corrections are welcome. Please contact ",
                         html.A("Gil Guerra", href="mailto:gguerra@niskanencenter.org", style={'color': COLORS['medium_teal']}),
                         " at ",
                         html.A("gguerra@niskanencenter.org", href="mailto:gguerra@niskanencenter.org", style={'color': COLORS['medium_teal']}),
                         "."
-                    ])
+                    ], style={'marginBottom': '0'}),
                 ], className='brand-card-body')
             ], className='brand-card mb-4'),
 
@@ -2691,7 +2590,8 @@ app.layout = html.Div([
             html.Div([
                 html.P([
                     "Data: ", html.A("IPUMS USA", href="https://usa.ipums.org", target="_blank"),
-                    " | Analysis: ", html.A("Niskanen Center, Gil Guerra", href="https://www.niskanencenter.org/author/gguerra/", target="_blank")
+                    " | Analysis: ", html.A("Niskanen Center, Gil Guerra", href="https://www.niskanencenter.org/author/gguerra/", target="_blank"),
+                    " | Follow: ", html.A("Points of Entry", href="https://www.points-of-entry.com/", target="_blank"),
                 ], className='footer-text'),
             ], className='footer-section'),
 
@@ -2707,25 +2607,26 @@ app.clientside_callback(
     """
     function(n1, n2, n3) {
         var triggered = dash_clientside.callback_context.triggered;
-        if (!triggered || triggered.length === 0) return dash_clientside.no_update;
+        if (!triggered || triggered.length === 0) return [dash_clientside.no_update, dash_clientside.no_update];
         var id = triggered[0].prop_id.split('.')[0];
         if (id === 'nav-card-compare') {
             var el = document.getElementById('compare');
             if (el) el.scrollIntoView({behavior: 'smooth'});
-            return 'tab-outmarriage';
+            return ['tab-outmarriage', dash_clientside.no_update];
         } else if (id === 'nav-card-geo') {
-            var el = document.getElementById('compare');
+            var el = document.getElementById('deeper-analysis');
             if (el) el.scrollIntoView({behavior: 'smooth'});
-            return 'tab-geographic';
+            return [dash_clientside.no_update, 'tab-geo-scatter'];
         } else if (id === 'nav-card-explore') {
             var el = document.getElementById('filters');
             if (el) el.scrollIntoView({behavior: 'smooth'});
-            return dash_clientside.no_update;
+            return [dash_clientside.no_update, dash_clientside.no_update];
         }
-        return dash_clientside.no_update;
+        return [dash_clientside.no_update, dash_clientside.no_update];
     }
     """,
-    Output('overview-tabs', 'active_tab', allow_duplicate=True),
+    [Output('overview-tabs', 'active_tab', allow_duplicate=True),
+     Output('explain-tabs', 'active_tab', allow_duplicate=True)],
     [Input('nav-card-compare', 'n_clicks'),
      Input('nav-card-geo', 'n_clicks'),
      Input('nav-card-explore', 'n_clicks')],
@@ -2870,7 +2771,7 @@ def load_url_state(search):
             year = int(year)
             if year not in years:
                 year = 'All'
-        except:
+        except (ValueError, TypeError):
             year = 'All'
     return mother, father, year
 
@@ -2940,7 +2841,8 @@ def update_social_links(href):
 
 
 @callback(
-    [Output('summary-body', 'className'), Output('toggle-summary-btn', 'children')],
+    [Output('summary-body', 'className', allow_duplicate=True),
+     Output('toggle-summary-btn', 'children', allow_duplicate=True)],
     [Input('toggle-summary-btn', 'n_clicks')],
     [State('summary-body', 'className')],
     prevent_initial_call=True
@@ -2971,7 +2873,8 @@ def download_csv(n_clicks, mother, father, year):
 @callback([Output('sample-size', 'children'), Output('auto-summary', 'children'),
            Output('key-stat-heritage', 'children'), Output('key-stat-american', 'children'),
            Output('current-selection-display', 'children'),
-           Output('narrative-snapshot', 'children')],
+           Output('narrative-snapshot', 'children'),
+           Output('summary-body', 'className'), Output('toggle-summary-btn', 'children')],
           [Input('mother-dropdown', 'value'), Input('father-dropdown', 'value'), Input('year-dropdown', 'value')])
 def update_summary(mother, father, year):
     stats, weighted, unweighted = get_marriage_stats(mother, father, year)
@@ -2998,8 +2901,13 @@ def update_summary(mother, father, year):
         html.Span(f"{selection_text} | {year_display}", className='current-selection-value')
     ], className='current-selection')
 
+    # Auto-expand when a specific origin is selected, collapse for default view
+    is_default = (mother == 'Any' and father == 'Any')
+    summary_class = 'brand-card-body summary-collapsed' if is_default else 'brand-card-body summary-expanded'
+    toggle_label = 'Show' if is_default else 'Hide'
+
     if stats is None:
-        return "0", "No data available", "—", "—", current_selection, "No data available for this selection."
+        return "0", "No data available", "—", "—", current_selection, "No data available for this selection.", summary_class, toggle_label
 
     # Sample size
     if unweighted < 30:
@@ -3031,7 +2939,7 @@ def update_summary(mother, father, year):
     )
 
     summary = generate_summary(mother, father, year)
-    return size_text, summary, heritage_text, american_text, current_selection, narrative
+    return size_text, summary, heritage_text, american_text, current_selection, narrative, summary_class, toggle_label
 
 
 @callback(Output('tab-content', 'children'),
@@ -3098,7 +3006,7 @@ def render_overview_tab_content(active_tab, year):
                          'disabled': DATA.get('geographic') is None},
                     ],
                     value='total',
-                    style={'width': '300px', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    style={'maxWidth': '400px', 'width': '100%', 'display': 'inline-block', 'verticalAlign': 'middle'},
                     clearable=False
                 ),
             ], style={'marginBottom': '1rem'}),
@@ -3126,8 +3034,8 @@ def render_overview_tab_content(active_tab, year):
                         {'label': 'Geography-Adjusted', 'value': 'adjusted',
                          'disabled': not has_adjusted},
                     ],
-                    value='raw',
-                    style={'width': '250px', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    value='adjusted' if has_adjusted else 'raw',
+                    style={'maxWidth': '300px', 'width': '100%', 'display': 'inline-block', 'verticalAlign': 'middle'},
                     clearable=False
                 ),
             ], style={'marginBottom': '1rem'}),
@@ -3152,7 +3060,7 @@ def render_overview_tab_content(active_tab, year):
                     id='single-origin-dropdown',
                     options=[{'label': o, 'value': o} for o in available_origins],
                     value=default_origin,
-                    style={'width': '200px', 'display': 'inline-block', 'verticalAlign': 'middle'}
+                    style={'maxWidth': '250px', 'width': '100%', 'display': 'inline-block', 'verticalAlign': 'middle'}
                 ),
             ], style={'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
@@ -3162,26 +3070,45 @@ def render_overview_tab_content(active_tab, year):
                 "Each row shows the marriage outcome breakdown for that parental combination: what percentage married within heritage, married a 3rd+ generation American, or married into a different immigrant community. Only the most common parental combinations are shown (those with sufficient sample sizes). US-born parents are excluded to focus on immigrant-origin combinations.",
             ]),
         ], style={'padding': '1rem'})
-    elif active_tab == 'tab-geographic':
-        geo_df = get_geographic_data()
-        if geo_df is None:
-            return html.Div([
-                html.P("Geographic data not available. Re-run preprocessing with a STATEFIP-enabled IPUMS extract.",
-                       style={'color': COLORS['muted_teal'], 'padding': '2rem'})
-            ])
-        geo_origins = sorted(geo_df['ORIGIN_GROUP'].unique().tolist())
-        default_geo = 'Italy' if 'Italy' in geo_origins else geo_origins[0]
+
+    return html.Div()
+
+
+@callback(Output('explain-tab-content', 'children'),
+          [Input('explain-tabs', 'active_tab'), Input('year-dropdown', 'value')])
+def render_explain_tab_content(active_tab, year):
+    """Render explain tabs that decompose patterns by geography."""
+    geo_df = get_geographic_data()
+    if geo_df is None:
         return html.Div([
-            html.P("See how geography affected marriage trends for various groups.",
+            html.P("Geographic data not available. Re-run preprocessing with a STATEFIP-enabled IPUMS extract.",
+                   style={'color': COLORS['muted_teal'], 'padding': '2rem'})
+        ])
+
+    if active_tab == 'tab-geo-scatter':
+        return html.Div([
+            html.P("Each dot represents one ethnic group in one state. Groups with higher local concentration "
+                   "tend to have lower outmarriage rates. The trend line shows the overall relationship.",
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
-            # Chart 1: Scatter plot (static, all groups)
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(
                            dcc.Graph(id='geo-scatter',
                                      figure=create_geo_scatter_chart(),
                                      config={'displayModeBar': True, 'scrollZoom': False}),
                            className='chart-scroll chart-scroll-medium')]),
-            # Chart 2: Single group across states
+            _methodology_block('geo-scatter', [
+                "Each dot represents one ethnic group in one state. The x-axis shows the group's share of that state's second-generation immigrant population (log scale); the y-axis shows their outmarriage rate.",
+                "The trend line is an OLS regression of outmarriage rate on log\u2081\u2080(concentration). R\u00b2 indicates how much of the variation in outmarriage is explained by concentration alone. All census years are pooled for statistical power.",
+            ]),
+        ], style={'padding': '1rem'})
+
+    elif active_tab == 'tab-geo-state':
+        geo_origins = sorted(geo_df['ORIGIN_GROUP'].unique().tolist())
+        default_geo = 'Italy' if 'Italy' in geo_origins else geo_origins[0]
+        return html.Div([
+            html.P("Select an ethnic group to see their outmarriage rate in each state. "
+                   "Annotations show the group's local concentration.",
+                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             html.Div([
                 html.Label("Select group:", style={'fontWeight': '500', 'marginRight': '10px',
                                                     'color': COLORS['dark_teal']}),
@@ -3189,25 +3116,34 @@ def render_overview_tab_content(active_tab, year):
                     id='geo-group-dropdown',
                     options=[{'label': get_demonym(o) + '-Americans', 'value': o} for o in geo_origins],
                     value=default_geo,
-                    style={'width': '250px', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    style={'maxWidth': '300px', 'width': '100%', 'display': 'inline-block', 'verticalAlign': 'middle'},
                     clearable=False
                 ),
-            ], style={'marginBottom': '1rem', 'marginTop': '1.5rem'}),
+            ], style={'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(id='geo-group-chart-container')]),
-            # Chart 3: Residuals
-            html.Div(style={'marginTop': '1.5rem'}),
+            _methodology_block('geo-state', [
+                "For the selected ethnic group, shows their outmarriage rate in each state where at least 5,000 weighted individuals are present.",
+                "The annotation on each bar shows the group's local concentration (share of the state's second-generation population). States where the group was more concentrated tend to show lower outmarriage rates.",
+            ]),
+        ], style={'padding': '1rem'})
+
+    elif active_tab == 'tab-geo-residuals':
+        return html.Div([
+            html.P("After accounting for geographic concentration, which groups outmarried more or less than predicted? "
+                   "Teal bars indicate groups that outmarried above expected rates; gold bars indicate groups that outmarried below.",
+                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(
                            dcc.Graph(id='geo-residuals', figure=create_geo_residuals_chart(),
                                      config={'displayModeBar': True, 'scrollZoom': False}),
                            className='chart-scroll chart-scroll-medium')]),
-            _methodology_block('geographic', [
-                "Scatter plot: Each dot represents one ethnic group in one state. The x-axis shows the group's share of that state's second-generation immigrant population (log scale); the y-axis shows their outmarriage rate. The trend line is an OLS regression of outmarriage rate on log\u2081\u2080(concentration). R\u00b2 indicates how much of the variation in outmarriage is explained by concentration alone. All census years are pooled for statistical power.",
-                "State breakdown: For the selected ethnic group, shows their outmarriage rate in each state where at least 5,000 weighted individuals are present. The annotation on each bar shows the group's local concentration (share of the state's second-generation population).",
-                "Residuals chart: For each ethnic group, computes the difference between their actual average outmarriage rate and what the concentration regression predicts. Positive residuals (teal) indicate groups that outmarried more than their geographic circumstances would predict\u2014suggesting cultural openness. Negative residuals (gold) indicate groups that outmarried less\u2014suggesting cultural insularity beyond what geography explains. Residuals are weighted by state-level sample size.",
+            _methodology_block('geo-residuals', [
+                "For each ethnic group, computes the difference between their actual average outmarriage rate and what the concentration regression predicts.",
+                "Positive residuals (teal) indicate groups that outmarried more than their geographic concentration would predict. Negative residuals (gold) indicate groups that outmarried less than predicted. Residuals are weighted by state-level sample size.",
             ]),
         ], style={'padding': '1rem'})
+
     return html.Div()
 
 
@@ -3913,54 +3849,6 @@ def create_attraction_chart():
     return fig
 
 
-def create_scatter_chart(year):
-    """Create scatter plot showing population size vs ethnic retention."""
-    scatter_data = get_scatter_data(year)
-
-    if not scatter_data:
-        fig = go.Figure()
-        fig.add_annotation(text="No data available", x=0.5, y=0.5, showarrow=False)
-        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
-        return fig
-
-    df = pd.DataFrame(scatter_data)
-
-    # Size bubbles by population (log scale for better visibility)
-    df['bubble_size'] = np.log10(df['population']) * 8
-
-    fig = go.Figure()
-
-    fig.add_trace(go.Scatter(
-        x=df['population'],
-        y=df['same_origin_rate'],
-        mode='markers+text',
-        marker=dict(
-            size=df['bubble_size'],
-            color=df['same_origin_rate'],
-            colorscale=[[0, COLORS['light_teal']], [0.5, COLORS['medium_teal']], [1, COLORS['dark_teal']]],
-            showscale=True,
-            colorbar=dict(title="Same-Origin<br>Rate (%)", ticksuffix="%"),
-            line=dict(width=1, color='white')
-        ),
-        text=df['demonym'],
-        textposition='top center',
-        textfont=dict(size=10, color=COLORS['dark_teal']),
-        hovertemplate="<b>%{text}</b><br>Population: %{x:,.0f}<br>Same-origin rate: %{y:.1f}%<extra></extra>"
-    ))
-
-    fig.update_layout(
-        title=dict(text="Population Size vs Ethnic Retention", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
-        xaxis_title="Population (Same-Origin Parents)",
-        yaxis_title="Same-Origin Marriage Rate (%)",
-        xaxis=dict(type='log', gridcolor=COLORS['light_gray'], fixedrange=True),
-        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, 100], fixedrange=True),
-        dragmode=False,
-        height=500, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        showlegend=False
-    )
-    return fig
-
-
 def create_single_origin_chart(origin, year):
     """Create stacked bar chart showing marriage patterns for all combinations involving an origin.
 
@@ -4178,7 +4066,7 @@ def create_geo_scatter_chart():
 
 
 def create_geo_group_chart(origin):
-    """Horizontal bar chart showing one group's outmarriage rate across states."""
+    """Stacked horizontal bar chart showing outmarriage breakdown by state."""
     odf = get_group_geographic_data(origin)
     if odf is None or len(odf) == 0:
         fig = go.Figure()
@@ -4186,39 +4074,76 @@ def create_geo_group_chart(origin):
         fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=400)
         return fig
 
+    odf = odf.copy()
+    odf['DIFF_ORIGIN_RATE'] = odf['OUTMARRIAGE_RATE'] - odf['THIRD_GEN_RATE']
     odf = odf.sort_values('OUTMARRIAGE_RATE', ascending=True)
     demonym = get_demonym(origin)
 
-    fig = go.Figure(go.Bar(
-        x=odf['OUTMARRIAGE_RATE'],
+    fig = go.Figure()
+
+    # 3rd+ gen American component
+    fig.add_trace(go.Bar(
+        x=odf['THIRD_GEN_RATE'],
         y=odf['STATE_NAME'],
         orientation='h',
-        marker_color=COLORS['medium_teal'],
-        text=[f"{r:.0f}%  (conc: {c:.1f}%)" for r, c in
-              zip(odf['OUTMARRIAGE_RATE'], odf['GROUP_SHARE_PCT'])],
-        textposition='outside',
-        textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
+        name='3rd+ Gen American',
+        marker_color=COLORS['light_teal'],
+        text=[f"{r:.0f}%" if r >= 5 else "" for r in odf['THIRD_GEN_RATE']],
+        textposition='inside',
+        textfont=dict(family='Hanken Grotesk', size=10, color=COLORS['dark_teal']),
         hovertemplate=(
             '<b>%{y}</b><br>'
-            'Outmarriage rate: %{x:.1f}%<br>'
+            '3rd+ gen American: %{x:.1f}%<br>'
             'Local concentration: %{customdata[0]:.1f}%<br>'
             'Sample size: %{customdata[1]:,.0f}<extra></extra>'
         ),
         customdata=list(zip(odf['GROUP_SHARE_PCT'], odf['WEIGHTED_N']))
     ))
 
+    # Different immigrant community component
+    fig.add_trace(go.Bar(
+        x=odf['DIFF_ORIGIN_RATE'],
+        y=odf['STATE_NAME'],
+        orientation='h',
+        name='Different Immigrant',
+        marker_color=COLORS['medium_teal'],
+        text=[f"{r:.0f}%" if r >= 5 else "" for r in odf['DIFF_ORIGIN_RATE']],
+        textposition='inside',
+        textfont=dict(family='Hanken Grotesk', size=10, color='white'),
+        hovertemplate=(
+            '<b>%{y}</b><br>'
+            'Different immigrant: %{x:.1f}%<br>'
+            'Local concentration: %{customdata[0]:.1f}%<br>'
+            'Sample size: %{customdata[1]:,.0f}<extra></extra>'
+        ),
+        customdata=list(zip(odf['GROUP_SHARE_PCT'], odf['WEIGHTED_N']))
+    ))
+
+    # Add total outmarriage rate and concentration outside bars
+    for i, (_, row) in enumerate(odf.iterrows()):
+        fig.add_annotation(
+            x=row['OUTMARRIAGE_RATE'] + 1.5,
+            y=row['STATE_NAME'],
+            text=f"{row['OUTMARRIAGE_RATE']:.0f}%  (conc: {row['GROUP_SHARE_PCT']:.1f}%)",
+            showarrow=False, xanchor='left',
+            font=dict(family='Hanken Grotesk', size=10, color=COLORS['dark_teal'])
+        )
+
     fig.update_layout(
+        barmode='stack',
         title=dict(text=f"{demonym}-Americans: Outmarriage by State",
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Outmarriage Rate (%)",
         xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True,
-                   range=[0, min(odf['OUTMARRIAGE_RATE'].max() * 1.25, 105)],
+                   range=[0, min(odf['OUTMARRIAGE_RATE'].max() * 1.3, 110)],
+                   ticksuffix='%',
                    title_font=dict(family='Hanken Grotesk', size=12)),
         yaxis=dict(fixedrange=True, automargin=True),
         dragmode=False,
-        height=max(400, len(odf) * 28 + 120),
+        height=max(400, len(odf) * 28 + 140),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=120, t=80)
+        margin=dict(r=120, t=80, b=80),
+        legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
     return fig
 
@@ -4281,7 +4206,7 @@ def create_geo_residuals_chart():
     fig.add_vline(x=0, line_width=1, line_color=COLORS['dark_teal'], opacity=0.5)
 
     fig.update_layout(
-        title=dict(text="Cultural vs. Geographic Effects on Outmarriage (All Groups)",
+        title=dict(text="Beyond Geography: Outmarriage Above or Below Predicted (All Groups)",
                    font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
         yaxis=dict(fixedrange=True, automargin=True),

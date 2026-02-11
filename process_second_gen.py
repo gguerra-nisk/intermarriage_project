@@ -26,7 +26,7 @@ PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 CHUNK_SIZE = 300000
 # Supports both .csv and .csv.gz files (pandas handles compression automatically)
-INPUT_FILE = "usa_00004.csv.gz"
+INPUT_FILE = "usa_00008.csv.gz"
 
 # Only process these census years - post-1930 censuses have sample-line limitations
 # that prevent reliable spouse heritage comparison
@@ -288,6 +288,10 @@ def process_chunk(chunk, chunk_num):
             'SHARES_MOTHER_HERITAGE': marriage['shares_mother'],
             'SHARES_FATHER_HERITAGE': marriage['shares_father'],
             'SHARED_COUNTRIES': '|'.join(sorted(marriage['shared_countries'])) if marriage['shared_countries'] else '',
+            'MTONGUE': int(row['MTONGUE']) if 'MTONGUE' in row.index and pd.notna(row.get('MTONGUE')) else 0,
+            'MTONGUED': int(row['MTONGUED']) if 'MTONGUED' in row.index and pd.notna(row.get('MTONGUED')) else 0,
+            'MTONGUE_SP': int(row['MTONGUE_SP']) if 'MTONGUE_SP' in row.index and pd.notna(row.get('MTONGUE_SP')) else 0,
+            'MTONGUED_SP': int(row['MTONGUED_SP']) if 'MTONGUED_SP' in row.index and pd.notna(row.get('MTONGUED_SP')) else 0,
         })
     
     return pd.DataFrame(results)
