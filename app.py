@@ -1902,18 +1902,33 @@ html {
     color: rgba(255,255,255,0.6);
 }
 
-/* Scrollable chart containers for mobile */
+/* Chart containers: responsive by default, scroll only when necessary */
 .chart-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
 
-.chart-scroll-wide .js-plotly-plot {
-    min-width: 540px;
+/* Desktop: enforce min-widths for dense charts */
+@media (min-width: 769px) {
+    .chart-scroll-wide .js-plotly-plot {
+        min-width: 540px;
+    }
+    .chart-scroll-medium .js-plotly-plot {
+        min-width: 480px;
+    }
 }
 
-.chart-scroll-medium .js-plotly-plot {
-    min-width: 480px;
+/* Mobile: let charts fit screen width */
+@media (max-width: 768px) {
+    .chart-scroll-wide .js-plotly-plot,
+    .chart-scroll-medium .js-plotly-plot {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+    /* Tighter chart padding */
+    .js-plotly-plot .plotly .main-svg {
+        overflow: visible;
+    }
 }
 
 /* Loading Animation Enhancement */
@@ -1981,6 +1996,26 @@ html {
         padding: 0.6rem 0.75rem;
         white-space: nowrap;
         flex: 0 0 auto;
+    }
+
+    /* Brand cards: reduce padding on mobile */
+    .brand-card-body {
+        padding: 0.75rem !important;
+    }
+    .brand-card-header, .brand-card-header-gold, .brand-card-header-light {
+        padding: 0.6rem 0.75rem !important;
+        font-size: 0.9rem;
+    }
+
+    /* Methodology blocks: tighter on mobile */
+    .methodology-content {
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    /* Filter panel: tighter */
+    .filter-label {
+        font-size: 0.8rem;
     }
 }
 
@@ -2951,7 +2986,7 @@ def render_tab_content(active_tab, mother, father, year):
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='main-chart', figure=create_main_chart(mother, father, year),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-wide')]),
+                                          config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}), className='chart-scroll chart-scroll-wide')]),
             _methodology_block('main-chart', [
                 "This chart shows the marriage patterns of second-generation Americans (U.S.-born individuals with at least one immigrant parent) based on the selected parental origins and census year.",
                 "Each bar represents a marriage outcome category. \"Same origin\" means the spouse shares the subject's parental heritage (e.g., a child of Irish parents married to an Irish immigrant or another child of Irish parents). \"3rd+ gen American\" means the spouse's parents were both U.S.-born. \"Different origin\" means the spouse has a different immigrant background.",
@@ -2962,7 +2997,7 @@ def render_tab_content(active_tab, mother, father, year):
         return html.Div([
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='time-chart', figure=create_time_chart(mother, father),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')]),
+                                          config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}), className='chart-scroll chart-scroll-medium')]),
             _methodology_block('trends-chart', [
                 "This chart tracks how marriage patterns changed across census years (1880, 1900, 1910, 1920, 1930) for the selected parental origins.",
                 "Each line shows the percentage of second-generation Americans who married a particular category of spouse. The data is cross-sectional: each census year captures everyone currently married at that time, not new marriages formed that year.",
@@ -2976,7 +3011,7 @@ def render_tab_content(active_tab, mother, father, year):
                    style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(dcc.Graph(id='spouse-gen-chart', figure=create_spouse_gen_chart(mother, father, year),
-                                          config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')]),
+                                          config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}), className='chart-scroll chart-scroll-medium')]),
             _methodology_block('spouse-gen-chart', [
                 "This chart breaks down spouses by their immigrant generation. \"1st generation\" spouses were themselves born outside the U.S. \"2nd generation\" spouses were U.S.-born with at least one foreign-born parent. \"3rd+ generation\" spouses had both parents born in the U.S.",
                 "Generation is determined from the spouse's birthplace (BPL_SP) and the spouse's parents' birthplaces (FBPL_SP, MBPL_SP) as recorded in the census. A spouse is classified as 2nd generation if either parent was foreign-born, and 3rd+ generation only if both parents were U.S.-born.",
@@ -3094,7 +3129,7 @@ def render_explain_tab_content(active_tab, year):
                        children=[html.Div(
                            dcc.Graph(id='geo-scatter',
                                      figure=create_geo_scatter_chart(),
-                                     config={'displayModeBar': True, 'scrollZoom': False}),
+                                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}),
                            className='chart-scroll chart-scroll-medium')]),
             _methodology_block('geo-scatter', [
                 "Each dot represents one ethnic group in one state. The x-axis shows the group's share of that state's second-generation immigrant population (log scale); the y-axis shows their outmarriage rate.",
@@ -3136,7 +3171,7 @@ def render_explain_tab_content(active_tab, year):
             dcc.Loading(type='circle', color=COLORS['medium_teal'],
                        children=[html.Div(
                            dcc.Graph(id='geo-residuals', figure=create_geo_residuals_chart(),
-                                     config={'displayModeBar': True, 'scrollZoom': False}),
+                                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}),
                            className='chart-scroll chart-scroll-medium')]),
             _methodology_block('geo-residuals', [
                 "For each ethnic group, computes the difference between their actual average outmarriage rate and what the concentration regression predicts.",
@@ -3157,15 +3192,15 @@ def update_network_chart(view_mode, year):
         avoidance_fig = create_avoidance_chart()
         return html.Div([
             html.Div(dcc.Graph(id='heatmap-chart', figure=network_fig,
-                     config={'displayModeBar': True, 'scrollZoom': False}),
+                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}),
                      className='chart-scroll chart-scroll-medium'),
             dbc.Row([
                 dbc.Col(html.Div(dcc.Graph(id='attraction-chart', figure=attraction_fig,
-                         config={'displayModeBar': True, 'scrollZoom': False}),
+                         config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}),
                          className='chart-scroll chart-scroll-medium'),
                          md=6),
                 dbc.Col(html.Div(dcc.Graph(id='avoidance-chart', figure=avoidance_fig,
-                         config={'displayModeBar': True, 'scrollZoom': False}),
+                         config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}),
                          className='chart-scroll chart-scroll-medium'),
                          md=6),
             ], style={'marginTop': '1.5rem'}),
@@ -3173,7 +3208,7 @@ def update_network_chart(view_mode, year):
     else:
         fig = create_heatmap_chart(year)
         return html.Div(dcc.Graph(id='heatmap-chart', figure=fig,
-                         config={'displayModeBar': True, 'scrollZoom': False}),
+                         config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}),
                          className='chart-scroll chart-scroll-medium')
 
 
@@ -3182,7 +3217,7 @@ def update_network_chart(view_mode, year):
 def update_outmarriage_chart(sort_by, year):
     """Update the outmarriage rates chart based on sorting selection."""
     return html.Div(dcc.Graph(id='outmarriage-chart', figure=create_outmarriage_chart(year, sort_by),
-                     config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')
+                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}), className='chart-scroll chart-scroll-medium')
 
 
 @callback(Output('geo-group-chart-container', 'children'),
@@ -3192,7 +3227,7 @@ def update_geo_group_chart(origin):
     if not origin:
         return html.P("Please select a group", style={'color': COLORS['muted_teal']})
     return html.Div(dcc.Graph(id='geo-group-chart', figure=create_geo_group_chart(origin),
-                     config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-medium')
+                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}), className='chart-scroll chart-scroll-medium')
 
 
 @callback(Output('single-origin-chart-container', 'children'),
@@ -3202,7 +3237,7 @@ def update_single_origin_chart(origin, year):
     if not origin:
         return html.P("Please select an origin", style={'color': COLORS['muted_teal']})
     return html.Div(dcc.Graph(id='single-origin-chart', figure=create_single_origin_chart(origin, year),
-                     config={'displayModeBar': True, 'scrollZoom': False}), className='chart-scroll chart-scroll-wide')
+                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True}), className='chart-scroll chart-scroll-wide')
 
 
 def create_main_chart(mother, father, year):
@@ -3249,11 +3284,11 @@ def create_main_chart(mother, father, year):
     fig.update_layout(
         title=dict(text=title, font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0, xanchor='left'),
         xaxis_title="Weighted Count",
-        xaxis=dict(title_font=dict(family='Hanken Grotesk', size=12), gridcolor=COLORS['light_gray'], fixedrange=True),
+        xaxis=dict(title_font=dict(family='Hanken Grotesk', size=12), gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
         yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True, automargin=True),
         dragmode=False,
         height=max(400, len(agg) * 45 + 120),
-        margin=dict(r=80, t=100, b=60),
+        margin=dict(l=10, r=80, t=80, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         annotations=[dict(text=sample_note, xref='paper', yref='paper', x=1, y=-0.08, showarrow=False,
                          font=dict(family='Hanken Grotesk', size=11, color=COLORS['muted_teal']))]
@@ -3309,11 +3344,11 @@ def create_time_chart(mother, father):
     fig.update_layout(
         title=dict(text="Trends Over Time", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         xaxis_title="Census Year", yaxis_title="% of Marriages",
-        xaxis=dict(gridcolor=COLORS['light_gray'], dtick=10, fixedrange=True),
-        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(yearly_agg['Percent'].max() * 1.15, 50)], fixedrange=True),
+        xaxis=dict(gridcolor=COLORS['light_gray'], dtick=10, fixedrange=True, automargin=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(yearly_agg['Percent'].max() * 1.15, 50)], fixedrange=True, automargin=True),
         dragmode=False,
         height=480, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(t=80),
+        margin=dict(l=10, r=10, t=80, b=60),
         legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
     return fig
@@ -3411,7 +3446,7 @@ def create_outmarriage_chart(year, sort_by='total'):
             dragmode=False,
             height=max(400, len(items) * 28 + 140),
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-            margin=dict(r=60, t=100, b=100),
+            margin=dict(l=10, r=60, t=80, b=100),
             annotations=[
                 dict(text="Removes effect of geographic concentration · "
                           "<b>Teal</b> = outmarried more than concentration predicts · "
@@ -3485,7 +3520,7 @@ def create_outmarriage_chart(year, sort_by='total'):
         dragmode=False,
         height=max(400, len(ranking) * 28 + 100),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100)
+        margin=dict(l=10, r=60, t=80)
     )
     return fig
 
@@ -3523,10 +3558,11 @@ def create_spouse_gen_chart(mother, father, year):
     fig.update_layout(
         title=dict(text="Spouse Generation Distribution", font=dict(family='Neuton', size=22, color=COLORS['dark_teal']), x=0),
         yaxis_title="% of Spouses",
-        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True),
-        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(percentages) * 1.2 if percentages else 100], fixedrange=True),
+        xaxis=dict(gridcolor=COLORS['light_gray'], fixedrange=True, automargin=True),
+        yaxis=dict(gridcolor=COLORS['light_gray'], range=[0, max(percentages) * 1.2 if percentages else 100], fixedrange=True, automargin=True),
         dragmode=False,
-        height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+        height=400, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=10, r=10, t=80, b=60))
     return fig
 
 
@@ -3648,7 +3684,7 @@ def _draw_network_fig(nodes, edges, positions, title, footer_lines=None):
         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False, visible=False, fixedrange=True),
         dragmode=False, height=550,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=40, r=40, t=100, b=60 + (len(footer_lines or []) * 18)),
+        margin=dict(l=20, r=20, t=80, b=60 + (len(footer_lines or []) * 18)),
         annotations=all_annotations
     )
     return fig
@@ -3767,7 +3803,7 @@ def create_avoidance_chart():
         dragmode=False,
         height=max(400, len(avoided) * 28 + 180),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100, b=120),
+        margin=dict(l=10, r=60, t=80, b=120),
         annotations=[
             dict(text="Shared the same states but rarely intermarried — cultural boundaries.",
                  xref='paper', yref='paper', x=0.5, y=-0.18, showarrow=False,
@@ -3839,7 +3875,7 @@ def create_attraction_chart():
         dragmode=False,
         height=max(400, len(attracted) * 28 + 180),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=60, t=100, b=120),
+        margin=dict(l=10, r=60, t=80, b=120),
         annotations=[
             dict(text="Married more than local shares predict — genuine cultural affinity.",
                  xref='paper', yref='paper', x=0.5, y=-0.18, showarrow=False,
@@ -3903,7 +3939,7 @@ def create_single_origin_chart(origin, year):
         yaxis=dict(tickfont=dict(family='Hanken Grotesk', size=11), fixedrange=True, automargin=True),
         barmode='stack', dragmode=False,
         height=max(400, len(df) * 45 + 120),
-        margin=dict(r=60, t=80, b=60),
+        margin=dict(l=10, r=60, t=80, b=60),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
@@ -4060,7 +4096,7 @@ def create_geo_scatter_chart():
         height=550,
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
         legend=dict(font=dict(size=10), itemsizing='constant'),
-        margin=dict(t=80, r=20)
+        margin=dict(l=10, t=80, r=20)
     )
     return fig
 
@@ -4142,7 +4178,7 @@ def create_geo_group_chart(origin):
         dragmode=False,
         height=max(400, len(odf) * 28 + 140),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=120, t=80, b=80),
+        margin=dict(l=10, r=120, t=80, b=80),
         legend=dict(orientation='h', yanchor='top', y=-0.15, xanchor='center', x=0.5)
     )
     return fig
@@ -4213,7 +4249,7 @@ def create_geo_residuals_chart():
         dragmode=False,
         height=max(400, len(group_resid) * 28 + 120),
         paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(r=80, t=100, b=100),
+        margin=dict(l=10, r=80, t=80, b=100),
         annotations=[
             dict(text="<b>Teal</b> = more outmarriage than predicted by concentration \u00a0\u00a0\u00a0 ",
                  xref='paper', yref='paper', x=0.35, y=-0.06, showarrow=False, xanchor='right',
