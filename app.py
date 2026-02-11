@@ -1323,6 +1323,7 @@ body {
     font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #194852;
     min-height: 100vh;
+    overscroll-behavior: contain;
 }
 
 /* Header */
@@ -2246,6 +2247,34 @@ app.index_string = f'''
             {{%scripts%}}
             {{%renderer%}}
         </footer>
+        <script>
+            // Broadcast content height to parent window for iframe embedding.
+            // The parent page can listen for 'dashboardResize' messages and
+            // resize the iframe to eliminate double-scrollbar issues.
+            (function() {{
+                var lastHeight = 0;
+                function postHeight() {{
+                    var h = document.documentElement.scrollHeight;
+                    if (h !== lastHeight) {{
+                        lastHeight = h;
+                        window.parent.postMessage({{type: 'dashboardResize', height: h}}, '*');
+                    }}
+                }}
+                // Check on load, resize, and DOM mutations (tab switches, selections)
+                window.addEventListener('load', postHeight);
+                window.addEventListener('resize', postHeight);
+                var observer = new MutationObserver(function() {{
+                    setTimeout(postHeight, 100);
+                }});
+                observer.observe(document.body, {{childList: true, subtree: true, attributes: true}});
+                // Also poll briefly after page load to catch async chart renders
+                var polls = 0;
+                var poller = setInterval(function() {{
+                    postHeight();
+                    if (++polls > 20) clearInterval(poller);
+                }}, 500);
+            }})();
+        </script>
     </body>
 </html>
 '''
