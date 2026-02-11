@@ -3259,8 +3259,9 @@ def create_main_chart(mother, father, year):
 
     fig = go.Figure(go.Bar(
         x=agg['WEIGHTED_COUNT'], y=agg['DisplayLabel'], orientation='h',
-        marker_color=agg['Color'], text=agg['Label'], textposition='outside',
+        marker_color=agg['Color'], text=agg['Label'], textposition='auto',
         textfont=dict(family='Hanken Grotesk', size=12, color=COLORS['dark_teal']),
+        insidetextanchor='end',
         hovertemplate='<b>%{y}</b><br>Count: %{x:,.0f}<br>Percent: %{text}<extra></extra>'
     ))
 
@@ -3431,7 +3432,8 @@ def create_outmarriage_chart(year, sort_by='total'):
             marker_color=[COLORS['medium_teal'] if r['residual'] >= 0 else COLORS['gold']
                           for r in items],
             text=[f"{v:.0f}%" for v in values],
-            textposition='outside',
+            textposition='auto',
+            insidetextanchor='end',
             hovertemplate="%{customdata}<extra></extra>",
             customdata=hover_texts
         ))
@@ -3507,7 +3509,8 @@ def create_outmarriage_chart(year, sort_by='total'):
         orientation='h',
         marker_color=COLORS['medium_teal'],
         text=[f"{v:.0f}%" for v in values],
-        textposition='outside',
+        textposition='auto',
+        insidetextanchor='end',
         hovertemplate="%{customdata}<extra></extra>",
         customdata=hover_texts
     ))
@@ -3550,7 +3553,7 @@ def create_spouse_gen_chart(mother, father, year):
         y=percentages,
         marker_color=[gen_colors[g] for g in generations],
         text=[f"{p:.1f}%" for p in percentages],
-        textposition='outside',
+        textposition='auto',
         hovertemplate="<b>%{x}</b><br>%{y:.1f}%<br>Count: %{customdata:,.0f}<extra></extra>",
         customdata=counts
     ))
@@ -3780,7 +3783,8 @@ def create_avoidance_chart():
         orientation='h',
         marker_color=colors,
         text=[f"{rv:.2f}x" for rv in raw_values],
-        textposition='outside',
+        textposition='auto',
+        insidetextanchor='end',
         textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
         hovertemplate=(
             '<b>%{y}</b><br>'
@@ -3851,7 +3855,8 @@ def create_attraction_chart():
         orientation='h',
         marker_color=colors,
         text=[f"{v:.1f}x" for v in values],
-        textposition='outside',
+        textposition='auto',
+        insidetextanchor='end',
         textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
         hovertemplate=(
             '<b>%{y}</b><br>'
@@ -4230,7 +4235,8 @@ def create_geo_residuals_chart():
         orientation='h',
         marker_color=colors,
         text=[f"{r:+.1f}pp" for r in group_resid['AVG_RESIDUAL']],
-        textposition='outside',
+        textposition='auto',
+        insidetextanchor='end',
         textfont=dict(family='Hanken Grotesk', size=11, color=COLORS['dark_teal']),
         hovertemplate=(
             '<b>%{y}</b><br>'
