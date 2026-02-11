@@ -2249,25 +2249,65 @@ app.index_string = f'''
         </footer>
         <script>
             // Broadcast content height to parent window for iframe embedding.
-            // The parent page can listen for 'dashboardResize' messages and
-            // resize the iframe to eliminate double-scrollbar issues.
+            // Uses actual rendered height (not scrollHeight which doesn't shrink
+            // reliably after CSS max-height collapse transitions).
             (function() {{
                 var lastHeight = 0;
+                var pending = null;
+
+                function measureHeight() {{
+                    // Get the actual bottom of rendered content by checking
+                    // the Dash app container's bounding rect
+                    var app = document.getElementById('react-entry-point');
+                    if (app) {{
+                        var rect = app.getBoundingClientRect();
+                        return Math.ceil(rect.top + window.scrollY + rect.height);
+                    }}
+                    // Fallback: walk top-level body children to find actual bottom
+                    var maxBottom = 0;
+                    var children = document.body.children;
+                    for (var i = 0; i < children.length; i++) {{
+                        var r = children[i].getBoundingClientRect();
+                        var bottom = r.top + window.scrollY + r.height;
+                        if (bottom > maxBottom) maxBottom = bottom;
+                    }}
+                    return Math.ceil(maxBottom) || document.documentElement.scrollHeight;
+                }}
+
                 function postHeight() {{
-                    var h = document.documentElement.scrollHeight;
+                    var h = measureHeight();
                     if (h !== lastHeight) {{
                         lastHeight = h;
                         window.parent.postMessage({{type: 'dashboardResize', height: h}}, '*');
                     }}
                 }}
-                // Check on load, resize, and DOM mutations (tab switches, selections)
-                window.addEventListener('load', postHeight);
+
+                // Schedule a height check after CSS transitions complete
+                function scheduleCheck() {{
+                    if (pending) clearTimeout(pending);
+                    // Immediate check for expansions
+                    requestAnimationFrame(postHeight);
+                    // Delayed checks for collapse transitions (0.3s-0.5s CSS durations)
+                    setTimeout(postHeight, 150);
+                    pending = setTimeout(postHeight, 500);
+                }}
+
+                window.addEventListener('load', scheduleCheck);
                 window.addEventListener('resize', postHeight);
-                var observer = new MutationObserver(function() {{
-                    setTimeout(postHeight, 100);
-                }});
+
+                // Watch for DOM changes (tab switches, dropdown selections, collapse/expand)
+                var observer = new MutationObserver(scheduleCheck);
                 observer.observe(document.body, {{childList: true, subtree: true, attributes: true}});
-                // Also poll briefly after page load to catch async chart renders
+
+                // Listen for CSS transition ends (collapse/expand animations)
+                document.addEventListener('transitionend', function(e) {{
+                    if (e.propertyName === 'max-height' || e.propertyName === 'height'
+                        || e.propertyName === 'padding') {{
+                        postHeight();
+                    }}
+                }});
+
+                // Initial polls to catch async chart renders
                 var polls = 0;
                 var poller = setInterval(function() {{
                     postHeight();
