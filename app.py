@@ -2925,13 +2925,8 @@ app.clientside_callback(
     """
     function(n_clicks, href) {
         if (!n_clicks) return [dash_clientside.no_update, ''];
-        // Build shareable URL with production domain
-        try {
-            var u = new URL(href);
-            var shareUrl = 'https://intermarriage-dashboard.onrender.com' + u.pathname + u.search + u.hash;
-        } catch(e) {
-            var shareUrl = href;
-        }
+        // Build shareable URL pointing to the Niskanen embed page
+        var shareUrl = 'https://www.niskanencenter.org/marriage-meltingpot/';
         // Copy to clipboard (works in both standalone and iframe contexts)
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(shareUrl).catch(function() {});
@@ -2960,19 +2955,18 @@ app.clientside_callback(
     [Input('url', 'href')]
 )
 def update_social_links(href):
-    if not href:
-        href = "https://www.niskanencenter.org/intermarriage-dashboard/"
+    # Always share the Niskanen embed page
+    share_url = "https://www.niskanencenter.org/marriage-meltingpot/"
 
     title = "Marriage and the Melting Pot, 1880-1930 - Niskanen Center"
     description = "Explore marriage patterns of second-generation Americans using census data from 1880-1930."
 
-    # URL encode the parameters
     from urllib.parse import quote
 
-    twitter_url = f"https://twitter.com/intent/tweet?url={quote(href)}&text={quote(title)}"
-    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={quote(href)}"
-    facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={quote(href)}"
-    email_url = f"mailto:?subject={quote(title)}&body={quote(description + chr(10) + chr(10) + href)}"
+    twitter_url = f"https://twitter.com/intent/tweet?url={quote(share_url)}&text={quote(title)}"
+    linkedin_url = f"https://www.linkedin.com/sharing/share-offsite/?url={quote(share_url)}"
+    facebook_url = f"https://www.facebook.com/sharer/sharer.php?u={quote(share_url)}"
+    email_url = f"mailto:?subject={quote(title)}&body={quote(description + chr(10) + chr(10) + share_url)}"
 
     return twitter_url, linkedin_url, facebook_url, email_url
 
