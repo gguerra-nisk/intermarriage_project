@@ -2396,8 +2396,8 @@ app.layout = html.Div([
                         html.Div("married within their ethnic heritage", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                     html.Div([
-                        html.Div("19.1M", className='welcome-stat-value-neutral'),
-                        html.Div("individuals in sample", className='welcome-stat-label'),
+                        html.Div("17.8M", className='welcome-stat-value-neutral'),
+                        html.Div("census records drawn from", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                 ], className='welcome-stats'),
                 # Navigation cards
@@ -2592,7 +2592,7 @@ app.layout = html.Div([
                 html.Div([
                     html.H4("Data Source", style={'color': COLORS['dark_teal'], 'marginTop': '0', 'marginBottom': '0.5rem', 'fontFamily': 'Neuton, serif'}),
                     html.P([
-                        "This dashboard uses microdata from ",
+                        "This dashboard draws on 17.8 million individual census records from ",
                         html.A("IPUMS USA", href="https://usa.ipums.org", target="_blank", style={'color': COLORS['medium_teal']}),
                         " (Integrated Public Use Microdata Series), a harmonized collection of U.S. Census samples maintained by the Minnesota Population Center."
                     ], style={'marginBottom': '0.75rem'}),
@@ -2604,11 +2604,11 @@ app.layout = html.Div([
                             html.Th("Approx. Records", style={'padding': '0.5rem', 'borderBottom': f'2px solid {COLORS["dark_teal"]}', 'textAlign': 'left'}),
                         ])),
                         html.Tbody([
-                            html.Tr([html.Td("1880"), html.Td("10%"), html.Td("~5 million")]),
-                            html.Tr([html.Td("1900"), html.Td("5%"), html.Td("~3.8 million")], style={'backgroundColor': COLORS['very_light_gray']}),
-                            html.Tr([html.Td("1910"), html.Td("1%"), html.Td("~0.9 million")]),
-                            html.Tr([html.Td("1920"), html.Td("1%"), html.Td("~1.0 million")], style={'backgroundColor': COLORS['very_light_gray']}),
-                            html.Tr([html.Td("1930"), html.Td("5%"), html.Td("~6.1 million")]),
+                            html.Tr([html.Td("1880"), html.Td("10%"), html.Td("5.9 million")]),
+                            html.Tr([html.Td("1900"), html.Td("5%"), html.Td("3.9 million")], style={'backgroundColor': COLORS['very_light_gray']}),
+                            html.Tr([html.Td("1910"), html.Td("1%"), html.Td("0.9 million")]),
+                            html.Tr([html.Td("1920"), html.Td("1%"), html.Td("1.1 million")], style={'backgroundColor': COLORS['very_light_gray']}),
+                            html.Tr([html.Td("1930"), html.Td("5%"), html.Td("6.1 million")]),
                         ])
                     ], style={'width': '100%', 'marginBottom': '1.25rem', 'fontSize': '0.9rem', 'borderCollapse': 'collapse'}),
 
