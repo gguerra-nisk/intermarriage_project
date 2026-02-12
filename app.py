@@ -2369,12 +2369,14 @@ app.layout = html.Div([
 
             # Welcome / Landing Section
             html.Div([
-                html.P(
+                html.P([
                     "This dashboard explores the marriage patterns of second-generation Americans"
                     "\u2014U.S.-born individuals with at least one immigrant parent\u2014using "
-                    "census data from 1880 to 1930.",
-                    className='welcome-intro'
-                ),
+                    "census data from 1880 to 1930. Read the author\u2019s analysis of the findings ",
+                    html.A("here", href="https://www.points-of-entry.com/p/marriage-and-the-melting-pot",
+                           target="_blank", style={'color': COLORS['medium_teal'], 'textDecoration': 'underline'}),
+                    "."
+                ], className='welcome-intro'),
                 # Topline stats
                 html.Div([
                     html.Div([
