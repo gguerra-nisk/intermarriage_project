@@ -2658,7 +2658,7 @@ app.layout = html.Div([
                     html.P("To cite this dashboard:", style={'marginTop': '1rem', 'marginBottom': '0.25rem'}),
                     html.Blockquote([
                         "Guerra, Gil. \u201cMarriage and the Melting Pot, 1880\u20131930.\u201d Interactive dashboard. Washington, DC: Niskanen Center, 2026. ",
-                        html.A("https://intermarriage-dashboard.onrender.com", href="https://intermarriage-dashboard.onrender.com", target="_blank", style={'color': COLORS['medium_teal']}),
+                        html.A("https://www.niskanencenter.org/marriage-meltingpot/", href="https://www.niskanencenter.org/marriage-meltingpot/", target="_blank", style={'color': COLORS['medium_teal']}),
                         "."
                     ], style={
                         'borderLeft': f'3px solid {COLORS["gold"]}',
