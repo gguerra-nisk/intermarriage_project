@@ -2396,8 +2396,8 @@ app.layout = html.Div([
                         html.Div("married within their ethnic heritage", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                     html.Div([
-                        html.Div("17.8M", className='welcome-stat-value-neutral'),
-                        html.Div("census records drawn from", className='welcome-stat-label'),
+                        html.Div("19.1M", className='welcome-stat-value-neutral'),
+                        html.Div("people represented", className='welcome-stat-label'),
                     ], className='welcome-stat-item'),
                 ], className='welcome-stats'),
                 # Navigation cards
