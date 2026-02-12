@@ -901,12 +901,12 @@ def generate_summary(mother, father, year):
         return "\n".join(lines)
 
     if weighted_n < SMALL_SAMPLE:
-        lines.append(f"*Based on {weighted_n:,.0f} individuals ({unweighted_n:,} census records)*")
+        lines.append(f"*Based on {unweighted_n:,} census records ({weighted_n:,.0f} weighted individuals)*")
         lines.append("")
         lines.append(f"**Note: Small sample size** - Results based on fewer than 50,000 weighted individuals.")
         lines.append("")
     else:
-        lines.append(f"*Based on {weighted_n:,.0f} individuals ({unweighted_n:,} census records)*")
+        lines.append(f"*Based on {unweighted_n:,} census records (representing ~{weighted_n:,.0f} individuals)*")
         lines.append("")
 
     # Add year-specific methodology notes with composition
@@ -2852,9 +2852,9 @@ def _build_narrative_snapshot(mother, father, year, mother_dem, father_dem,
 
     # Sentence 3: Sample context
     if weighted >= 100000:
-        sentence3 = f"Based on a robust sample of {weighted:,.0f} individuals."
+        sentence3 = f"Based on {unweighted:,} census records (representing ~{weighted:,.0f} individuals)."
     else:
-        sentence3 = f"Based on {weighted:,.0f} individuals ({unweighted:,} census records)."
+        sentence3 = f"Based on {unweighted:,} census records ({weighted:,.0f} weighted individuals)."
 
     return f"{sentence1} {sentence2} {sentence3}"
 
