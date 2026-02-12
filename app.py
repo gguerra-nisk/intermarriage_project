@@ -2921,10 +2921,34 @@ def reset_filters(n_clicks):
     return ('Any', 'Any', 'All', '') if n_clicks else (no_update, no_update, no_update, no_update)
 
 
-@callback([Output('clipboard', 'content'), Output('link-copied-msg', 'children')],
-          [Input('copy-link-btn', 'n_clicks')], [State('url', 'href')], prevent_initial_call=True)
-def copy_link(n_clicks, href):
-    return (href, "Copied!") if n_clicks else (no_update, "")
+app.clientside_callback(
+    """
+    function(n_clicks, href) {
+        if (!n_clicks) return [dash_clientside.no_update, ''];
+        // Build shareable URL with production domain
+        try {
+            var u = new URL(href);
+            var shareUrl = 'https://intermarriage-dashboard.onrender.com' + u.pathname + u.search + u.hash;
+        } catch(e) {
+            var shareUrl = href;
+        }
+        // Copy to clipboard (works in both standalone and iframe contexts)
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(shareUrl).catch(function() {});
+        }
+        // Clear "Copied!" after 3 seconds
+        setTimeout(function() {
+            var el = document.getElementById('link-copied-msg');
+            if (el) el.textContent = '';
+        }, 3000);
+        return [shareUrl, 'Copied!'];
+    }
+    """,
+    [Output('clipboard', 'content'), Output('link-copied-msg', 'children')],
+    [Input('copy-link-btn', 'n_clicks')],
+    [State('url', 'href')],
+    prevent_initial_call=True
+)
 
 
 # Social share button URLs
