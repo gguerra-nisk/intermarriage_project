@@ -3348,7 +3348,7 @@ def render_explain_tab_content(active_tab, year):
                 "(i.e., those with no recent immigrant ancestry). \u201cMarried Diff. 2nd Gen\u201d shows the share "
                 "who outmarried into a different second-generation immigrant community rather than marrying "
                 "a 3rd+ generation American. Together, these two views compose the overall outmarriage rate.",
-                "The \u201cConcentration-Adjusted\u201d view asks: did this state\u2019s immigrants outmarry more or less than "
+                "The \u201cConcentration-Adjusted\u201d view asks: did this state\u2019s second-generation Americans outmarry more or less than "
                 "you\u2019d predict from how concentrated each group was locally? It uses the same log-concentration "
                 "regression from the \u201cConcentration vs. Outmarriage\u201d scatter plot to predict each group\u2019s "
                 "expected outmarriage rate given its share of the state\u2019s 2nd-generation population, then compares "
