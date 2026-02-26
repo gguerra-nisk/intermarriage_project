@@ -115,6 +115,25 @@ DEMONYMS = {
 def get_demonym(country):
     return DEMONYMS.get(country, country)
 
+# State name → 2-letter abbreviation for Plotly choropleth
+STATE_ABBREV = {
+    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE',
+    'District of Columbia': 'DC', 'Florida': 'FL', 'Georgia': 'GA',
+    'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN',
+    'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA',
+    'Maine': 'ME', 'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI',
+    'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO', 'Montana': 'MT',
+    'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH',
+    'New Jersey': 'NJ', 'New Mexico': 'NM', 'New York': 'NY',
+    'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+    'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA',
+    'Rhode Island': 'RI', 'South Carolina': 'SC', 'South Dakota': 'SD',
+    'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+    'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV',
+    'Wisconsin': 'WI', 'Wyoming': 'WY',
+}
+
 # =============================================================================
 # DATA LOADING (Aggregated Files)
 # =============================================================================
@@ -2575,13 +2594,15 @@ app.layout = html.Div([
                     html.Span("— geography and culture beyond national origin", className='section-subtitle')
                 ], className='section-header-prominent'),
                 dbc.Tabs([
+                    dbc.Tab(label="Map", tab_id="tab-geo-map",
+                            disabled=DATA.get('geographic') is None),
                     dbc.Tab(label="Concentration vs. Outmarriage", tab_id="tab-geo-scatter",
                             disabled=DATA.get('geographic') is None),
-                    dbc.Tab(label="By State", tab_id="tab-geo-state",
+                    dbc.Tab(label="Group by State", tab_id="tab-geo-state",
                             disabled=DATA.get('geographic') is None),
                     dbc.Tab(label="Beyond Geography", tab_id="tab-geo-residuals",
                             disabled=DATA.get('geographic') is None),
-                ], id='explain-tabs', active_tab='tab-geo-scatter', className='mb-0'),
+                ], id='explain-tabs', active_tab='tab-geo-map', className='mb-0'),
                 html.Div([html.Div(id='explain-tab-content')], className='brand-card',
                         style={'borderRadius': '0 0 16px 16px'})
             ], id='deeper-analysis', className='mb-4'),
@@ -2731,7 +2752,7 @@ app.clientside_callback(
         } else if (id === 'nav-card-geo') {
             var el = document.getElementById('deeper-analysis');
             if (el) el.scrollIntoView({behavior: 'smooth'});
-            return [dash_clientside.no_update, 'tab-geo-scatter'];
+            return [dash_clientside.no_update, 'tab-geo-map'];
         } else if (id === 'nav-card-explore') {
             var el = document.getElementById('filters');
             if (el) el.scrollIntoView({behavior: 'smooth'});
@@ -3277,7 +3298,111 @@ def render_explain_tab_content(active_tab, year):
             ]),
         ], style={'padding': '1rem'})
 
+    elif active_tab == 'tab-geo-map':
+        geo_origins = sorted(geo_df['ORIGIN_GROUP'].unique().tolist())
+        default_map_group = 'Italy' if 'Italy' in geo_origins else geo_origins[0]
+        btn_style = {
+            'fontSize': '0.8rem', 'padding': '0.35rem 0.75rem', 'border': f'1px solid {COLORS["light_gray"]}',
+            'borderRadius': '6px', 'cursor': 'pointer', 'fontFamily': 'Hanken Grotesk',
+            'backgroundColor': COLORS['white'], 'color': COLORS['dark_teal'],
+        }
+        btn_active = {**btn_style, 'backgroundColor': COLORS['dark_teal'], 'color': COLORS['white'],
+                      'border': f'1px solid {COLORS["dark_teal"]}'}
+        map_view_buttons = [
+            ('composition_adjusted', 'Concentration-Adjusted'),
+            ('overall_outmarriage', 'Overall Outmarriage'),
+            ('third_gen_rate', 'Married 3rd+ Gen'),
+            ('diff_2ndgen_rate', 'Married Diff. 2nd Gen'),
+            ('group_outmarriage', 'By Group'),
+        ]
+        return html.Div([
+            html.P("Explore geographic patterns interactively. Choose a view to see how outmarriage, "
+                   "ethnic concentration, and population vary across states.",
+                   style={'color': COLORS['muted_teal'], 'fontSize': '0.9rem', 'marginBottom': '1rem'}),
+            dcc.Store(id='map-view-store', data='composition_adjusted'),
+            html.Div([
+                html.Button(
+                    label,
+                    id={'type': 'map-view-btn', 'index': val},
+                    n_clicks=0,
+                    style=btn_active if val == 'composition_adjusted' else btn_style,
+                ) for val, label in map_view_buttons
+            ], style={'display': 'flex', 'flexWrap': 'wrap', 'gap': '0.4rem', 'marginBottom': '0.75rem'}),
+            html.Div([
+                html.Label("Group: ", style={'fontWeight': '600', 'marginRight': '0.5rem',
+                           'color': COLORS['dark_teal'], 'display': 'inline-block', 'verticalAlign': 'middle'}),
+                dcc.Dropdown(
+                    id='map-group-dropdown',
+                    options=[{'label': get_demonym(o) + '-Americans', 'value': o} for o in geo_origins],
+                    value=default_map_group,
+                    style={'maxWidth': '300px', 'width': '100%', 'display': 'inline-block', 'verticalAlign': 'middle'},
+                    clearable=False,
+                ),
+            ], id='map-group-dropdown-container', style={'marginBottom': '1rem', 'display': 'none'}),
+            dcc.Loading(type='circle', color=COLORS['medium_teal'],
+                       children=[html.Div(id='map-chart-container')]),
+            _methodology_block('geo-map', [
+                "This choropleth map shows state-level patterns for second-generation immigrants (1880\u20131930). "
+                "All census years are pooled for statistical power.",
+                "\u201cMarried 3rd+ Gen\u201d shows the share who married third-or-later-generation Americans "
+                "(i.e., those with no recent immigrant ancestry). \u201cMarried Diff. 2nd Gen\u201d shows the share "
+                "who outmarried into a different second-generation immigrant community rather than marrying "
+                "a 3rd+ generation American. Together, these two views compose the overall outmarriage rate.",
+                "The \u201cConcentration-Adjusted\u201d view asks: did this state\u2019s immigrants outmarry more or less than "
+                "you\u2019d predict from how concentrated each group was locally? It uses the same log-concentration "
+                "regression from the \u201cConcentration vs. Outmarriage\u201d scatter plot to predict each group\u2019s "
+                "expected outmarriage rate given its share of the state\u2019s 2nd-generation population, then compares "
+                "the weighted-average predicted rate to the actual rate. This controls for both which groups live "
+                "in a state and how dominant they are locally \u2014 so the residual reflects genuinely state-level "
+                "factors (local culture, labor markets, residential patterns) rather than compositional artifacts.",
+                "States with fewer than 5,000 weighted second-generation observations are shown in gray. "
+                "Hover over gray states for details.",
+            ]),
+        ], style={'padding': '1rem'})
+
     return html.Div()
+
+
+@callback(
+    [Output('map-view-store', 'data'),
+     Output({'type': 'map-view-btn', 'index': ALL}, 'style')],
+    Input({'type': 'map-view-btn', 'index': ALL}, 'n_clicks'),
+    State('map-view-store', 'data'),
+    prevent_initial_call=True,
+)
+def update_map_view_store(n_clicks_list, current_view):
+    """Track which map-view button was clicked and restyle all buttons."""
+    triggered = ctx.triggered_id
+    if triggered is None:
+        return no_update, no_update
+    new_view = triggered['index']
+    base = {
+        'fontSize': '0.8rem', 'padding': '0.35rem 0.75rem', 'border': f'1px solid {COLORS["light_gray"]}',
+        'borderRadius': '6px', 'cursor': 'pointer', 'fontFamily': 'Hanken Grotesk',
+        'backgroundColor': COLORS['white'], 'color': COLORS['dark_teal'],
+    }
+    active = {**base, 'backgroundColor': COLORS['dark_teal'], 'color': COLORS['white'],
+              'border': f'1px solid {COLORS["dark_teal"]}'}
+    styles = [active if inp['id']['index'] == new_view else base for inp in ctx.inputs_list[0]]
+    return new_view, styles
+
+
+@callback(Output('map-chart-container', 'children'),
+          [Input('map-view-store', 'data'), Input('map-group-dropdown', 'value')])
+def update_map_chart(view_mode, group):
+    """Update the choropleth map based on view mode and group selection."""
+    fig = create_choropleth_map(view_mode, group)
+    return dcc.Graph(id='choropleth-map', figure=fig,
+                     config={'displayModeBar': True, 'scrollZoom': False, 'responsive': True})
+
+
+@callback(Output('map-group-dropdown-container', 'style'),
+          [Input('map-view-store', 'data')])
+def toggle_map_group_dropdown(view_mode):
+    """Show the group dropdown only for group-specific view modes."""
+    if view_mode == 'group_outmarriage':
+        return {'marginBottom': '1rem', 'display': 'block'}
+    return {'marginBottom': '1rem', 'display': 'none'}
 
 
 @callback(Output('network-chart-container', 'children'),
@@ -4365,6 +4490,274 @@ def create_geo_residuals_chart():
                  xref='paper', yref='paper', x=0.5, y=-0.13, showarrow=False, xanchor='center',
                  font=dict(size=10, color=COLORS['muted_teal'], family='Hanken Grotesk')),
         ]
+    )
+    return fig
+
+
+ALL_STATE_ABBREVS = list(STATE_ABBREV.values())
+
+def create_choropleth_map(view_mode, group=None):
+    """Create an interactive US choropleth map for the given view mode."""
+    geo_df = get_geographic_data()
+    if geo_df is None or len(geo_df) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No geographic data available", x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=500)
+        return fig
+
+    MIN_POP = 5000
+
+    def _weighted_avg(df, col):
+        w = df['WEIGHTED_N']
+        return np.average(df[col], weights=w) if w.sum() > 0 else np.nan
+
+    if view_mode == 'overall_outmarriage':
+        state_data = geo_df.groupby('STATE_NAME').apply(
+            lambda g: pd.Series({
+                'value': _weighted_avg(g, 'OUTMARRIAGE_RATE'),
+                'pop': g['WEIGHTED_N'].sum(),
+            }), include_groups=False
+        ).reset_index()
+        state_data = state_data[state_data['pop'] >= MIN_POP]
+        title_text = "Overall Outmarriage Rate by State"
+        colorscale = [[0, COLORS['very_light_teal']], [1, COLORS['dark_teal']]]
+        zmin, zmax = 0, 80
+        fmt = '.1f'
+        suffix = '%'
+        colorbar_title = 'Outmarriage %'
+
+    elif view_mode == 'third_gen_rate':
+        state_data = geo_df.groupby('STATE_NAME').apply(
+            lambda g: pd.Series({
+                'value': _weighted_avg(g, 'THIRD_GEN_RATE'),
+                'pop': g['WEIGHTED_N'].sum(),
+            }), include_groups=False
+        ).reset_index()
+        state_data = state_data[state_data['pop'] >= MIN_POP]
+        title_text = "Outmarriage to 3rd+ Gen Americans by State"
+        colorscale = [[0, COLORS['very_light_teal']], [1, COLORS['dark_teal']]]
+        zmin, zmax = 0, 60
+        fmt = '.1f'
+        suffix = '%'
+        colorbar_title = '3rd+ Gen %'
+
+    elif view_mode == 'diff_2ndgen_rate':
+        state_data = geo_df.groupby('STATE_NAME').apply(
+            lambda g: pd.Series({
+                'value': _weighted_avg(g, 'OUTMARRIAGE_RATE') - _weighted_avg(g, 'THIRD_GEN_RATE'),
+                'pop': g['WEIGHTED_N'].sum(),
+            }), include_groups=False
+        ).reset_index()
+        state_data = state_data[state_data['pop'] >= MIN_POP]
+        title_text = "Outmarriage to Different 2nd-Gen Immigrants by State"
+        colorscale = [[0, COLORS['very_light_gold']], [1, COLORS['dark_gold']]]
+        zmin, zmax = 0, 40
+        fmt = '.1f'
+        suffix = '%'
+        colorbar_title = 'Diff. 2nd Gen %'
+
+    elif view_mode == 'composition_adjusted':
+        # Fit log-concentration → outmarriage regression across all group-state observations
+        reg_df = geo_df[geo_df['WEIGHTED_N'] >= MIN_POP].copy()
+        reg_df = reg_df[reg_df['GROUP_SHARE_PCT'] > 0]
+        log_conc = np.log10(reg_df['GROUP_SHARE_PCT'].values)
+        out_rate = reg_df['OUTMARRIAGE_RATE'].values
+        mask = np.isfinite(log_conc) & np.isfinite(out_rate)
+        coeffs = np.polyfit(log_conc[mask], out_rate[mask], 1) if mask.sum() > 2 else [0, 0]
+        # For each state, predict each group's outmarriage from its local concentration,
+        # then compare the weighted-average actual rate to the weighted-average predicted rate
+        states = geo_df['STATE_NAME'].unique()
+        rows = []
+        for state in states:
+            sdf = geo_df[geo_df['STATE_NAME'] == state]
+            total_pop = sdf['WEIGHTED_N'].sum()
+            if total_pop < MIN_POP:
+                continue
+            actual = np.average(sdf['OUTMARRIAGE_RATE'], weights=sdf['WEIGHTED_N'])
+            # Predicted rate for each group given its local concentration
+            pred_rates = []
+            weights = []
+            for _, row in sdf.iterrows():
+                conc = row['GROUP_SHARE_PCT']
+                if conc > 0 and np.isfinite(conc):
+                    pred = np.polyval(coeffs, np.log10(conc))
+                    pred_rates.append(pred)
+                    weights.append(row['WEIGHTED_N'])
+            if weights:
+                expected = np.average(pred_rates, weights=weights)
+            else:
+                expected = actual
+            rows.append({'STATE_NAME': state, 'value': actual - expected, 'pop': total_pop,
+                         'actual': actual, 'expected': expected})
+        state_data = pd.DataFrame(rows)
+        title_text = "Concentration-Adjusted Outmarriage (Actual vs. Predicted)"
+        colorscale = [[0, COLORS['light_gold']], [0.5, COLORS['very_light_gray']], [1, COLORS['dark_teal']]]
+        zmin, zmax = -15, 15
+        fmt = '+.1f'
+        suffix = ' pp'
+        colorbar_title = 'Residual (pp)'
+
+    elif view_mode == 'group_outmarriage':
+        if group is None:
+            fig = go.Figure()
+            fig.add_annotation(text="Select a group", x=0.5, y=0.5, showarrow=False)
+            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=500)
+            return fig
+        gdf = geo_df[geo_df['ORIGIN_GROUP'] == group]
+        state_data = gdf[gdf['WEIGHTED_N'] >= MIN_POP][['STATE_NAME', 'OUTMARRIAGE_RATE', 'WEIGHTED_N']].copy()
+        state_data = state_data.rename(columns={'OUTMARRIAGE_RATE': 'value', 'WEIGHTED_N': 'pop'})
+        title_text = f"{get_demonym(group)}-American Outmarriage Rate by State"
+        colorscale = [[0, COLORS['very_light_teal']], [1, COLORS['dark_teal']]]
+        zmin, zmax = 0, 100
+        fmt = '.1f'
+        suffix = '%'
+        colorbar_title = 'Outmarriage %'
+
+    elif view_mode == 'group_concentration':
+        if group is None:
+            fig = go.Figure()
+            fig.add_annotation(text="Select a group", x=0.5, y=0.5, showarrow=False)
+            fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=500)
+            return fig
+        gdf = geo_df[geo_df['ORIGIN_GROUP'] == group]
+        state_data = gdf[gdf['WEIGHTED_N'] >= MIN_POP][['STATE_NAME', 'GROUP_SHARE_PCT', 'WEIGHTED_N']].copy()
+        state_data = state_data.rename(columns={'GROUP_SHARE_PCT': 'value', 'WEIGHTED_N': 'pop'})
+        title_text = f"{get_demonym(group)}-American Concentration by State"
+        colorscale = [[0, COLORS['very_light_gold']], [1, COLORS['dark_gold']]]
+        zmin, zmax = 0, 50
+        fmt = '.1f'
+        suffix = '%'
+        colorbar_title = 'Group Share %'
+
+    elif view_mode == 'total_population':
+        state_data = geo_df.groupby('STATE_NAME').agg(
+            pop=('WEIGHTED_N', 'sum')
+        ).reset_index()
+        state_data['value'] = state_data['pop']
+        title_text = "Total Second-Generation Population by State"
+        colorscale = [[0, COLORS['very_light_purple']], [1, COLORS['dark_purple']]]
+        zmin, zmax = 0, state_data['value'].quantile(0.95) if len(state_data) > 0 else 1
+        fmt = ',.0f'
+        suffix = ''
+        colorbar_title = 'Population'
+    else:
+        fig = go.Figure()
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=500)
+        return fig
+
+    if len(state_data) == 0:
+        fig = go.Figure()
+        fig.add_annotation(text="No data meeting minimum population threshold",
+                           x=0.5, y=0.5, showarrow=False)
+        fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', height=500)
+        return fig
+
+    state_data['abbrev'] = state_data['STATE_NAME'].map(STATE_ABBREV)
+    state_data = state_data.dropna(subset=['abbrev'])
+
+    # Build layperson-friendly hover text for states with data
+    hover_labels = {
+        'overall_outmarriage': 'Outmarriage rate',
+        'third_gen_rate': 'Married 3rd+ gen Americans',
+        'diff_2ndgen_rate': 'Married diff. immigrant group',
+        'composition_adjusted': None,  # custom below
+        'group_outmarriage': 'Outmarriage rate',
+        'group_concentration': 'Share of 2nd-gen population',
+        'total_population': '2nd-gen immigrant population',
+    }
+    hover_text = []
+    for _, row in state_data.iterrows():
+        pop_str = f"{row['pop']:,.0f}"
+        if view_mode == 'composition_adjusted':
+            val = row['value']
+            direction = 'above' if val > 0 else 'below'
+            hover_text.append(
+                f"<b>{row['STATE_NAME']}</b><br>"
+                f"Actual outmarriage: {row['actual']:.1f}%<br>"
+                f"Predicted from concentration: {row['expected']:.1f}%<br>"
+                f"<b>{abs(val):.1f} pp {direction}</b> what concentration predicts<br>"
+                f"Based on {pop_str} observations"
+            )
+        elif view_mode == 'total_population':
+            hover_text.append(
+                f"<b>{row['STATE_NAME']}</b><br>"
+                f"{pop_str} second-generation immigrants"
+            )
+        else:
+            label = hover_labels.get(view_mode, 'Value')
+            val_str = f"{row['value']:{fmt}}{suffix}"
+            hover_text.append(
+                f"<b>{row['STATE_NAME']}</b><br>"
+                f"{label}: {val_str}<br>"
+                f"Based on {pop_str} observations"
+            )
+
+    # Identify states without sufficient data for the no-data overlay
+    data_abbrevs = set(state_data['abbrev'].tolist())
+    nodata_abbrevs = [a for a in ALL_STATE_ABBREVS if a not in data_abbrevs]
+    abbrev_to_name = {v: k for k, v in STATE_ABBREV.items()}
+
+    fig = go.Figure()
+
+    # No-data states: gray fill with informative hover
+    if nodata_abbrevs:
+        group_label = f" {get_demonym(group)}-American" if group and view_mode == 'group_outmarriage' else ''
+        nodata_hover = [
+            f"<b>{abbrev_to_name.get(a, a)}</b><br>"
+            f"Not enough{group_label} data in this state<br>"
+            "to present a statistically strong finding.<br>"
+            "<i>(Fewer than 5,000 weighted observations)</i>"
+            for a in nodata_abbrevs
+        ]
+        fig.add_trace(go.Choropleth(
+            locations=nodata_abbrevs,
+            z=[0] * len(nodata_abbrevs),
+            locationmode='USA-states',
+            colorscale=[[0, COLORS['light_gray']], [1, COLORS['light_gray']]],
+            zmin=0, zmax=1,
+            text=nodata_hover,
+            hoverinfo='text',
+            marker_line_color=COLORS['white'],
+            marker_line_width=1.5,
+            showscale=False,
+        ))
+
+    # Main data trace
+    fig.add_trace(go.Choropleth(
+        locations=state_data['abbrev'],
+        z=state_data['value'],
+        locationmode='USA-states',
+        colorscale=colorscale,
+        zmin=zmin,
+        zmax=zmax,
+        text=hover_text,
+        hoverinfo='text',
+        marker_line_color=COLORS['white'],
+        marker_line_width=1.5,
+        colorbar=dict(
+            title=dict(text=colorbar_title, font=dict(family='Hanken Grotesk', size=11)),
+            tickfont=dict(family='Hanken Grotesk', size=10),
+            len=0.6,
+        ),
+    ))
+
+    fig.update_layout(
+        title=dict(text=title_text,
+                   font=dict(family='Neuton', size=20, color=COLORS['dark_teal']), x=0),
+        geo=dict(
+            scope='usa',
+            bgcolor='rgba(0,0,0,0)',
+            lakecolor=COLORS['very_light_gray'],
+            showlakes=True,
+        ),
+        paper_bgcolor='rgba(0,0,0,0)',
+        height=520,
+        margin=dict(l=0, r=0, t=60, b=20),
+        annotations=[
+            dict(text="Gray states have fewer than 5,000 weighted observations \u2014 hover for details.",
+                 xref='paper', yref='paper', x=0.5, y=-0.02, showarrow=False, xanchor='center',
+                 font=dict(size=10, color=COLORS['muted_teal'], family='Hanken Grotesk')),
+        ],
     )
     return fig
 
